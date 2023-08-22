@@ -1,0 +1,152 @@
+{
+  "common.loading": [
+    {
+      "type": 0,
+      "value": "Extras"
+    }
+  ],
+  "components.additionalRequests.form.message.label": [
+    {
+      "type": 0,
+      "value": "Your message"
+    }
+  ],
+  "components.additionalRequests.title": [
+    {
+      "type": 0,
+      "value": "Additional Requests"
+    }
+  ],
+  "components.basket.empty.message": [
+    {
+      "type": 0,
+      "value": "Your basket is empty"
+    }
+  ],
+  "components.basket.submit": [
+    {
+      "type": 0,
+      "value": "Submit"
+    }
+  ],
+  "components.chefShops.button.print": [
+    {
+      "type": 0,
+      "value": "Submit"
+    }
+  ],
+  "components.chefShops.message": [
+    {
+      "type": 0,
+      "value": "Let us know which ingredients you already have at home, so we don't buy more than you need."
+    }
+  ],
+  "components.clientShops.button.print": [
+    {
+      "type": 0,
+      "value": "Click to Print"
+    }
+  ],
+  "components.clientShops.message": [
+    {
+      "type": 0,
+      "value": "Please find your supply list below:"
+    }
+  ],
+  "components.customizations.title": [
+    {
+      "type": 0,
+      "value": "Customizations"
+    }
+  ],
+  "components.meal.button.cancel": [
+    {
+      "type": 0,
+      "value": "Cancel"
+    }
+  ],
+  "components.meal.button.submit": [
+    {
+      "type": 0,
+      "value": "Save & Add"
+    }
+  ],
+  "components.meal.form.portions.label": [
+    {
+      "type": 0,
+      "value": "Portions"
+    }
+  ],
+  "components.meal.form.portions.large": [
+    {
+      "type": 0,
+      "value": "Large (6 portions)"
+    }
+  ],
+  "components.meal.form.portions.medium": [
+    {
+      "type": 0,
+      "value": "Medium (4 portions)"
+    }
+  ],
+  "components.meal.form.portions.small": [
+    {
+      "type": 0,
+      "value": "Small (2 portions)"
+    }
+  ],
+  "components.meal.toast.message": [
+    {
+      "type": 0,
+      "value": "was added to your basket"
+    }
+  ],
+  "components.meal.toast.title": [
+    {
+      "type": 0,
+      "value": "Yum :)"
+    }
+  ],
+  "components.menus.tabs.extras.title": [
+    {
+      "type": 0,
+      "value": "Extras"
+    }
+  ],
+  "components.menus.tabs.familyClassics.title": [
+    {
+      "type": 0,
+      "value": "Family Classics"
+    }
+  ],
+  "components.menus.tabs.history.title": [
+    {
+      "type": 0,
+      "value": "Your History"
+    }
+  ],
+  "components.menus.tabs.seasonal.title": [
+    {
+      "type": 0,
+      "value": "Seasonal"
+    }
+  ],
+  "components.requiredSelections.title": [
+    {
+      "type": 0,
+      "value": "Required selections"
+    }
+  ],
+  "components.welcomeMessage.bookingTime": [
+    {
+      "type": 0,
+      "value": "Booking Time"
+    }
+  ],
+  "components.welcomeMessage.message": [
+    {
+      "type": 0,
+      "value": "Hi"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "common.loading": {
+    "defaultMessage": "Extras"
+  },
+  "components.additionalRequests.form.message.label": {
+    "defaultMessage": "Your message"
+  },
+  "components.additionalRequests.title": {
+    "defaultMessage": "Additional Requests"
+  },
+  "components.basket.empty.message": {
+    "defaultMessage": "Your basket is empty"
+  },
+  "components.basket.submit": {
+    "defaultMessage": "Submit"
+  },
+  "components.chefShops.button.print": {
+    "defaultMessage": "Submit"
+  },
+  "components.chefShops.message": {
+    "defaultMessage": "Let us know which ingredients you already have at home, so we don't buy more than you need."
+  },
+  "components.clientShops.button.print": {
+    "defaultMessage": "Click to Print"
+  },
+  "components.clientShops.message": {
+    "defaultMessage": "Please find your supply list below:"
+  },
+  "components.customizations.title": {
+    "defaultMessage": "Customizations"
+  },
+  "components.meal.button.cancel": {
+    "defaultMessage": "Cancel"
+  },
+  "components.meal.button.submit": {
+    "defaultMessage": "Save & Add"
+  },
+  "components.meal.form.portions.label": {
+    "defaultMessage": "Portions"
+  },
+  "components.meal.form.portions.large": {
+    "defaultMessage": "Large (6 portions)"
+  },
+  "components.meal.form.portions.medium": {
+    "defaultMessage": "Medium (4 portions)"
+  },
+  "components.meal.form.portions.small": {
+    "defaultMessage": "Small (2 portions)"
+  },
+  "components.meal.toast.message": {
+    "defaultMessage": "was added to your basket"
+  },
+  "components.meal.toast.title": {
+    "defaultMessage": "Yum :)"
+  },
+  "components.menus.tabs.extras.title": {
+    "defaultMessage": "Extras"
+  },
+  "components.menus.tabs.familyClassics.title": {
+    "defaultMessage": "Family Classics"
+  },
+  "components.menus.tabs.history.title": {
+    "defaultMessage": "Your History"
+  },
+  "components.menus.tabs.seasonal.title": {
+    "defaultMessage": "Seasonal"
+  },
+  "components.requiredSelections.title": {
+    "defaultMessage": "Required selections"
+  },
+  "components.welcomeMessage.bookingTime": {
+    "defaultMessage": "Booking Time"
+  },
+  "components.welcomeMessage.message": {
+    "defaultMessage": "Hi"
+  }
+}
