@@ -8,8 +8,8 @@ export default function Error({ error, reset }) {
   }, [error]);
 
   return (
-    <section className="flex flex-col items-center justify-between p-4 max-w-6xl m-auto">
-      <div className="text-lg mb-2">Something went wrong!</div>
+    <section className="flex flex-col items-start justify-between p-4 max-w-4xl m-auto text-xs tracking-wider">
+      <div className="mb-2">Something went wrong!</div>
       <button
         onClick={
           // Attempt to recover by trying to re-render the segment

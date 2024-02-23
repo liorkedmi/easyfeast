@@ -8,8 +8,8 @@ export default function ShoppingListNotes({ notes, shopper }) {
   }
 
   return (
-    <div>
-      <div className="font-medium text-base uppercase">
+    <div className="text-xs tracking-wider text-destructive">
+      <div className="font-medium uppercase">
         {shopper === "Chef" ? (
           <FormattedMessage
             id="components.notes.chef.title"
@@ -22,9 +22,14 @@ export default function ShoppingListNotes({ notes, shopper }) {
           />
         )}
       </div>
-      <div className="text-red-600">
+      <div className="mt-2">
         {notes.map((note, index) => {
-          return <div key={`note-${index}`}>- {note}</div>;
+          return (
+            <div key={`note-${index}`}>
+              - <span className="underline">{note.name}</span>:{" "}
+              {note.description}
+            </div>
+          );
         })}
       </div>
     </div>

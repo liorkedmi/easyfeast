@@ -1,7 +1,11 @@
 import Filters from "./filters";
 import Meals from "@/components/meals";
+import Sidebar from "./sidebar";
 import base from "@/lib/airtable";
+import { cn } from "@/lib/utils";
 import { currentUser } from "@clerk/nextjs";
+
+const order = ["Poultry", "Meat", "Fish", "Vegetarian", "Vegan"];
 
 async function getBookings(email) {
   const result = [];
@@ -25,10 +29,10 @@ async function getBookings(email) {
         },
         function done(err) {
           if (err) {
-            reject(err);
+            return reject(err);
           }
 
-          resolve(result);
+          return resolve(result);
         }
       );
   });
@@ -79,10 +83,10 @@ function getMeals(bookings) {
         },
         function done(err) {
           if (err) {
-            reject(err);
+            return reject(err);
           }
 
-          resolve(result);
+          return resolve(result);
         }
       );
   });
@@ -120,34 +124,79 @@ async function getVariations(ids) {
         },
         function done(err) {
           if (err) {
-            reject(err);
+            return reject(err);
           }
 
-          resolve(result);
+          return resolve(result);
         }
       );
   });
 }
 
 function getCategories(data) {
-  const categories = [];
+  let categories = [];
 
   data.forEach((item) => {
     const category = item.fields["Category"];
-    if (categories.indexOf(category) === -1) {
-      categories.push(category);
+
+    if (categories[category] === undefined) {
+      categories[category] = {
+        label: category,
+        count: 0,
+      };
     }
+
+    categories[category].count++;
+  });
+
+  categories = Object.values(categories);
+
+  const order = ["Poultry", "Meat", "Fish", "Vegetarian", "Vegan"];
+  categories.sort((a, b) => {
+    const aIndex = order.indexOf(a.label);
+    const bIndex = order.indexOf(b.label);
+
+    if (aIndex === -1 && bIndex === -1) {
+      return 0;
+    }
+
+    if (aIndex === -1) {
+      return 1;
+    }
+
+    if (bIndex === -1) {
+      return -1;
+    }
+
+    return aIndex - bIndex;
   });
 
   return categories;
 }
 
-export default async function History() {
+function getFilters(data) {
+  const result = [];
+
+  data.forEach((item) => {
+    const filters = item.fields["Filters"];
+
+    filters?.forEach((filter) => {
+      if (result.indexOf(filter) === -1) {
+        result.push(filter);
+      }
+    });
+  });
+
+  return result;
+}
+
+export default async function History({ searchParams }) {
   const user = await currentUser();
   const email = user.emailAddresses[0].emailAddress;
   const bookings = await getBookings(email);
   const data = await getMeals(bookings);
   const categories = getCategories(data);
+  const filters = getFilters(data);
   const result = JSON.parse(JSON.stringify(data));
 
   for (const item of result) {
@@ -159,13 +208,55 @@ export default async function History() {
     }
   }
 
-  return (
-    <div className="flex gap-4">
-      <div className="flex gap-4 flex-col">
-        <Filters categories={categories} />
+  result.sort((a, b) => {
+    const aIndex = order.indexOf(a.fields["Category"]);
+    const bIndex = order.indexOf(b.fields["Category"]);
+
+    if (aIndex === -1 && bIndex === -1) {
+      return 0;
+    }
+
+    if (aIndex === -1) {
+      return 1;
+    }
+
+    if (bIndex === -1) {
+      return -1;
+    }
+
+    return aIndex - bIndex;
+  });
+
+  if (result.length === 0) {
+    return (
+      <div className="flex flex-col gap-4 w-full mt-4">
+        <h2 className="text-xs tracking-wider">
+          No items available at this point
+        </h2>
       </div>
-      <div className="grow">
-        <Meals type="history" data={result} />
+    );
+  }
+
+  return (
+    <div className="flex flex-row gap-4 w-full mt-4">
+      {categories?.length > 0 && (
+        <div className="w-1/5">
+          <Sidebar categories={categories} />
+        </div>
+      )}
+
+      <div className={cn(categories?.length > 0 ? "w-4/5" : "w-full")}>
+        <div className="flex flex-col gap-4 w-full">
+          {filters?.length > 0 && (
+            <div className="flex gap-4 flex-row">
+              <Filters filters={filters} />
+            </div>
+          )}
+
+          <div className={cn("grow", filters?.length > 0 ? "mt-4" : "")}>
+            <Meals type="history" data={result} />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -8,6 +8,21 @@ import ClientShops from "./client-shops";
 import { useSelector } from "react-redux";
 
 // TODO:
+//  - Fix the sidebar counters when filtering
+//  - Show a clear error message when there are no available bookings
+//  - Next available booking - only take bookings with a future date
+//  - Report
+//    - Recipes
+//       - Break down the recipe ingredient into a list
+//       - Highlight in red the "notes", "allergies/aversions"
+//     - Reheating Tips
+//       - This is Remove the green part from but leave the logo
+//       - Use "https://fonts.google.com/specimen/Shadows+Into+Light" font
+//    - Shopping List
+//      - Add the "red" notes for the booking
+// - Changes to the database
+//   - Menus Table
+//   -
 //  - Strings
 //  - Design (mobile compatible)
 //  - Handoff:
@@ -23,17 +38,13 @@ export default function ShoppingList() {
   const booking = useSelector((state) => state.booking);
 
   function updateShoppingList() {
-    const values = shoppingList.map((item) => item.id);
     const allShoppingList = [];
     const finalShoppingList = [];
 
     shoppingList.forEach((group) => {
       group.ingredients.forEach((item) => {
         allShoppingList.push(item.id);
-
-        if (!values.ingredients.includes(item.id)) {
-          finalShoppingList.push(item.id);
-        }
+        finalShoppingList.push(item.id);
       });
     });
 
@@ -152,12 +163,12 @@ export default function ShoppingList() {
   }, [ingredients]);
 
   useEffect(() => {
-    if (booking) {
+    if (booking && shoppingList) {
       const formData = new FormData();
 
-      const reheatingTips = `${document.location.origin}/booking/${booking.id}/reheating-tips`;
-      const shoppingList = `${document.location.origin}/booking/${booking.id}/shopping-list`;
-      const recipes = `${document.location.origin}/booking/${booking.id}/recipes`;
+      const reheatingTipsUrl = `${document.location.origin}/booking/${booking.id}/reheating-tips`;
+      const shoppingListUrl = `${document.location.origin}/booking/${booking.id}/shopping-list`;
+      const recipesUrl = `${document.location.origin}/booking/${booking.id}/recipes`;
       const clientName = booking.clientName;
       const clientAddress = booking.clientAddress;
       const chefEmail = booking.chefEmail;
@@ -166,9 +177,9 @@ export default function ShoppingList() {
         new Date(booking.datetime).getTime() + 4 * 60 * 60 * 1000
       ); // 4 hours later
 
-      formData.append("reheating_tips_url", reheatingTips);
-      formData.append("shopping_list_url", shoppingList);
-      formData.append("recipes_url", recipes);
+      formData.append("reheating_tips_url", reheatingTipsUrl);
+      formData.append("shopping_list_url", shoppingListUrl);
+      formData.append("recipes_url", recipesUrl);
       formData.append("client", clientName);
       formData.append("location", clientAddress);
       formData.append("recipient", chefEmail);
@@ -182,10 +193,14 @@ export default function ShoppingList() {
         body: formData,
       });
     }
-  }, [booking]);
+  }, [booking, shoppingList]);
 
-  if (!shoppingList) {
-    return <div>Loading</div>;
+  if (!booking || !shoppingList) {
+    return (
+      <h2 className="text-xs tracking-wider opacity-50">
+        Loading shopping list...
+      </h2>
+    );
   }
 
   return (

@@ -1,4 +1,3 @@
-import Email from "@/emails/booking-submitted";
 import base from "@/lib/airtable";
 import { getAuth } from "@clerk/nextjs/server";
 
@@ -18,10 +17,6 @@ export async function submitBooking(booking) {
     });
 
     const itemNotes = [];
-
-    item.customizations.forEach((selection) => {
-      itemNotes.push(selection);
-    });
 
     if (item.additionalRequests) {
       itemNotes.push(item.additionalRequests);
@@ -66,10 +61,10 @@ export async function submitBooking(booking) {
       base("Bookings").update([payload], function (err, records) {
         if (err) {
           console.error(err);
-          reject(err);
+          return reject(err);
         }
 
-        resolve(records[0]);
+        return resolve(records[0]);
       });
     });
   } catch (ex) {

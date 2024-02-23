@@ -1,6 +1,6 @@
 import base from "@/lib/airtable";
-import { getAuth } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs";
+import { getAuth } from "@clerk/nextjs/server";
 
 export async function fetchShoppingListIngredients(ids) {
   try {
@@ -32,10 +32,10 @@ export async function fetchShoppingListIngredients(ids) {
           },
           function done(err) {
             if (err) {
-              reject(err);
+              return reject(err);
             }
 
-            resolve(result);
+            return resolve(result);
           }
         );
     });

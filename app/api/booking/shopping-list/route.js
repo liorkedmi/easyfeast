@@ -1,4 +1,3 @@
-import Email from "@/emails/booking-submitted";
 import base from "@/lib/airtable";
 import { getAuth } from "@clerk/nextjs/server";
 
@@ -18,10 +17,10 @@ export async function updateBooking(booking) {
       base("Bookings").update([payload], function (err, records) {
         if (err) {
           console.error(err);
-          reject(err);
+          return reject(err);
         }
 
-        resolve(records[0]);
+        return resolve(records[0]);
       });
     });
   } catch (ex) {

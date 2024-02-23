@@ -39,7 +39,6 @@ export default function Basket() {
           name: item.name,
           portion: item.portion,
           requiredSelections: item.requiredSelections,
-          customizations: item.customizations,
           variations: item.variations,
           additionalRequests: item.additionalRequests,
           recipes: item.recipes,
@@ -50,7 +49,7 @@ export default function Basket() {
       }),
     })
       .then(() => {
-        router.push("/order/shopping-list");
+        router.push("/booking/order/shopping-list");
       })
       .catch((error) => {
         console.error("Error submitting booking:", error);
@@ -61,24 +60,26 @@ export default function Basket() {
     <Popover>
       <PopoverTrigger>
         <div className="relative">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-            />
-          </svg>
+          <div className="hover:opacity-50 transition-all">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.2"
+              stroke="currentColor"
+              className="w-8 h-8"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+              />
+            </svg>
+          </div>
 
           <Badge
             variant="destructive"
-            className="absolute top-[-10px] right-[-16px]"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 mt-[3px] scale-75"
           >
             {basket.items.length}
           </Badge>
@@ -86,7 +87,7 @@ export default function Basket() {
       </PopoverTrigger>
       <PopoverContent>
         {basket.items.length === 0 ? (
-          <div>
+          <div className="text-xs">
             <FormattedMessage
               id="components.basket.empty.message"
               defaultMessage="Your basket is empty"
@@ -100,16 +101,8 @@ export default function Basket() {
                   <div key={`basket-${item.id}`}>
                     <div className="flex justify-between">
                       <div className="grow shrink-1 pr-2">
-                        <div className="text-sm mb-2">{item.name}</div>
+                        <div className="text-xs mb-2">{item.name}</div>
                         {item.requiredSelections.map((item) => (
-                          <div
-                            key={`basket-menu-item-${item.id}`}
-                            className="text-xs pl-2"
-                          >
-                            - {item}
-                          </div>
-                        ))}
-                        {item.customizations.map((item) => (
                           <div
                             key={`basket-menu-item-${item.id}`}
                             className="text-xs pl-2"
@@ -152,7 +145,7 @@ export default function Basket() {
 
             <div className="flex justify-center">
               <PopoverClose asChild>
-                <Button onClick={() => submitMenu()}>
+                <Button size="sm" onClick={() => submitMenu()}>
                   <FormattedMessage
                     id="components.basket.submit"
                     defaultMessage="Submit"

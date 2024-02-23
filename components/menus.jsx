@@ -1,40 +1,57 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+"use client";
 
-import ClassicsMenu from "@/components/menus/classics";
-import ExtrasMenu from "@/components/menus/extras";
-import History from "@/components/menus/history";
-import SeasonalMenu from "@/components/menus/seasonal";
-import { Suspense } from "react";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
-export default async function Menus() {
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+
+const menuItems = [
+  {
+    name: "Seasonal Specials",
+    href: "/booking/menu/seasonal-specials",
+  },
+  {
+    name: "Main Menu",
+    href: "/booking/menu/main-menu",
+  },
+  {
+    name: "Kid Favorites",
+    href: "/booking/menu/kid-favorites",
+  },
+  {
+    name: "Your History",
+    href: "/booking/menu/your-history",
+  },
+  {
+    name: "Extras",
+    href: "/booking/menu/extras",
+  },
+];
+
+export default function Menus() {
+  const pathname = usePathname();
+
   return (
-    <Tabs defaultValue="seasonal" className="w-[800px]">
-      <TabsList className="grid w-full grid-cols-4">
-        <TabsTrigger value="seasonal">Seasonal</TabsTrigger>
-        <TabsTrigger value="classics">Family Classics</TabsTrigger>
-        <TabsTrigger value="favorites">Your History</TabsTrigger>
-        <TabsTrigger value="extras">Extras</TabsTrigger>
-      </TabsList>
-      <TabsContent value="seasonal">
-        <Suspense fallback={<h2>Loading...</h2>}>
-          <SeasonalMenu />
-        </Suspense>
-      </TabsContent>
-      <TabsContent value="classics">
-        <Suspense fallback={<h2>Loading...</h2>}>
-          <ClassicsMenu />
-        </Suspense>
-      </TabsContent>
-      <TabsContent value="favorites">
-        <Suspense fallback={<h2>Loading...</h2>}>
-          <History />
-        </Suspense>
-      </TabsContent>
-      <TabsContent value="extras">
-        <Suspense fallback={<h2>Loading...</h2>}>
-          <ExtrasMenu />
-        </Suspense>
-      </TabsContent>
-    </Tabs>
+    <ScrollArea className="w-full whitespace-nowrap">
+      <div className="mb-4 flex justify-center items-center">
+        {menuItems.map((menuItem, index) => (
+          <Link
+            href={menuItem.href}
+            key={menuItem.href}
+            className={cn(
+              "flex p-2 items-center justify-center px-4 text-center text-xs tracking-wider transition-colors hover:text-primary",
+              pathname?.startsWith(menuItem.href) ||
+                (index === 0 && pathname === "/")
+                ? "bg-muted font-medium text-primary"
+                : "text-muted-foreground"
+            )}
+          >
+            {menuItem.name}
+          </Link>
+        ))}
+      </div>
+      <ScrollBar orientation="horizontal" />
+    </ScrollArea>
   );
 }

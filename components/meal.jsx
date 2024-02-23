@@ -2,6 +2,7 @@
 
 import * as z from "zod";
 
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -26,8 +27,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 import AdditionalRequests from "./additional-requests";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
-import Customizations from "./customizations";
 import { Input } from "@/components/ui/input";
 import RequiredSelections from "./required-selections";
 import Variations from "./variations";
@@ -50,8 +49,6 @@ export default function Meal({
   portion = "Medium",
   requiredSelections = [],
   requiredSelectionsOptions = [],
-  customizations = [],
-  customizationsOptions = [],
   variations = [],
   variationsOptions = [],
   additionalRequests = "",
@@ -61,7 +58,7 @@ export default function Meal({
   const formRef = useRef(null);
   const [open, setOpen] = useState(false);
   const mealInBasket = useSelector((state) =>
-    state.basket.items.some((item) => item.id === id)
+    state.basket.items.some((item) => item.id === id || item.originalId === id)
   );
   const booking = useSelector((state) => state.booking);
   const numberOfMealsInBasket = useSelector(
@@ -89,7 +86,6 @@ export default function Meal({
             })
             .nullable()
         : z.string().array().optional(),
-    customizations: z.string().array(),
     variations: z.string().array().optional(),
     additionalRequests: z.string().nullable(),
   });
@@ -100,7 +96,6 @@ export default function Meal({
       id,
       portion,
       requiredSelections,
-      customizations,
       variations,
       additionalRequests,
     },
@@ -113,44 +108,65 @@ export default function Meal({
     }
   }, [form, booking]);
 
-  const getShoppingList = (data) => {
-    let variation = "primary";
-
-    if (data.variations.length > 0) {
-      variation = data.variations[0];
-    }
-
-    return shoppingList[variation][data.portion];
-  };
-
-  const getRecipes = (data) => {
-    let variation = "primary";
-
-    if (data.variations.length > 0) {
-      variation = data.variations[0];
-    }
-
-    return recipes[variation][data.portion];
-  };
-
-  function onSubmit(data) {
-    const shoppingList = getShoppingList(data);
-    const recipes = getRecipes(data);
-
-    const menuItem = {
+  const getMealInfo = (data) => {
+    let meal = {
       id,
       name,
-      type,
-      shoppingList,
-      recipes,
+      shoppingList: shoppingList["primary"][data.portion],
+      recipes: recipes["primary"][data.portion],
       portion: data.portion,
       requiredSelections: data.requiredSelections,
-      customizations: data.customizations,
       variations: data.variations,
       additionalRequests: data.additionalRequests,
     };
 
-    dispatch(addItem(menuItem));
+    if (data.variations.length > 0) {
+      const variationName = data.variations.join(",");
+
+      for (let i = 0; i < variationsOptions.length; i++) {
+        if (
+          variationsOptions[i].fields["Variation Name"].join(",") ===
+          variationName
+        ) {
+          meal.id = variationsOptions[i].id;
+          meal.name = variationsOptions[i].fields["Your Menu"];
+          meal.shoppingList = shoppingList[variationName][data.portion];
+          meal.recipes = recipes[variationName][data.portion];
+          meal.originalId = id;
+          break;
+        }
+      }
+    }
+
+    return meal;
+  };
+
+  function getLimitNote() {
+    if (mealInBasket) {
+      return;
+    }
+
+    if (type !== "extras") {
+      if (booking.numberOfMeals === numberOfMealsInBasket) {
+        return intl.formatMessage({
+          id: "components.meal.note.meals.limit",
+          defaultMessage: "You have reached the limit of meals",
+        });
+      }
+    } else {
+      if (booking.numberOfExtras === numberOfExtrasInBasket) {
+        return intl.formatMessage({
+          id: "components.meal.note.extras.limit",
+          defaultMessage: "You have reached the limit of extras",
+        });
+      }
+    }
+  }
+
+  function onSubmit(data) {
+    const meal = getMealInfo(data);
+
+    dispatch(addItem(meal));
 
     toast({
       title: intl.formatMessage({
@@ -159,7 +175,7 @@ export default function Meal({
       }),
       description: (
         <div className="mt-2">
-          <em className="italic">{name}</em>
+          <em className="italic">{name}</em>{" "}
           <FormattedMessage
             id="components.meal.toast.add.message"
             defaultMessage="was added to your basket"
@@ -170,17 +186,24 @@ export default function Meal({
   }
 
   return (
-    <div className="border border-input bg-background p-4">
+    <div className="border border-input bg-background p-4 hover:border-primary/70 transition-all">
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger asChild>
-          <div className="flex items-center">
-            <div className="text-sm cursor-pointer grow">{name}</div>
-            <div>{mealInBasket ? <Check color="#00a94d" /> : null}</div>
+          <div className="flex items-center gap-2 cursor-pointer">
+            <div className="flex items-center gap-2 grow">
+              <div className="text-xs tracking-wider">{name}</div>
+              <div>
+                {mealInBasket ? <Check color="#00a94d" size={16} /> : null}
+              </div>
+            </div>
+            <div>
+              {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </div>
           </div>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="flex flex-col gap-4">
-            <div className="text-sm mt-2 pt-4 border-t text-gray-700">
+          <div className="flex flex-col gap-4 w-full">
+            <div className="text-xs mt-2 pt-4 border-t text-gray-700">
               {ingredients.join(", ")}
             </div>
 
@@ -248,7 +271,7 @@ export default function Meal({
 
                 {requiredSelectionsOptions.length > 0 && (
                   <div>
-                    <div className="text-lg mb-2">
+                    <div className="text-sm mb-2">
                       <FormattedMessage
                         id="components.requiredSelections.title"
                         defaultMessage="Required selections"
@@ -264,10 +287,9 @@ export default function Meal({
                   </div>
                 )}
 
-                {customizationsOptions.length + variationsOptions.length >
-                  0 && (
+                {variationsOptions.length > 0 && (
                   <div>
-                    <div className="text-lg mb-2">
+                    <div className="text-sm mb-2">
                       <FormattedMessage
                         id="components.customizations.title"
                         defaultMessage="Customizations"
@@ -275,12 +297,6 @@ export default function Meal({
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      {customizationsOptions.length > 0 && (
-                        <Customizations
-                          form={form}
-                          data={customizationsOptions}
-                        />
-                      )}
                       {variationsOptions.length > 0 && (
                         <Variations form={form} data={variationsOptions} />
                       )}
@@ -289,7 +305,7 @@ export default function Meal({
                 )}
 
                 <div>
-                  <div className="text-lg mb-2">
+                  <div className="text-sm mb-2">
                     <FormattedMessage
                       id="components.additionalRequests.title"
                       defaultMessage="Additional Requests"
@@ -301,17 +317,25 @@ export default function Meal({
                 </div>
 
                 <div>
-                  <div className="flex flex-row justify-between">
+                  <div className="flex flex-row justify-between gap-4">
                     <CollapsibleTrigger asChild>
-                      <Button type="button" variant="outline">
+                      <Button type="button" size="sm" variant="outline">
                         <FormattedMessage
                           id="components.meal.button.cancel"
                           defaultMessage="Cancel"
                         />
                       </Button>
                     </CollapsibleTrigger>
+
+                    <div className="flex justify-end items-center grow">
+                      <span className="text-xs tracking-wider font-medium text-destructive">
+                        {getLimitNote()}
+                      </span>
+                    </div>
+
                     <Button
                       type="submit"
+                      size="sm"
                       onClick={() => {
                         if (isValid) {
                           if (formRef.current) {
@@ -323,9 +347,10 @@ export default function Meal({
                         }
                       }}
                       disabled={
-                        mealInBasket || type !== "extras"
+                        mealInBasket ||
+                        (type !== "extras"
                           ? booking.numberOfMeals === numberOfMealsInBasket
-                          : booking.numberOfExtras === numberOfExtrasInBasket
+                          : booking.numberOfExtras === numberOfExtrasInBasket)
                       }
                     >
                       <FormattedMessage

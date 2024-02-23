@@ -1,4 +1,5 @@
 import base from "@/lib/airtable";
+import { cn } from "@/lib/utils";
 
 export async function fetchBooking(id) {
   try {
@@ -22,14 +23,14 @@ export async function fetchBooking(id) {
           },
           function done(err) {
             if (err) {
-              reject(err);
+              return reject(err);
             }
 
-            if (result?.length === 0) {
-              reject(err);
+            if (!result || result?.length === 0) {
+              return reject(err);
             }
 
-            resolve(result[0]);
+            return resolve(result[0]);
           }
         );
     });
@@ -68,10 +69,10 @@ export async function fetchShoppingListIngredients(ids) {
           },
           function done(err) {
             if (err) {
-              reject(err);
+              return reject(err);
             }
 
-            resolve(result);
+            return resolve(result);
           }
         );
     });
@@ -160,39 +161,41 @@ export default async function BookingShoppingListPage({ params }) {
   });
 
   return (
-    <div>
-      {result.map((group) => {
-        return (
-          <div className="mb-4" key={group.section}>
-            <div className="font-bold">{group.section}</div>
-            <ul>
-              {group.ingredients.map((item) => {
-                const id = item.id;
+    <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto">
+      <div className="font-bold text-xl mt-4 mb-8 uppercase">Shopping List</div>
+      <div className="w-full">
+        {result.map((group) => {
+          return (
+            <div className="mb-4" key={group.section}>
+              <div className="font-semibold">{group.section}</div>
+              <ul>
+                {group.ingredients.map((item) => {
+                  const id = item.id;
 
-                return (
-                  <>
-                    <div>
+                  return (
+                    <>
                       <ol
                         key={id}
-                        className={
+                        className={cn(
+                          "text-xs tracking-wider",
                           booking.fields["Final Shopping List"].indexOf(
                             item.id
                           ) === -1
                             ? "line-through"
                             : ""
-                        }
+                        )}
                       >
                         {item.ingredient} - {item.amount} {item.unit}{" "}
                         {item.description}
                       </ol>
-                    </div>
-                  </>
-                );
-              })}
-            </ul>
-          </div>
-        );
-      })}
-    </div>
+                    </>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }

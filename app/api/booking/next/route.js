@@ -23,14 +23,14 @@ export async function fetchClient(email) {
           },
           function done(err) {
             if (err) {
-              reject(err);
+              return reject(err);
             }
 
-            if (result?.length === 0) {
-              reject(err);
+            if (!result || result?.length === 0) {
+              return reject(err);
             }
 
-            resolve(result[0]);
+            return resolve(result[0]);
           }
         );
     });
@@ -60,14 +60,14 @@ export async function fetchChef(chefId) {
           },
           function done(err) {
             if (err) {
-              reject(err);
+              return reject(err);
             }
 
-            if (result?.length === 0) {
-              reject(err);
+            if (!result || result?.length === 0) {
+              return reject(err);
             }
 
-            resolve(result[0]);
+            return resolve(result[0]);
           }
         );
     });
@@ -98,14 +98,14 @@ export async function fetchNextAvailableBooking(email) {
           },
           function done(err) {
             if (err) {
-              reject(err);
+              return reject(err);
             }
 
-            if (result?.length === 0) {
-              reject(err);
+            if (!result || result?.length === 0) {
+              return reject(err);
             }
 
-            resolve(result[0]);
+            return resolve(result[0]);
           }
         );
     });
@@ -135,6 +135,7 @@ export async function GET(req, res) {
     portionSize: client.fields["Portion Size Requested"]?.[0],
     clientAddress: client.fields["Address"],
     clientName: client.fields["Name for Chef Display"],
+    chefName: chef.fields["Name"],
     chefEmail: chef.fields["Email Address"],
   };
 

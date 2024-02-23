@@ -1,6 +1,10 @@
 import Filters from "./filters";
 import Meals from "@/components/meals";
+import Sidebar from "./sidebar";
 import base from "@/lib/airtable";
+import { cn } from "@/lib/utils";
+
+const order = ["Poultry", "Meat", "Fish", "Vegetarian", "Vegan"];
 
 async function getData() {
   const result = [];
@@ -25,10 +29,10 @@ async function getData() {
         },
         function done(err) {
           if (err) {
-            reject(err);
+            return reject(err);
           }
 
-          resolve(result);
+          return resolve(result);
         }
       );
   });
@@ -66,32 +70,76 @@ async function getVariations(ids) {
         },
         function done(err) {
           if (err) {
-            reject(err);
+            return reject(err);
           }
 
-          resolve(result);
+          return resolve(result);
         }
       );
   });
 }
 
 function getCategories(data) {
-  const categories = [];
+  let categories = [];
 
   data.forEach((item) => {
     const category = item.fields["Category"];
-    if (categories.indexOf(category) === -1) {
-      categories.push(category);
+
+    if (categories[category] === undefined) {
+      categories[category] = {
+        label: category,
+        count: 0,
+      };
     }
+
+    categories[category].count++;
+  });
+
+  categories = Object.values(categories);
+
+  const order = ["Poultry", "Meat", "Fish", "Vegetarian", "Vegan"];
+  categories.sort((a, b) => {
+    const aIndex = order.indexOf(a.label);
+    const bIndex = order.indexOf(b.label);
+
+    if (aIndex === -1 && bIndex === -1) {
+      return 0;
+    }
+
+    if (aIndex === -1) {
+      return 1;
+    }
+
+    if (bIndex === -1) {
+      return -1;
+    }
+
+    return aIndex - bIndex;
   });
 
   return categories;
 }
 
-export default async function ExtrasMenu() {
+function getFilters(data) {
+  const result = [];
+
+  data.forEach((item) => {
+    const filters = item.fields["Filters"];
+
+    filters?.forEach((filter) => {
+      if (result.indexOf(filter) === -1) {
+        result.push(filter);
+      }
+    });
+  });
+
+  return result;
+}
+
+export default async function ExtrasMenu({ searchParams }) {
   const data = await getData();
   const categories = getCategories(data);
-
+  const filters = getFilters(data);
   const result = JSON.parse(JSON.stringify(data));
 
   for (const item of result) {
@@ -103,17 +151,55 @@ export default async function ExtrasMenu() {
     }
   }
 
-  return (
-    <div className="flex gap-4">
-      <div className="flex gap-4 flex-col">
-        <Filters categories={categories} />
+  result.sort((a, b) => {
+    const aIndex = order.indexOf(a.fields["Category"]);
+    const bIndex = order.indexOf(b.fields["Category"]);
+
+    if (aIndex === -1 && bIndex === -1) {
+      return 0;
+    }
+
+    if (aIndex === -1) {
+      return 1;
+    }
+
+    if (bIndex === -1) {
+      return -1;
+    }
+
+    return aIndex - bIndex;
+  });
+
+  if (result.length === 0) {
+    return (
+      <div className="flex flex-col gap-4 w-full mt-4">
+        <h2 className="text-xs tracking-wider">
+          No items available at this point
+        </h2>
       </div>
-      <div className="grow">
-        <p>
-          Reach out to us if you&apos;d like to add any of these extras to the
-          menu
-        </p>
-        <Meals type="extras" data={result} />
+    );
+  }
+
+  return (
+    <div className="flex flex-row gap-4 w-full mt-4">
+      {categories?.length > 0 && (
+        <div className="w-1/5">
+          <Sidebar categories={categories} />
+        </div>
+      )}
+
+      <div className={cn(categories?.length > 0 ? "w-4/5" : "w-full")}>
+        <div className="flex flex-col gap-4 w-full">
+          {filters?.length > 0 && (
+            <div className="flex gap-4 flex-row">
+              <Filters filters={filters} />
+            </div>
+          )}
+
+          <div className={cn("grow", filters?.length > 0 ? "mt-4" : "")}>
+            <Meals type="extras" data={result} />
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import { Separator } from "@/components/ui/separator";
 import base from "@/lib/airtable";
 
 export async function fetchBooking(id) {
@@ -22,14 +23,14 @@ export async function fetchBooking(id) {
           },
           function done(err) {
             if (err) {
-              reject(err);
+              return reject(err);
             }
 
-            if (result?.length === 0) {
-              reject(err);
+            if (!result || result?.length === 0) {
+              return reject(err);
             }
 
-            resolve(result[0]);
+            return resolve(result[0]);
           }
         );
     });
@@ -70,10 +71,10 @@ async function fetchMenus(finalMenu) {
         },
         function done(err) {
           if (err) {
-            reject(err);
+            return reject(err);
           }
 
-          resolve(result);
+          return resolve(result);
         }
       );
   });
@@ -88,31 +89,21 @@ export default async function BookingReheatingTipsPage({ params }) {
   const menus = await fetchMenus(booking.fields["Final Menu"]);
 
   return (
-    <table class="border-collapse table-auto w-full text-sm">
-      <thead>
-        <tr>
-          <th class="border-b font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 text-left">
-            Menu
-          </th>
-          <th class="border-b font-medium p-4 pt-0 pb-3 text-slate-400 text-left">
-            Reheating Tips
-          </th>
-        </tr>
-      </thead>
-      <tbody class="bg-white">
-        {menus.map((menu) => {
-          return (
-            <tr key={menu}>
-              <td class="border-b border-slate-100 p-4 pl-8 text-slate-500">
-                {menu.fields["Your Menu"]}
-              </td>
-              <td class="border-b border-slate-100 p-4 text-slate-500">
-                {menu.fields["Reheating Tips"]}
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+    <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto text-xs tracking-wider">
+      <div className="font-bold text-xl mt-4 mb-8 uppercase">
+        Reheating Tips
+      </div>
+
+      {menus.map((menu, index) => (
+        <div key={index} className="w-full">
+          <div className="text-sm font-bold mb-4 underline">
+            {menu.fields["Your Menu"]}
+          </div>
+          <div>{menu.fields["Reheating Tips"]}</div>
+
+          {index < menus.length - 1 && <Separator className="my-8" />}
+        </div>
+      ))}
+    </section>
   );
 }

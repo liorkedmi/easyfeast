@@ -1,46 +1,51 @@
 "use client";
 
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useRouter, useSearchParams } from "next/navigation";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { createUrl } from "@/lib/utils";
 
-export default function Filters({ categories }) {
+export default function Filters({ filters }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const urlSearchParams = new URLSearchParams(searchParams.toString());
+  let currentFilters = "";
+
+  if (urlSearchParams.get("filter")) {
+    currentFilters = urlSearchParams.get("filter").split(",");
+  }
+
+  if (filters.length === 0) {
+    return null;
+  }
 
   return (
-    <>
-      {categories.map((category) => (
-        <div key={`filter-${category}`} className="items-top flex space-x-2">
-          <Checkbox
-            id={`filter-${category}`}
-            checked={searchParams?.get("filter")?.indexOf(category) > -1}
-            onCheckedChange={(checked) => {
-              const newParams = new URLSearchParams(searchParams.toString());
-              const currentFilter = (newParams.get("filter") || "")?.split(",");
-              let newFilter = currentFilter;
-
-              if (checked) {
-                newFilter.push(category);
-                newParams.set("filter", newFilter.join(","));
-              } else {
-                newFilter = newFilter.filter((item) => item !== category);
-                newParams.set("filter", newFilter.join(","));
-              }
-
-              router.push(createUrl("/", newParams));
-            }}
-          />
-          <div className="grid gap-1.5 leading-none">
-            <label
-              htmlFor={`filter-${category}`}
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+    <div className="flex items-center justify-center gap-4">
+      <span className="text-xs tracking-wider underline">Filters By:</span>
+      <div className="flex items-center justify-center gap-1">
+        <ToggleGroup
+          type="multiple"
+          size="sm"
+          variant="outline"
+          defaultValue={currentFilters}
+          onValueChange={(value) => {
+            const newParams = new URLSearchParams(searchParams.toString());
+            newParams.set("filter", value.join(","));
+            router.push(createUrl(document.location.pathname, newParams));
+          }}
+        >
+          {filters.map((filter) => (
+            <ToggleGroupItem
+              key={`filter-${filter}`}
+              value={filter}
+              aria-label={`Toggle ${filter}`}
             >
-              {category}
-            </label>
-          </div>
-        </div>
-      ))}
-    </>
+              <span className="text-xs tracking-wider">{filter}</span>
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
+      </div>
+    </div>
   );
 }

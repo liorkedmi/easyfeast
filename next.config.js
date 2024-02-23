@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  productionBrowserSourceMaps: true,
   experimental: {
     serverActions: true,
   },
@@ -15,7 +16,7 @@ const nextConfig = {
     return [
       {
         source: "/",
-        destination: "/order",
+        destination: "/booking/menu/seasonal-specials",
         permanent: true,
       },
     ];

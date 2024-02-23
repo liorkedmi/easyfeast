@@ -9,39 +9,68 @@ import { UserButton } from "@clerk/nextjs";
 import WelcomeMessage from "@/components/welcome-message";
 import { useUser } from "@clerk/nextjs";
 
-function PageHeader() {
+function PageHeader({ bookingInfo, menu, mode }) {
   const { user } = useUser();
 
   return (
-    <header className="flex items-center justify-start w-full mb-8 gap-4">
-      <div>
-        <Link href="/">
-          <Image
-            className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-            src="/logo.png"
-            alt="EasyFeast"
-            width={182}
-            height={27}
-            priority
-          />
-        </Link>
-      </div>
-
-      {user ? (
+    <header className="w-full">
+      <div className="flex items-center justify-start gap-4 mb-4">
         <>
-          <div className="grow">
-            <WelcomeMessage />
+          <div className="w-1/3">
+            {menu && (
+              <nav>
+                <menu>
+                  <ul>
+                    <li className="uppercase text-xs font-semibold tracking-wider">
+                      <a
+                        href="https://www.easyfeast.com/contact-2"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="color-[#1d1d1d] hover:opacity-50 transition-all"
+                      >
+                        {user ? (
+                          <span>Hi {user.firstName}, need help?</span>
+                        ) : (
+                          <span>Need help?</span>
+                        )}
+                      </a>
+                    </li>
+                  </ul>
+                </menu>
+              </nav>
+            )}
           </div>
 
-          <div>
-            <UserButton afterSignOutUrl="/" />
+          <div className="w-1/3 flex items-center justify-center">
+            <Link href="/" className="hover:opacity-75 transition-all">
+              <Image
+                className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
+                src="/logo.png"
+                alt="EasyFeast"
+                width={118}
+                height={18}
+                priority
+              />
+            </Link>
           </div>
 
-          <div>
-            <Basket />
+          <div className="w-1/3 flex items-center justify-center">
+            {menu && (
+              <div className="flex items-center justify-end w-full gap-4">
+                {user ? <UserButton afterSignOutUrl="/" /> : null}
+                <Basket />
+              </div>
+            )}
           </div>
         </>
-      ) : null}
+      </div>
+
+      <div
+        className="bg-[#004c45] text-white p-2"
+        style={{ WebkitPrintColorAdjust: "exact" }}
+      >
+        <WelcomeMessage bookingInfo={bookingInfo} mode={mode} />
+      </div>
     </header>
   );
 }

@@ -53,21 +53,12 @@ export const selectNotes = createSelector(
     let notes = [];
 
     for (let i = 0; i < items.length; i++) {
-      for (let j = 0; j < items[i].requiredSelections.length; j++) {
-        if (notes.indexOf(items[i].requiredSelections[j]) === -1) {
-          notes.push(items[i].requiredSelections[j]);
-        }
-      }
-
-      for (let j = 0; j < items[i].customizations.length; j++) {
-        if (notes.indexOf(items[i].customizations[j]) === -1) {
-          notes.push(items[i].customizations[j]);
-        }
-      }
-
       if (items[i].additionalRequests) {
         if (notes.indexOf(items[i].additionalRequests) === -1) {
-          notes.push(items[i].additionalRequests);
+          notes.push({
+            name: items[i].name,
+            description: items[i].additionalRequests,
+          });
         }
       }
     }

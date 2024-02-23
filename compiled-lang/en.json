@@ -1,10 +1,4 @@
 {
-  "common.loading": [
-    {
-      "type": 0,
-      "value": "Extras"
-    }
-  ],
   "components.additionalRequests.form.message.label": [
     {
       "type": 0,
@@ -29,18 +23,6 @@
       "value": "Submit"
     }
   ],
-  "components.chefShops.button.print": [
-    {
-      "type": 0,
-      "value": "Submit"
-    }
-  ],
-  "components.chefShops.message": [
-    {
-      "type": 0,
-      "value": "Let us know which ingredients you already have at home, so we don't buy more than you need."
-    }
-  ],
   "components.clientShops.button.print": [
     {
       "type": 0,
@@ -50,7 +32,7 @@
   "components.clientShops.message": [
     {
       "type": 0,
-      "value": "Please find your supply list below:"
+      "value": "Please find your supply list here:"
     }
   ],
   "components.customizations.title": [
@@ -95,40 +77,40 @@
       "value": "Small (2 portions)"
     }
   ],
-  "components.meal.toast.message": [
+  "components.meal.note.extras.limit": [
+    {
+      "type": 0,
+      "value": "You have reached the limit of extras"
+    }
+  ],
+  "components.meal.note.meals.limit": [
+    {
+      "type": 0,
+      "value": "You have reached the limit of meals"
+    }
+  ],
+  "components.meal.toast.add.message": [
     {
       "type": 0,
       "value": "was added to your basket"
     }
   ],
-  "components.meal.toast.title": [
+  "components.meal.toast.add.title": [
     {
       "type": 0,
       "value": "Yum :)"
     }
   ],
-  "components.menus.tabs.extras.title": [
+  "components.notes.chef.title": [
     {
       "type": 0,
-      "value": "Extras"
+      "value": "Client requested the following adjustments, please update the grocery shopping list accordingly"
     }
   ],
-  "components.menus.tabs.familyClassics.title": [
+  "components.notes.client.title": [
     {
       "type": 0,
-      "value": "Family Classics"
-    }
-  ],
-  "components.menus.tabs.history.title": [
-    {
-      "type": 0,
-      "value": "Your History"
-    }
-  ],
-  "components.menus.tabs.seasonal.title": [
-    {
-      "type": 0,
-      "value": "Seasonal"
+      "value": "You requested the following adjustments, please update the grocery shopping list accordingly"
     }
   ],
   "components.requiredSelections.title": [
@@ -137,16 +119,22 @@
       "value": "Required selections"
     }
   ],
-  "components.welcomeMessage.bookingTime": [
+  "components.welcomeMessage.loadBookingInformation": [
     {
       "type": 0,
-      "value": "Booking Time"
+      "value": "Loading booking information"
     }
   ],
-  "components.welcomeMessage.message": [
+  "components.welcomeMessage.loadNextAvailableBooking": [
     {
       "type": 0,
-      "value": "Hi"
+      "value": "Loading next available booking"
+    }
+  ],
+  "components.welcomeMessage.nextBooking": [
+    {
+      "type": 0,
+      "value": "Please select your menu for"
     }
   ]
 }

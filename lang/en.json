@@ -1,7 +1,4 @@
 {
-  "common.loading": {
-    "defaultMessage": "Extras"
-  },
   "components.additionalRequests.form.message.label": {
     "defaultMessage": "Your message"
   },
@@ -14,17 +11,11 @@
   "components.basket.submit": {
     "defaultMessage": "Submit"
   },
-  "components.chefShops.button.print": {
-    "defaultMessage": "Submit"
-  },
-  "components.chefShops.message": {
-    "defaultMessage": "Let us know which ingredients you already have at home, so we don't buy more than you need."
-  },
   "components.clientShops.button.print": {
     "defaultMessage": "Click to Print"
   },
   "components.clientShops.message": {
-    "defaultMessage": "Please find your supply list below:"
+    "defaultMessage": "Please find your supply list here:"
   },
   "components.customizations.title": {
     "defaultMessage": "Customizations"
@@ -47,31 +38,34 @@
   "components.meal.form.portions.small": {
     "defaultMessage": "Small (2 portions)"
   },
-  "components.meal.toast.message": {
+  "components.meal.note.extras.limit": {
+    "defaultMessage": "You have reached the limit of extras"
+  },
+  "components.meal.note.meals.limit": {
+    "defaultMessage": "You have reached the limit of meals"
+  },
+  "components.meal.toast.add.message": {
     "defaultMessage": "was added to your basket"
   },
-  "components.meal.toast.title": {
+  "components.meal.toast.add.title": {
     "defaultMessage": "Yum :)"
   },
-  "components.menus.tabs.extras.title": {
-    "defaultMessage": "Extras"
+  "components.notes.chef.title": {
+    "defaultMessage": "Client requested the following adjustments, please update the grocery shopping list accordingly"
   },
-  "components.menus.tabs.familyClassics.title": {
-    "defaultMessage": "Family Classics"
-  },
-  "components.menus.tabs.history.title": {
-    "defaultMessage": "Your History"
-  },
-  "components.menus.tabs.seasonal.title": {
-    "defaultMessage": "Seasonal"
+  "components.notes.client.title": {
+    "defaultMessage": "You requested the following adjustments, please update the grocery shopping list accordingly"
   },
   "components.requiredSelections.title": {
     "defaultMessage": "Required selections"
   },
-  "components.welcomeMessage.bookingTime": {
-    "defaultMessage": "Booking Time"
+  "components.welcomeMessage.loadBookingInformation": {
+    "defaultMessage": "Loading booking information"
   },
-  "components.welcomeMessage.message": {
-    "defaultMessage": "Hi"
+  "components.welcomeMessage.loadNextAvailableBooking": {
+    "defaultMessage": "Loading next available booking"
+  },
+  "components.welcomeMessage.nextBooking": {
+    "defaultMessage": "Please select your menu for"
   }
 }

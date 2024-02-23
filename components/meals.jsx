@@ -22,14 +22,30 @@ export default function Meals({ type, data }) {
   };
 
   const params = new URLSearchParams(searchParams.toString());
-  const filter = (params.get("filter") || "")?.split(",");
+
+  let filter;
+  if (params.get("filter")) {
+    filter = (params.get("filter") || "")?.split(",");
+  }
 
   const filteredMeals = data.filter((meal) => {
-    if (filter.length === 1) {
-      return true;
+    let result = false;
+
+    if (!filter && !filter) {
+      result = true;
     }
 
-    return filter?.indexOf(meal.fields["Category"]) > -1;
+    if (filter) {
+      result ||= filter?.indexOf(meal.fields["Category"]) > -1;
+    }
+
+    if (filter) {
+      for (const sub of filter) {
+        result ||= meal.fields["Filters"]?.indexOf(sub) > -1;
+      }
+    }
+
+    return result;
   });
 
   const meals = groupByCategory(filteredMeals);
@@ -39,7 +55,9 @@ export default function Meals({ type, data }) {
     <>
       {groups.map((group) => (
         <div key={`group-${group}`} className="pb-4">
-          <div className="text-lg mb-2">{group}</div>
+          <div id={group} className="text-sm font-semibold tracking-wider mb-2">
+            {group}
+          </div>
           {meals[group].map((menu) => {
             const shoppingList = {
               primary: {
@@ -92,11 +110,6 @@ export default function Meals({ type, data }) {
                   shoppingList={shoppingList}
                   recipes={recipes}
                   requiredSelectionsOptions={menu.fields["Required Selections"]}
-                  customizationsOptions={
-                    menu.fields[
-                      "Meal Customizations (NO recipe for the customization)"
-                    ]
-                  }
                   variationsOptions={
                     menu.fields["Link to the Variations of this Meal"]
                   }

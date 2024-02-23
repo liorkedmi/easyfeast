@@ -11,7 +11,10 @@ export default function ClientShops({ booking, notes, shoppingList }) {
   };
 
   function updateShoppingList() {
-    const values = shoppingList.map((item) => item.id);
+    const values = shoppingList
+      .map((group) => group.ingredients)
+      .flat()
+      .map((item) => item.id);
     const allShoppingList = [];
     const finalShoppingList = [];
 
@@ -19,7 +22,7 @@ export default function ClientShops({ booking, notes, shoppingList }) {
       group.ingredients.forEach((item) => {
         allShoppingList.push(item.id);
 
-        if (!values.ingredients.includes(item.id)) {
+        if (!values.includes(item.id)) {
           finalShoppingList.push(item.id);
         }
       });
@@ -45,36 +48,34 @@ export default function ClientShops({ booking, notes, shoppingList }) {
   return (
     <>
       <div className="flex flex-col gap-2">
-        <div>
-          <FormattedMessage
-            id="components.clientShops.message"
-            defaultMessage="Please find your supply list below:"
-          />
-        </div>
-
         {notes.length > 0 ? (
-          <div className="mb-4">
+          <div>
             <Notes notes={notes} shopper="Client" />
           </div>
         ) : null}
 
+        <div className="mt-4">
+          <div className="text-xs tracking-wider">
+            <FormattedMessage
+              id="components.clientShops.message"
+              defaultMessage="Please find your supply list here:"
+            />
+          </div>
+        </div>
+
         {shoppingList.map((group) => {
           return (
-            <div className="mb-4" key={group.section}>
+            <div className="mt-4" key={group.section}>
               <div className="font-bold">{group.section}</div>
               <ul>
                 {group.ingredients.map((item) => {
                   const id = item.id;
 
                   return (
-                    <>
-                      <div>
-                        <ol key={id}>
-                          {item.ingredient} - {item.amount} {item.unit}{" "}
-                          {item.description}
-                        </ol>
-                      </div>
-                    </>
+                    <ol key={id} className="text-xs tracking-wider">
+                      {item.ingredient} - {item.amount} {item.unit}{" "}
+                      {item.description}
+                    </ol>
                   );
                 })}
               </ul>
@@ -83,8 +84,13 @@ export default function ClientShops({ booking, notes, shoppingList }) {
         })}
       </div>
 
-      <div className="flex">
-        <Button type="button" variant="default" onClick={() => onPrint()}>
+      <div className="flex mt-4">
+        <Button
+          type="button"
+          size="sm"
+          variant="default"
+          onClick={() => onPrint()}
+        >
           <FormattedMessage
             id="components.clientShops.button.print"
             defaultMessage="Click to Print"
