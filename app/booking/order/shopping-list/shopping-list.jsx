@@ -8,21 +8,18 @@ import ClientShops from "./client-shops";
 import { useSelector } from "react-redux";
 
 // TODO:
-//  - Fix the sidebar counters when filtering
+//  V Fix the sidebar counters when filtering
 //  - Show a clear error message when there are no available bookings
 //  - Next available booking - only take bookings with a future date
 //  - Report
 //    - Recipes
 //       - Break down the recipe ingredient into a list
-//       - Highlight in red the "notes", "allergies/aversions"
+//       V Highlight in red the "notes", "allergies/aversions"
 //     - Reheating Tips
 //       - This is Remove the green part from but leave the logo
-//       - Use "https://fonts.google.com/specimen/Shadows+Into+Light" font
-//    - Shopping List
-//      - Add the "red" notes for the booking
-// - Changes to the database
-//   - Menus Table
-//   -
+//       V Use "https://fonts.google.com/specimen/Shadows+Into+Light" font
+//    V Shopping List
+//      V Add the "red" notes for the booking
 //  - Strings
 //  - Design (mobile compatible)
 //  - Handoff:

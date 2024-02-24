@@ -194,7 +194,20 @@ export default async function History({ searchParams }) {
   const user = await currentUser();
   const email = user.emailAddresses[0].emailAddress;
   const bookings = await getBookings(email);
-  const data = await getMeals(bookings);
+  let data = await getMeals(bookings);
+
+  data = data.filter((item) => {
+    if (searchParams?.filter) {
+      const params = searchParams?.filter
+        ?.split(",")
+        .map((item) => item.trim());
+
+      return params.some((filter) => item.fields["Filters"]?.includes(filter));
+    }
+
+    return true;
+  });
+
   const categories = getCategories(data);
   const filters = getFilters(data);
   const result = JSON.parse(JSON.stringify(data));

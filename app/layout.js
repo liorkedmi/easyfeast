@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import LocalizationProvider from "@/components/localization-provider";
 import { Providers } from "@/redux/provider";
 import { Toaster } from "@/components/ui/toaster";
+import { shadowsIntoLightClass } from "@/lib/font";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,7 +18,7 @@ export default function RootLayout({ children }) {
   return (
     <LocalizationProvider>
       <ClerkProvider>
-        <html lang="en">
+        <html lang="en" className={shadowsIntoLightClass}>
           <body className={inter.className}>
             <Providers>{children}</Providers>
             <Toaster />

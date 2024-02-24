@@ -138,9 +138,21 @@ function getFilters(data) {
 
 export default async function ClassicsMenu({ searchParams }) {
   let data = await getData();
+
+  data = data.filter((item) => {
+    if (searchParams?.filter) {
+      const params = searchParams?.filter
+        ?.split(",")
+        .map((item) => item.trim());
+
+      return params.some((filter) => item.fields["Filters"]?.includes(filter));
+    }
+
+    return true;
+  });
+
   const categories = getCategories(data);
   const filters = getFilters(data);
-
   const result = JSON.parse(JSON.stringify(data));
 
   for (const item of result) {

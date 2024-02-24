@@ -164,6 +164,12 @@ export default async function BookingShoppingListPage({ params }) {
     <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto">
       <div className="font-bold text-xl mt-4 mb-8 uppercase">Shopping List</div>
       <div className="w-full">
+        <div className="mb-4 text-xs tracking-wider text-red-600">
+          <p className="font-bold">Notes:</p>
+          <p className="whitespace-pre-line">
+            {booking.fields["Notes for chef about the Menu"]}
+          </p>
+        </div>
         {result.map((group) => {
           return (
             <div className="mb-4" key={group.section}>

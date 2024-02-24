@@ -396,7 +396,7 @@ export default async function BookingRecipesPage({ params }) {
               <td className="p-2 w-1/3 border-b border-slate-200 text-bold">
                 Allergies/Aversions:
               </td>
-              <td className="p-2 w-2/3 border-b border-slate-200 whitespace-pre-line">
+              <td className="p-2 w-2/3 border-b border-slate-200 text-red-600 whitespace-pre-line">
                 {client.fields["Allergies/Dislikes:"]}
               </td>
             </tr>
