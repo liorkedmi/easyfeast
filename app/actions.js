@@ -194,7 +194,8 @@ export async function getSessionInfo(id = null) {
 
     return result;
   } catch (ex) {
-    console.log(JSON.stringify(ex));
+    console.log("Error.toString:" + ex.toString());
+    console.log("Error.message:" + ex.message);
     return { error: true, error: ex.message };
   }
 }
