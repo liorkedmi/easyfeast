@@ -173,6 +173,10 @@ export async function getSessionInfo(id = null) {
       booking = await fetchNextAvailableBooking(email);
     }
 
+    console.log("Booking:" + JSON.stringify(booking.fields));
+    console.log("Client:" + JSON.stringify(client.fields));
+    console.log("Chef:" + JSON.stringify(chef.fields));
+
     const client = await fetchClient(email);
     const chef = await fetchChef(booking.fields["Chef"][0]);
 
