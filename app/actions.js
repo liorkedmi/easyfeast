@@ -118,7 +118,7 @@ export async function fetchBooking(id) {
 export async function fetchNextAvailableBooking(email) {
   try {
     const result = [];
-    const filterByFormula = `AND({Final Menu}=BLANK(), {Email}='${email}')`;
+    const filterByFormula = `AND({Final Menu}=BLANK(), {Email}='${email}', IS_AFTER({Booking Date and Arrival Time}, NOW()))`;
 
     return new Promise((resolve, reject) => {
       base("Bookings")
@@ -141,7 +141,7 @@ export async function fetchNextAvailableBooking(email) {
             }
 
             if (!result || result?.length === 0) {
-              return reject(err);
+              return reject(new Error("No bookings found"));
             }
 
             return resolve(result[0]);
@@ -198,8 +198,8 @@ export async function getSessionInfo(id = null) {
 
     return result;
   } catch (ex) {
-    console.log("Error.toString:" + ex.toString());
-    console.log("Error.message:" + ex.message);
+    // console.log("Error.toString:" + ex.toString());
+    // console.log("Error.message:" + ex.message);
     return { error: true, error: ex.message };
   }
 }

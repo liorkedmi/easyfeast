@@ -501,11 +501,15 @@ export default async function BookingRecipesPage({ params }) {
             </div>
 
             <div className="mb-4">
-              <div className="text-xs font-bold mb-4">Recipe Ingredients</div>
+              <div className="text-xs font-bold mb-4">Recipe Ingredients:</div>
               <div className="mb-4 whitespace-pre-line">
-                {ingredients
-                  .map((ingredient) => ingredient.fields["Ingredient List"])
-                  .join(", ")}
+                <ul className="list-disc pl-8">
+                  {ingredients.map((ingredient) => (
+                    <li key={ingredient}>
+                      {ingredient.fields["Ingredient List"]}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
 

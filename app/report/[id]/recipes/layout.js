@@ -9,7 +9,14 @@ export default async function MenuLayout({ children, params }) {
       <main className="flex flex-col items-start justify-between p-4 max-w-4xl m-auto">
         <PageHeader bookingInfo={bookingInfo} menu={false} mode="report" />
       </main>
-      <div className="pb-4">{!bookingInfo.error && children}</div>
+
+      {!bookingInfo.error ? (
+        <div className="pb-4">{children}</div>
+      ) : (
+        <section className="flex flex-col items-start justify-between p-4 max-w-4xl m-auto">
+          <div className="pb-4 text-xs tracking-wider">No bookings found</div>
+        </section>
+      )}
     </>
   );
 }
