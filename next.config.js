@@ -2,7 +2,7 @@
 const nextConfig = {
   productionBrowserSourceMaps: true,
   experimental: {
-    serverActions: true,
+    allowedOrigins: [],
   },
   images: {
     remotePatterns: [
