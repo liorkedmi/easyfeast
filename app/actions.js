@@ -121,32 +121,48 @@ export async function fetchNextAvailableBooking(email) {
     const filterByFormula = `AND({Final Menu}=BLANK(), {Email}='${email}')`;
 
     return new Promise((resolve, reject) => {
-      base("Bookings")
-        .select({
-          maxRecords: 1,
-          view: "Booking Master",
-          filterByFormula,
-        })
-        .eachPage(
-          function page(records, fetchNextPage) {
-            records.forEach((record) => {
-              result.push(record);
-            });
+      try {
+        base("Bookings")
+          .select({
+            maxRecords: 1,
+            view: "Booking Master",
+            filterByFormula,
+          })
+          .eachPage(
+            function page(records, fetchNextPage) {
+              try {
+                records.forEach((record) => {
+                  result.push(record);
+                });
 
-            fetchNextPage();
-          },
-          function done(err) {
-            if (err) {
-              return reject(err);
+                fetchNextPage();
+              } catch (ex) {
+                console.log("fetchNextAvailableBooking:promise:done:page", ex);
+              }
+            },
+            function done(err) {
+              try {
+                if (err) {
+                  console.log(
+                    "fetchNextAvailableBooking:promise:done:error",
+                    err
+                  );
+                  return reject(err);
+                }
+
+                if (!result || result?.length === 0) {
+                  return reject(err);
+                }
+
+                return resolve(result[0]);
+              } catch (ex) {
+                console.log("fetchNextAvailableBooking:promise:done:catch", ex);
+              }
             }
-
-            if (!result || result?.length === 0) {
-              return reject(err);
-            }
-
-            return resolve(result[0]);
-          }
-        );
+          );
+      } catch (ex) {
+        console.log("fetchNextAvailableBooking:promise:error", ex);
+      }
     });
   } catch (ex) {
     console.log("Error:", ex);
