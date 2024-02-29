@@ -173,6 +173,8 @@ export async function getSessionInfo(id = null) {
       booking = await fetchNextAvailableBooking(email);
     }
 
+    console.log("booking:", booking);
+
     const client = await fetchClient(email);
     const chef = await fetchChef(booking.fields["Chef"][0]);
 
