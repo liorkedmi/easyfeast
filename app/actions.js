@@ -121,48 +121,32 @@ export async function fetchNextAvailableBooking(email) {
     const filterByFormula = `AND({Final Menu}=BLANK(), {Email}='${email}')`;
 
     return new Promise((resolve, reject) => {
-      try {
-        base("Bookings")
-          .select({
-            maxRecords: 1,
-            view: "Booking Master",
-            filterByFormula,
-          })
-          .eachPage(
-            function page(records, fetchNextPage) {
-              try {
-                records.forEach((record) => {
-                  result.push(record);
-                });
+      base("Bookings")
+        .select({
+          maxRecords: 1,
+          view: "Booking Master",
+          filterByFormula,
+        })
+        .eachPage(
+          function page(records, fetchNextPage) {
+            records.forEach((record) => {
+              result.push(record);
+            });
 
-                fetchNextPage();
-              } catch (ex) {
-                console.log("fetchNextAvailableBooking:promise:done:page", ex);
-              }
-            },
-            function done(err) {
-              try {
-                if (err) {
-                  console.log(
-                    "fetchNextAvailableBooking:promise:done:error",
-                    err
-                  );
-                  return reject(err);
-                }
-
-                if (!result || result?.length === 0) {
-                  return reject(err);
-                }
-
-                return resolve(result[0]);
-              } catch (ex) {
-                console.log("fetchNextAvailableBooking:promise:done:catch", ex);
-              }
+            fetchNextPage();
+          },
+          function done(err) {
+            if (err) {
+              return reject(err);
             }
-          );
-      } catch (ex) {
-        console.log("fetchNextAvailableBooking:promise:error", ex);
-      }
+
+            if (!result || result?.length === 0) {
+              return reject(err);
+            }
+
+            return resolve(result[0]);
+          }
+        );
     });
   } catch (ex) {
     console.log("Error:", ex);
@@ -180,6 +164,8 @@ export async function getSessionInfo(id = null) {
 
     const email = user.emailAddresses[0].emailAddress;
     let booking = null;
+
+    console.log("getSessionInfo:", email);
 
     if (id) {
       booking = await fetchBooking(id);
