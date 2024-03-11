@@ -16,6 +16,10 @@ module.exports = {
       },
     },
     extend: {
+      screens: {
+        print: { raw: "print" },
+        screen: { raw: "screen" },
+      },
       fontFamily: {
         shadowsIntoLight: ["var(--font-shadows-into-light)"],
       },

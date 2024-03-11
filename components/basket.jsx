@@ -43,13 +43,13 @@ export default function Basket() {
           additionalRequests: item.additionalRequests,
           recipes: item.recipes,
         })),
-        reheatingTipsUrl: `${document.location.origin}/booking/${booking.id}/reheating-tips`,
-        shoppingListUrl: `${document.location.origin}/booking/${booking.id}/shopping-list`,
-        recipesUrl: `${document.location.origin}/booking/${booking.id}/recipes`,
+        reheatingTipsUrl: `${document.location.origin}/report/${booking.id}/reheating-tips`,
+        shoppingListUrl: `${document.location.origin}/report/${booking.id}/shopping-list`,
+        recipesUrl: `${document.location.origin}/report/${booking.id}/recipes`,
       }),
     })
       .then(() => {
-        router.push("/booking/order/shopping-list");
+        router.push(`/booking/order/shopping-list/${booking.id}`);
       })
       .catch((error) => {
         console.error("Error submitting booking:", error);
@@ -148,7 +148,7 @@ export default function Basket() {
                 <Button size="sm" onClick={() => submitMenu()}>
                   <FormattedMessage
                     id="components.basket.submit"
-                    defaultMessage="Submit"
+                    defaultMessage="Proceed to grocery shopping list"
                   />
                 </Button>
               </PopoverClose>

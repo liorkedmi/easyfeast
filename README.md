@@ -35,5 +35,5 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ## To extract translations
 
-pnpm extract '\*_/_.jsx' --out-file lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'
+pnpm extract '**/*.jsx' --out-file lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'
 pnpm compile lang/en.json --ast --out-file compiled-lang/en.json

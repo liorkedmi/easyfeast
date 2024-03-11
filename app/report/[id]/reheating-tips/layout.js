@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import PageHeader from "@/components/page-header";
 import { getSessionInfo } from "@/app/actions";
 
 export default async function MenuLayout({ children, params }) {

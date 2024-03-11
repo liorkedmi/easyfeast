@@ -154,18 +154,25 @@ export async function fetchNextAvailableBooking(email) {
 }
 
 export async function getSessionInfo(id = null) {
+  // For testing purposes, we allow passing the user email address as a parameter
   try {
-    const user = await currentUser();
+    let user;
+    let email;
 
-    if (!user) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
+    if (true) {
+      user = await currentUser();
+
+      if (!user) {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+
+      email = user.emailAddresses[0].emailAddress;
+    } else {
+      //
     }
 
-    const email = user.emailAddresses[0].emailAddress;
     let booking = null;
-
-    console.log("getSessionInfo:", email);
 
     if (id) {
       booking = await fetchBooking(id);

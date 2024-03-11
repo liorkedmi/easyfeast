@@ -26,7 +26,7 @@ export default function AdditionalRequests({ form }) {
           </FormLabel>
           <FormControl>
             <Textarea
-              placeholder="Tell us if you have any additional requests..."
+              placeholder={`Anything else you'd like to request for this dish? (e.g., "omit cilantro" or "cook salmon to medium rare")`}
               className="resize-none"
               {...field}
             />

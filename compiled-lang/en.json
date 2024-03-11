@@ -20,7 +20,7 @@
   "components.basket.submit": [
     {
       "type": 0,
-      "value": "Submit"
+      "value": "Proceed to grocery shopping list"
     }
   ],
   "components.clientShops.button.print": [
@@ -32,7 +32,15 @@
   "components.clientShops.message": [
     {
       "type": 0,
-      "value": "Please find your supply list here:"
+      "value": "Please find the grocery shopping list for your booking on "
+    },
+    {
+      "type": 1,
+      "value": "bookingDate"
+    },
+    {
+      "type": 0,
+      "value": ". Please purchase each of the items on the list or check that you have the items already in stock at home"
     }
   ],
   "components.customizations.title": [
@@ -119,6 +127,12 @@
       "value": "Required selections"
     }
   ],
+  "components.welcomeMessage.error": [
+    {
+      "type": 0,
+      "value": "Error loading booking information"
+    }
+  ],
   "components.welcomeMessage.loadBookingInformation": [
     {
       "type": 0,
@@ -131,10 +145,26 @@
       "value": "Loading next available booking"
     }
   ],
-  "components.welcomeMessage.nextBooking": [
+  "components.welcomeMessage.prefix": [
     {
       "type": 0,
-      "value": "Please select your menu for"
+      "value": "Greetings, "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": "! Please select your "
+    },
+    {
+      "type": 1,
+      "value": "upcomingMenu"
+    },
+    {
+      "type": 0,
+      "value": " from any of the categories below:"
     }
   ]
 }

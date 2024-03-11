@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useDispatch, useSelector } from "react-redux";
 
 import { FormattedMessage } from "react-intl";
@@ -45,20 +50,37 @@ export default function WelcomeMessage({ bookingInfo, mode }) {
             <>
               <>
                 {mode === "booking" ? (
-                  <span className="text-sm">
-                    <FormattedMessage
-                      id="components.welcomeMessage.prefix"
-                      defaultMessage="Please select your menu for"
-                    />{" "}
-                    <span className="font-semibold">
+                  <>
+                    <span className="text-sm print:hidden">
+                      <FormattedMessage
+                        id="components.welcomeMessage.prefix"
+                        defaultMessage="Greetings, {name}! Please select your {upcomingMenu} from any of the categories below:"
+                        values={{
+                          name: user.firstName,
+                          upcomingMenu: (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="underline decoration-dotted">
+                                  upcoming menu
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <span className="font-semibold">
+                                  {dateFormatter.format(
+                                    new Date(booking.datetime)
+                                  )}
+                                </span>
+                              </TooltipContent>
+                            </Tooltip>
+                          ),
+                        }}
+                      />
+                    </span>
+                    <span className="text-sm screen:hidden">
+                      Chef {booking.chefName} | {booking.clientName} |{" "}
                       {dateFormatter.format(new Date(booking.datetime))}
-                    </span>{" "}
-                    <FormattedMessage
-                      id="components.welcomeMessage.suffix"
-                      defaultMessage="from any of the categories below"
-                    />
-                    :
-                  </span>
+                    </span>
+                  </>
                 ) : (
                   <span className="text-sm">
                     Chef {booking.chefName} | {booking.clientName} |{" "}

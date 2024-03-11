@@ -54,11 +54,34 @@ export default function ChefShops({ booking, notes, shoppingList }) {
     <>
       {shoppingList && (
         <div className="flex flex-col gap-2">
-          {notes.length > 0 ? (
-            <div>
-              <Notes notes={notes} shopper="Chef" />
+          <div className="mt-4">
+            <div className="text-xs tracking-wider">
+              <p className="mb-4">
+                <FormattedMessage
+                  id="components.clientShops.message"
+                  defaultMessage="Please mark off each of the items below that you already have in stock at home. That way, we won't purchase more than you need. Otherwise, we'll do our best to only purchase the items we think you need."
+                  values={{
+                    bookingDate: (
+                      <span className="font-bold">
+                        {new Date(booking.datetime).toLocaleDateString(
+                          "en-US",
+                          {
+                            dateStyle: "full",
+                          }
+                        )}
+                      </span>
+                    ),
+                  }}
+                />
+              </p>
+
+              {notes.length > 0 ? (
+                <div className="mb-4">
+                  <Notes notes={notes} shopper="Chef" />
+                </div>
+              ) : null}
             </div>
-          ) : null}
+          </div>
 
           <div id="shopping-list" className="mt-4">
             <Form {...form}>

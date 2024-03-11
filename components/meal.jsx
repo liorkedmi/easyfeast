@@ -248,19 +248,19 @@ export default function Meal({
                           <SelectItem value="Small">
                             <FormattedMessage
                               id="components.meal.form.portions.small"
-                              defaultMessage="Small (2 portions)"
+                              defaultMessage="Small (~2 servings)"
                             />
                           </SelectItem>
                           <SelectItem value="Medium">
                             <FormattedMessage
                               id="components.meal.form.portions.medium"
-                              defaultMessage="Medium (4 portions)"
+                              defaultMessage="Medium (~4 servings)"
                             />
                           </SelectItem>
                           <SelectItem value="Large">
                             <FormattedMessage
                               id="components.meal.form.portions.large"
-                              defaultMessage="Large (6 portions)"
+                              defaultMessage="Large (~6 servings)"
                             />
                           </SelectItem>
                         </SelectContent>

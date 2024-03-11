@@ -18,26 +18,28 @@ function PageHeader({ bookingInfo, menu, mode }) {
         <>
           <div className="w-1/3">
             {menu && (
-              <nav>
-                <menu>
-                  <ul>
-                    <li className="uppercase text-xs font-semibold tracking-wider">
-                      <a
-                        href="https://www.easyfeast.com/contact-2"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="color-[#1d1d1d] hover:opacity-50 transition-all"
-                      >
-                        {user ? (
-                          <span>Hi {user.firstName}, need help?</span>
-                        ) : (
-                          <span>Need help?</span>
-                        )}
-                      </a>
-                    </li>
-                  </ul>
-                </menu>
-              </nav>
+              <div className="w-full print:hidden">
+                <nav>
+                  <menu>
+                    <ul>
+                      <li className="uppercase text-xs font-semibold tracking-wider">
+                        <a
+                          href="https://www.easyfeast.com/contact-2"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="color-[#1d1d1d] hover:opacity-50 transition-all"
+                        >
+                          {user ? (
+                            <span>Hi {user.firstName}, need help?</span>
+                          ) : (
+                            <span>Need help?</span>
+                          )}
+                        </a>
+                      </li>
+                    </ul>
+                  </menu>
+                </nav>
+              </div>
             )}
           </div>
 
@@ -56,9 +58,11 @@ function PageHeader({ bookingInfo, menu, mode }) {
 
           <div className="w-1/3 flex items-center justify-center">
             {menu && (
-              <div className="flex items-center justify-end w-full gap-4">
-                {user ? <UserButton afterSignOutUrl="/" /> : null}
-                <Basket />
+              <div className="w-full print:hidden">
+                <div className="flex items-center justify-end w-full gap-4">
+                  {user ? <UserButton afterSignOutUrl="/" /> : null}
+                  <Basket />
+                </div>
               </div>
             )}
           </div>

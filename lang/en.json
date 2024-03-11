@@ -9,13 +9,13 @@
     "defaultMessage": "Your basket is empty"
   },
   "components.basket.submit": {
-    "defaultMessage": "Submit"
+    "defaultMessage": "Proceed to grocery shopping list"
   },
   "components.clientShops.button.print": {
     "defaultMessage": "Click to Print"
   },
   "components.clientShops.message": {
-    "defaultMessage": "Please find your supply list here:"
+    "defaultMessage": "Please find the grocery shopping list for your booking on {bookingDate}. Please purchase each of the items on the list or check that you have the items already in stock at home"
   },
   "components.customizations.title": {
     "defaultMessage": "Customizations"
@@ -59,13 +59,16 @@
   "components.requiredSelections.title": {
     "defaultMessage": "Required selections"
   },
+  "components.welcomeMessage.error": {
+    "defaultMessage": "Error loading booking information"
+  },
   "components.welcomeMessage.loadBookingInformation": {
     "defaultMessage": "Loading booking information"
   },
   "components.welcomeMessage.loadNextAvailableBooking": {
     "defaultMessage": "Loading next available booking"
   },
-  "components.welcomeMessage.nextBooking": {
-    "defaultMessage": "Please select your menu for"
+  "components.welcomeMessage.prefix": {
+    "defaultMessage": "Greetings, {name}! Please select your {upcomingMenu} from any of the categories below:"
   }
 }

@@ -159,10 +159,9 @@ export default function ShoppingList() {
       const clientName = booking.clientName;
       const clientAddress = booking.clientAddress;
       const chefEmail = booking.chefEmail;
-      const startTime = new Date(booking.datetime).getTime();
-      const endTime = new Date(
-        new Date(booking.datetime).getTime() + 4 * 60 * 60 * 1000
-      ); // 4 hours later
+      const startTime = new Date(booking.datetime);
+      const endTime = new Date(booking.datetime);
+      endTime.setHours(startTime.getHours() + 4);
 
       formData.append("reheating_tips_url", reheatingTipsUrl);
       formData.append("shopping_list_url", shoppingListUrl);
@@ -170,8 +169,8 @@ export default function ShoppingList() {
       formData.append("client", clientName);
       formData.append("location", clientAddress);
       formData.append("recipient", chefEmail);
-      formData.append("start_time", startTime);
-      formData.append("end_time", endTime);
+      formData.append("start_time", startTime.getTime());
+      formData.append("end_time", endTime.getTime());
 
       updateShoppingList();
 
