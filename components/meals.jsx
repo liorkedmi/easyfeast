@@ -53,72 +53,85 @@ export default function Meals({ type, data }) {
 
   return (
     <>
-      {groups.map((group) => (
-        <div key={`group-${group}`} className="pb-4">
-          <div id={group} className="text-sm font-semibold tracking-wider mb-2">
-            {group}
+      {groups.map((group) => {
+        const list = meals[group].sort((a, b) => {
+          a.fields["Your Menu"] < b.fields["Your Menu"];
+        });
+
+        return (
+          <div key={`group-${group}`} className="pb-4">
+            <div
+              id={group}
+              className="text-sm font-semibold tracking-wider mb-2"
+            >
+              {group}
+            </div>
+            {list.map((menu) => {
+              const shoppingList = {
+                primary: {
+                  Small: menu.fields["Shopping List Ingredients - Small"],
+                  Medium: menu.fields["Shopping List Ingredients - Medium"],
+                  Large: menu.fields["Shopping List Ingredients - Large"],
+                },
+              };
+
+              if (menu.fields["Link to the Variations of this Meal"]) {
+                for (const variation of menu.fields[
+                  "Link to the Variations of this Meal"
+                ]) {
+                  shoppingList[variation.fields["Variation Name"]] = {
+                    Small:
+                      variation.fields["Shopping List Ingredients - Small"],
+                    Medium:
+                      variation.fields["Shopping List Ingredients - Medium"],
+                    Large:
+                      variation.fields["Shopping List Ingredients - Large"],
+                  };
+                }
+              }
+
+              const recipes = {
+                primary: {
+                  Small: menu.fields["Recipes - Small"],
+                  Medium: menu.fields["Recipes - Medium"],
+                  Large: menu.fields["Recipes - Large"],
+                },
+              };
+
+              if (menu.fields["Link to the Variations of this Meal"]) {
+                for (const variation of menu.fields[
+                  "Link to the Variations of this Meal"
+                ]) {
+                  recipes[variation.fields["Variation Name"]] = {
+                    Small: variation.fields["Recipes - Small"],
+                    Medium: variation.fields["Recipes - Medium"],
+                    Large: variation.fields["Recipes - Large"],
+                  };
+                }
+              }
+
+              return (
+                <div key={`menu-${menu.id}`} className="pb-4">
+                  <Meal
+                    id={menu.id}
+                    name={menu.fields["Your Menu"]}
+                    type={type}
+                    ingredients={menu.fields["Ingredients"]}
+                    shoppingList={shoppingList}
+                    recipes={recipes}
+                    requiredSelectionsOptions={
+                      menu.fields["Required Selections"]
+                    }
+                    variationsOptions={
+                      menu.fields["Link to the Variations of this Meal"]
+                    }
+                  />
+                </div>
+              );
+            })}
           </div>
-          {meals[group].map((menu) => {
-            const shoppingList = {
-              primary: {
-                Small: menu.fields["Shopping List Ingredients - Small"],
-                Medium: menu.fields["Shopping List Ingredients - Medium"],
-                Large: menu.fields["Shopping List Ingredients - Large"],
-              },
-            };
-
-            if (menu.fields["Link to the Variations of this Meal"]) {
-              for (const variation of menu.fields[
-                "Link to the Variations of this Meal"
-              ]) {
-                shoppingList[variation.fields["Variation Name"]] = {
-                  Small: variation.fields["Shopping List Ingredients - Small"],
-                  Medium:
-                    variation.fields["Shopping List Ingredients - Medium"],
-                  Large: variation.fields["Shopping List Ingredients - Large"],
-                };
-              }
-            }
-
-            const recipes = {
-              primary: {
-                Small: menu.fields["Recipes - Small"],
-                Medium: menu.fields["Recipes - Medium"],
-                Large: menu.fields["Recipes - Large"],
-              },
-            };
-
-            if (menu.fields["Link to the Variations of this Meal"]) {
-              for (const variation of menu.fields[
-                "Link to the Variations of this Meal"
-              ]) {
-                recipes[variation.fields["Variation Name"]] = {
-                  Small: variation.fields["Recipes - Small"],
-                  Medium: variation.fields["Recipes - Medium"],
-                  Large: variation.fields["Recipes - Large"],
-                };
-              }
-            }
-
-            return (
-              <div key={`menu-${menu.id}`} className="pb-4">
-                <Meal
-                  id={menu.id}
-                  name={menu.fields["Your Menu"]}
-                  type={type}
-                  ingredients={menu.fields["Ingredients"]}
-                  shoppingList={shoppingList}
-                  recipes={recipes}
-                  requiredSelectionsOptions={menu.fields["Required Selections"]}
-                  variationsOptions={
-                    menu.fields["Link to the Variations of this Meal"]
-                  }
-                />
-              </div>
-            );
-          })}
-        </div>
-      ))}
+        );
+      })}
     </>
   );
 }

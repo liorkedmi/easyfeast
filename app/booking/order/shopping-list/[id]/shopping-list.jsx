@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 
 // TODO:
 //  V Show a clear error message when there are no available bookings
+//  - How to configure a variation with both a required selection and other type of customizations? Each one will have their own menu...
 //  - Strings
 //  - Design (mobile compatible)
 //  - Handoff:
@@ -153,9 +154,9 @@ export default function ShoppingList() {
     if (booking && shoppingList) {
       const formData = new FormData();
 
-      const reheatingTipsUrl = `${document.location.origin}/booking/${booking.id}/reheating-tips`;
-      const shoppingListUrl = `${document.location.origin}/booking/${booking.id}/shopping-list`;
-      const recipesUrl = `${document.location.origin}/booking/${booking.id}/recipes`;
+      const reheatingTipsUrl = `${document.location.origin}/report/${booking.id}/reheating-tips`;
+      const shoppingListUrl = `${document.location.origin}/report/${booking.id}/shopping-list`;
+      const recipesUrl = `${document.location.origin}/report/${booking.id}/recipes`;
       const clientName = booking.clientName;
       const clientAddress = booking.clientAddress;
       const chefEmail = booking.chefEmail;

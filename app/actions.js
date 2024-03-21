@@ -159,14 +159,14 @@ export async function getSessionInfo(id = null) {
     let user;
     let email;
 
+    user = await currentUser();
+
+    if (!user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
     if (true) {
-      user = await currentUser();
-
-      if (!user) {
-        res.status(401).json({ error: "Unauthorized" });
-        return;
-      }
-
       email = user.emailAddresses[0].emailAddress;
     } else {
       //

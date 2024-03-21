@@ -1,5 +1,6 @@
 import History from "@/components/menus/history";
 import Menus from "@/components/menus";
+import { Separator } from "@/components/ui/separator";
 import { Suspense } from "react";
 
 export default function YourHistoryPage({ searchParams }) {
@@ -7,6 +8,8 @@ export default function YourHistoryPage({ searchParams }) {
     <>
       <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto">
         <Menus />
+
+        <Separator className="mb-4" />
 
         <Suspense
           fallback={

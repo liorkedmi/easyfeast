@@ -134,7 +134,8 @@ async function fetchMenus(ids) {
   const promise = new Promise((resolve, reject) => {
     base("Menus")
       .select({
-        maxRecords: 100,
+        pageSize: 100,
+        maxRecords: 1000,
         view: "Menu Master",
         filterByFormula,
       })
@@ -179,7 +180,8 @@ async function fetchRecipes(ids) {
   const promise = new Promise((resolve, reject) => {
     base("Recipes")
       .select({
-        maxRecords: 100,
+        pageSize: 100,
+        maxRecords: 1000,
         view: "Recipes Master",
         filterByFormula,
       })
@@ -224,7 +226,8 @@ async function fetchRecipeIngredients(ids) {
   const promise = new Promise((resolve, reject) => {
     base("Recipe Ingredients")
       .select({
-        maxRecords: 100,
+        pageSize: 100,
+        maxRecords: 1000,
         view: "Recipe Ingredients Master",
         filterByFormula,
       })

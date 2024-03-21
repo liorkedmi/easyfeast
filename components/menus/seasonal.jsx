@@ -1,4 +1,5 @@
 import Filters from "./filters";
+import Image from "next/image";
 import Meals from "@/components/meals";
 import Sidebar from "./sidebar";
 import base from "@/lib/airtable";
@@ -12,7 +13,8 @@ async function getData() {
   const promise = new Promise((resolve, reject) => {
     base("Menus")
       .select({
-        maxRecords: 100,
+        pageSize: 100,
+        maxRecords: 1000,
         view: "Menu Master",
         filterByFormula: "FIND('Current Seasonal Menu', {Tag}) > 0",
       })
@@ -57,7 +59,8 @@ async function getVariations(ids) {
   return new Promise((resolve, reject) => {
     base("Menus")
       .select({
-        maxRecords: 100,
+        pageSize: 100,
+        maxRecords: 1000,
         view: "Menu Master",
         filterByFormula,
       })
@@ -148,7 +151,7 @@ export default async function SeasonalMenu({ searchParams }) {
         ?.split(",")
         .map((item) => item.trim());
 
-      return params.some((filter) => item.fields["Filters"]?.includes(filter));
+      return params.every((filter) => item.fields["Filters"]?.includes(filter));
     }
 
     return true;
@@ -188,8 +191,14 @@ export default async function SeasonalMenu({ searchParams }) {
 
   if (result.length === 0) {
     return (
-      <div className="flex flex-col gap-4 w-full mt-4">
-        <h2 className="text-xs tracking-wider">
+      <div className="flex items-center justify-normal flex-col gap-4 w-full mt-8">
+        <Image
+          src="/chef.svg"
+          width="450"
+          height="350"
+          alt="No items available at this point"
+        />
+        <h2 className="mt-8 text-lg tracking-wider">
           No items available at this point
         </h2>
       </div>

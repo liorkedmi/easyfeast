@@ -18,12 +18,6 @@ export default function AdditionalRequests({ form }) {
       name="additionalRequests"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>
-            <FormattedMessage
-              id="components.additionalRequests.form.message.label"
-              defaultMessage="Your message"
-            />
-          </FormLabel>
           <FormControl>
             <Textarea
               placeholder={`Anything else you'd like to request for this dish? (e.g., "omit cilantro" or "cook salmon to medium rare")`}

@@ -18,7 +18,8 @@ export async function fetchShoppingListIngredients(ids) {
     return new Promise((resolve, reject) => {
       base("Shopping List Ingredients")
         .select({
-          maxRecords: 100,
+          pageSize: 100,
+          maxRecords: 1000,
           view: "Shopping List Master",
           filterByFormula,
         })

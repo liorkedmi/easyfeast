@@ -14,36 +14,9 @@ function PageHeader({ bookingInfo, menu, mode }) {
 
   return (
     <header className="w-full">
-      <div className="flex items-center justify-start gap-4 mb-4">
+      <div className="flex items-center justify-between gap-4 mb-4">
         <>
-          <div className="w-1/3">
-            {menu && (
-              <div className="w-full print:hidden">
-                <nav>
-                  <menu>
-                    <ul>
-                      <li className="uppercase text-xs font-semibold tracking-wider">
-                        <a
-                          href="https://www.easyfeast.com/contact-2"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="color-[#1d1d1d] hover:opacity-50 transition-all"
-                        >
-                          {user ? (
-                            <span>Hi {user.firstName}, need help?</span>
-                          ) : (
-                            <span>Need help?</span>
-                          )}
-                        </a>
-                      </li>
-                    </ul>
-                  </menu>
-                </nav>
-              </div>
-            )}
-          </div>
-
-          <div className="w-1/3 flex items-center justify-center">
+          <div className="w-1/2 flex items-center justify-start">
             <Link href="/" className="hover:opacity-75 transition-all">
               <Image
                 className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
@@ -56,7 +29,7 @@ function PageHeader({ bookingInfo, menu, mode }) {
             </Link>
           </div>
 
-          <div className="w-1/3 flex items-center justify-center">
+          <div className="w-1/2 flex items-center justify-center">
             {menu && (
               <div className="w-full print:hidden">
                 <div className="flex items-center justify-end w-full gap-4">

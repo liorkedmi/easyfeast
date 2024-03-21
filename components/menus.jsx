@@ -44,7 +44,7 @@ export default function Menus() {
               pathname?.startsWith(menuItem.href) ||
                 (index === 0 && pathname === "/")
                 ? "bg-muted font-medium text-primary"
-                : "text-muted-foreground"
+                : "text-muted-foreground hover:bg-muted/50"
             )}
           >
             {menuItem.name}

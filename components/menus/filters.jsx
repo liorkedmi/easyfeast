@@ -1,20 +1,31 @@
 "use client";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "../ui/button";
+import { Trash2 } from "lucide-react";
 import { createUrl } from "@/lib/utils";
 
 export default function Filters({ filters }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlSearchParams = new URLSearchParams(searchParams.toString());
-  let currentFilters = "";
+  const [currentFilters, setCurrentFilters] = useState("");
 
-  if (urlSearchParams.get("filter")) {
-    currentFilters = urlSearchParams.get("filter").split(",");
-  }
+  useEffect(() => {
+    if (urlSearchParams.get("filter")) {
+      setCurrentFilters(urlSearchParams.get("filter").split(","));
+    }
+  }, []);
+
+  const resetFilters = () => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set("filter", "");
+    router.push(createUrl(document.location.pathname, newParams));
+    setCurrentFilters("");
+  };
 
   if (filters.length === 0) {
     return null;
@@ -28,11 +39,12 @@ export default function Filters({ filters }) {
           type="multiple"
           size="sm"
           variant="outline"
-          defaultValue={currentFilters}
+          value={currentFilters}
           onValueChange={(value) => {
             const newParams = new URLSearchParams(searchParams.toString());
-            newParams.set("filter", value.join(","));
+            newParams.set("filter", value);
             router.push(createUrl(document.location.pathname, newParams));
+            setCurrentFilters(value);
           }}
         >
           {filters.map((filter) => (
@@ -45,6 +57,11 @@ export default function Filters({ filters }) {
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
+
+        <Button variant="ghost" size="sm" onClick={() => resetFilters()}>
+          <Trash2 className="h-4 w-4 mr-1" />
+          <span className="text-xs tracking-wider">Reset</span>
+        </Button>
       </div>
     </div>
   );

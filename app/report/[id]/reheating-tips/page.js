@@ -54,7 +54,8 @@ async function fetchMenus(finalMenu) {
   const promise = new Promise((resolve, reject) => {
     base("Menus")
       .select({
-        maxRecords: 100,
+        pageSize: 100,
+        maxRecords: 1000,
         view: "Menu Master",
         filterByFormula,
       })
