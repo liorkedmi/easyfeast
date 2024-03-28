@@ -10,7 +10,7 @@ export async function fetchBooking(id) {
       base("Bookings")
         .select({
           maxRecords: 1,
-          view: "Booking Master",
+          // view: "App View",
           filterByFormula,
         })
         .eachPage(
@@ -57,7 +57,7 @@ export async function fetchShoppingListIngredients(ids) {
         .select({
           pageSize: 100,
           maxRecords: 1000,
-          view: "Shopping List Master",
+          // view: "App View",
           filterByFormula,
         })
         .eachPage(
@@ -163,10 +163,12 @@ export default async function BookingShoppingListPage({ params }) {
 
   return (
     <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto">
-      <div className="font-bold text-xl mt-4 mb-8 uppercase">Shopping List</div>
+      <div className="font-bold text-2xl mt-4 mb-8 uppercase">
+        Shopping List
+      </div>
       <div className="w-full">
         {booking.fields["Notes for chef about the Menu"] && (
-          <div className="mb-4 text-xs tracking-wider text-red-600">
+          <div className="mb-4 text-sm tracking-wider text-red-600">
             <p className="font-bold">Notes:</p>
             <p className="whitespace-pre-line">
               {booking.fields["Notes for chef about the Menu"]}
@@ -186,7 +188,7 @@ export default async function BookingShoppingListPage({ params }) {
                       <ol
                         key={id}
                         className={cn(
-                          "text-xs tracking-wider",
+                          "text-sm tracking-wider",
                           booking.fields["Final Shopping List"].indexOf(
                             item.id
                           ) === -1

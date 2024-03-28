@@ -62,7 +62,7 @@ export default function Meals({ type, data }) {
           <div key={`group-${group}`} className="pb-4">
             <div
               id={group}
-              className="text-sm font-semibold tracking-wider mb-2"
+              className="text-base font-semibold tracking-wider mb-2"
             >
               {group}
             </div>

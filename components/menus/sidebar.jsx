@@ -37,7 +37,7 @@ export default function Sidebar({ categories }) {
         >
           <Link
             href={`#${category.label}`}
-            className="block text-xs tracking-wider hover:underline"
+            className="block text-sm tracking-wider hover:underline"
           >
             {category.label} ({category.count})
           </Link>

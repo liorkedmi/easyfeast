@@ -1,13 +1,48 @@
 "use client";
 
+import { FormattedMessage, useIntl } from "react-intl";
+
 import { Button } from "@/components/ui/button";
-import { FormattedMessage } from "react-intl";
 import Notes from "./notes";
+import { toast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ClientShops({ booking, notes, shoppingList }) {
+  const router = useRouter();
+  const intl = useIntl();
+
   const onPrint = () => {
     window.print();
+  };
+
+  const onSubmit = () => {
+    toast({
+      title: intl.formatMessage({
+        id: "components.booking.toast.add.title",
+        defaultMessage: "You are all set!",
+      }),
+      description: (
+        <div className="mt-2">
+          <em className="italic">{name}</em>{" "}
+          <FormattedMessage
+            id="components.booking.toast.add.message"
+            defaultMessage="Your booking for {bookingDate} has been confirmed."
+            values={{
+              bookingDate: (
+                <span className="font-bold">
+                  {new Date(booking.datetime).toLocaleDateString("en-US", {
+                    dateStyle: "full",
+                  })}
+                </span>
+              ),
+            }}
+          />
+        </div>
+      ),
+    });
+
+    router.push(`/`);
   };
 
   function updateShoppingList() {
@@ -49,7 +84,7 @@ export default function ClientShops({ booking, notes, shoppingList }) {
     <>
       <div className="flex flex-col gap-2">
         <div className="mt-4">
-          <div className="text-xs tracking-wider">
+          <div className="text-sm tracking-wider">
             <p className="mb-4">
               <FormattedMessage
                 id="components.clientShops.message"
@@ -90,7 +125,7 @@ export default function ClientShops({ booking, notes, shoppingList }) {
                   const id = item.id;
 
                   return (
-                    <ol key={id} className="text-xs tracking-wider">
+                    <ol key={id} className="text-sm tracking-wider">
                       {item.ingredient} - {item.amount} {item.unit}{" "}
                       {item.description}
                     </ol>
@@ -102,16 +137,28 @@ export default function ClientShops({ booking, notes, shoppingList }) {
         })}
       </div>
 
-      <div className="flex mt-4 print:hidden">
+      <div className="flex justify-center gap-2 mt-10 print:hidden">
         <Button
           type="button"
           size="sm"
-          variant="default"
+          variant="outline"
           onClick={() => onPrint()}
         >
           <FormattedMessage
             id="components.clientShops.button.print"
-            defaultMessage="Click to Print"
+            defaultMessage="Print"
+          />
+        </Button>
+
+        <Button
+          type="button"
+          size="sm"
+          variant="default"
+          onClick={() => onSubmit()}
+        >
+          <FormattedMessage
+            id="components.clientShops.button.submit"
+            defaultMessage="Submit"
           />
         </Button>
       </div>

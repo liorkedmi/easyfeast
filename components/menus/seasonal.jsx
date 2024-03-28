@@ -15,7 +15,7 @@ async function getData() {
       .select({
         pageSize: 100,
         maxRecords: 1000,
-        view: "Menu Master",
+        // view: "App View",
         filterByFormula: "FIND('Current Seasonal Menu', {Tag}) > 0",
       })
       .eachPage(
@@ -61,7 +61,7 @@ async function getVariations(ids) {
       .select({
         pageSize: 100,
         maxRecords: 1000,
-        view: "Menu Master",
+        // view: "App View",
         filterByFormula,
       })
       .eachPage(
@@ -198,7 +198,7 @@ export default async function SeasonalMenu({ searchParams }) {
           height="350"
           alt="No items available at this point"
         />
-        <h2 className="mt-8 text-lg tracking-wider">
+        <h2 className="mt-8 text-xl tracking-wider">
           No items available at this point
         </h2>
       </div>

@@ -14,7 +14,7 @@ export default async function MenuLayout({ children, params }) {
         <div className="pb-4">{children}</div>
       ) : (
         <section className="flex flex-col items-start justify-between p-4 max-w-4xl m-auto">
-          <div className="pb-4 text-xs tracking-wider">No bookings found</div>
+          <div className="pb-4 text-sm tracking-wider">No bookings found</div>
         </section>
       )}
     </>

@@ -10,7 +10,7 @@ export async function fetchBooking(id) {
       base("Bookings")
         .select({
           maxRecords: 1,
-          view: "Booking Master",
+          // view: "App View",
           filterByFormula,
         })
         .eachPage(
@@ -56,7 +56,7 @@ async function fetchMenus(finalMenu) {
       .select({
         pageSize: 100,
         maxRecords: 1000,
-        view: "Menu Master",
+        // view: "App View",
         filterByFormula,
       })
       .eachPage(
@@ -90,14 +90,14 @@ export default async function BookingReheatingTipsPage({ params }) {
   const menus = await fetchMenus(booking.fields["Final Menu"]);
 
   return (
-    <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto text-lg tracking-wider font-shadowsIntoLight">
-      <div className="font-bold text-xl mt-4 mb-8 uppercase">
+    <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto text-xl tracking-wider font-shadowsIntoLight">
+      <div className="font-bold text-2xl mt-4 mb-8 uppercase">
         Reheating Tips
       </div>
 
       {menus.map((menu, index) => (
         <div key={index} className="w-full">
-          <div className="text-xl font-bold mb-4 underline">
+          <div className="text-2xl font-bold mb-4 underline">
             {menu.fields["Your Menu"]}
           </div>
           <div>{menu.fields["Reheating Tips"]}</div>

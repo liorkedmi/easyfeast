@@ -20,7 +20,7 @@ export async function fetchShoppingListIngredients(ids) {
         .select({
           pageSize: 100,
           maxRecords: 1000,
-          view: "Shopping List Master",
+          // view: "App View",
           filterByFormula,
         })
         .eachPage(

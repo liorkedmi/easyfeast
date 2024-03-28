@@ -34,13 +34,13 @@ export default function Menus() {
 
   return (
     <ScrollArea className="w-full whitespace-nowrap">
-      <div className="mb-4 flex justify-center items-center">
+      <div className="flex justify-center items-center">
         {menuItems.map((menuItem, index) => (
           <Link
             href={menuItem.href}
             key={menuItem.href}
             className={cn(
-              "flex p-2 items-center justify-center px-4 text-center text-xs tracking-wider transition-colors hover:text-primary",
+              "flex p-2 items-center justify-center px-4 text-center text-sm tracking-wider transition-colors hover:text-primary",
               pathname?.startsWith(menuItem.href) ||
                 (index === 0 && pathname === "/")
                 ? "bg-muted font-medium text-primary"

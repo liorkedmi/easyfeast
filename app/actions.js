@@ -86,7 +86,7 @@ export async function fetchBooking(id) {
       base("Bookings")
         .select({
           maxRecords: 1,
-          view: "Booking Master",
+          // view: "App View",
           filterByFormula,
         })
         .eachPage(
@@ -124,7 +124,7 @@ export async function fetchNextAvailableBooking(email) {
       base("Bookings")
         .select({
           maxRecords: 1,
-          view: "Booking Master",
+          // view: "App View",
           filterByFormula,
         })
         .eachPage(
@@ -153,7 +153,7 @@ export async function fetchNextAvailableBooking(email) {
   }
 }
 
-export async function getSessionInfo(id = null) {
+export async function getSessionInfo(id = null, backdoorEmail = null) {
   // For testing purposes, we allow passing the user email address as a parameter
   try {
     let user;
@@ -166,10 +166,10 @@ export async function getSessionInfo(id = null) {
       return;
     }
 
-    if (true) {
-      email = user.emailAddresses[0].emailAddress;
+    if (backdoorEmail) {
+      email = backdoorEmail;
     } else {
-      //
+      email = user.emailAddresses[0].emailAddress;
     }
 
     let booking = null;
@@ -199,6 +199,7 @@ export async function getSessionInfo(id = null) {
       portionSize: client.fields["Portion Size Requested"]?.[0],
       clientAddress: client.fields["Address"],
       clientName: client.fields["Name for Chef Display"],
+      clientRole: client.fields["Role"],
       chefName: chef.fields["Name"],
       chefEmail: chef.fields["Email Address"],
     };

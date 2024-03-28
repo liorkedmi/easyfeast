@@ -30,8 +30,8 @@ export default function WelcomeMessage({ bookingInfo, mode }) {
   if (bookingInfo.error) {
     return (
       <div className="flex justify-between gap-4">
-        <div className="grow text-center text-sm tracking-wider">
-          <h2 className="text-sm tracking-wider opacity-70">
+        <div className="grow text-center text-base tracking-wider">
+          <h2 className="text-base tracking-wider opacity-70">
             <FormattedMessage
               id="components.welcomeMessage.error"
               defaultMessage="Error loading booking information"
@@ -45,13 +45,13 @@ export default function WelcomeMessage({ bookingInfo, mode }) {
   return (
     <>
       <div className="flex justify-between gap-4">
-        <div className="grow text-center text-sm tracking-wider">
+        <div className="grow text-center text-base tracking-wider">
           {user && booking.datetime ? (
             <>
               <>
                 {mode === "booking" ? (
                   <>
-                    <span className="text-sm print:hidden">
+                    <span className="text-base print:hidden">
                       <FormattedMessage
                         id="components.welcomeMessage.prefix"
                         defaultMessage="Greetings, {name}! Please select your {upcomingMenu} from any of the categories below:"
@@ -76,13 +76,13 @@ export default function WelcomeMessage({ bookingInfo, mode }) {
                         }}
                       />
                     </span>
-                    <span className="text-sm screen:hidden">
+                    <span className="text-base screen:hidden">
                       Chef {booking.chefName} | {booking.clientName} |{" "}
                       {dateFormatter.format(new Date(booking.datetime))}
                     </span>
                   </>
                 ) : (
-                  <span className="text-sm">
+                  <span className="text-base">
                     Chef {booking.chefName} | {booking.clientName} |{" "}
                     {dateFormatter.format(new Date(booking.datetime))}
                   </span>
@@ -90,7 +90,7 @@ export default function WelcomeMessage({ bookingInfo, mode }) {
               </>
             </>
           ) : (
-            <h2 className="text-sm tracking-wider opacity-70">
+            <h2 className="text-base tracking-wider opacity-70">
               {mode === "booking" ? (
                 <span>
                   <FormattedMessage

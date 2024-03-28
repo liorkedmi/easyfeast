@@ -31,7 +31,6 @@ import { Input } from "@/components/ui/input";
 import RequiredSelections from "./required-selections";
 import Variations from "./variations";
 import { addItem } from "@/redux/features/basketSlice";
-import { data } from "autoprefixer";
 import { toast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -191,7 +190,7 @@ export default function Meal({
         <CollapsibleTrigger asChild>
           <div className="flex items-center gap-2 cursor-pointer">
             <div className="flex items-center gap-2 grow">
-              <div className="text-xs tracking-wider">{name}</div>
+              <div className="text-sm tracking-wider">{name}</div>
               <div>
                 {mealInBasket ? <Check color="#00a94d" size={16} /> : null}
               </div>
@@ -203,7 +202,7 @@ export default function Meal({
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div className="flex flex-col gap-4 w-full">
-            <div className="text-xs mt-2 pt-4 border-t text-gray-700">
+            <div className="text-sm mt-2 pt-4 border-t text-gray-700">
               {ingredients.join(", ")}
             </div>
 
@@ -271,7 +270,7 @@ export default function Meal({
 
                 {requiredSelectionsOptions.length > 0 && (
                   <div>
-                    <div className="text-sm mb-2">
+                    <div className="text-base mb-2">
                       <FormattedMessage
                         id="components.requiredSelections.title"
                         defaultMessage="Required selections"
@@ -289,7 +288,7 @@ export default function Meal({
 
                 {variationsOptions.length > 0 && (
                   <div>
-                    <div className="text-sm mb-2">
+                    <div className="text-base mb-2">
                       <FormattedMessage
                         id="components.customizations.title"
                         defaultMessage="Customizations"
@@ -305,7 +304,7 @@ export default function Meal({
                 )}
 
                 <div>
-                  <div className="text-sm mb-2">
+                  <div className="text-base mb-2">
                     <FormattedMessage
                       id="components.additionalRequests.title"
                       defaultMessage="Additional Requests"
@@ -328,7 +327,7 @@ export default function Meal({
                     </CollapsibleTrigger>
 
                     <div className="flex justify-end items-center grow">
-                      <span className="text-xs tracking-wider font-medium text-destructive">
+                      <span className="text-sm tracking-wider font-medium text-destructive">
                         {getLimitNote()}
                       </span>
                     </div>

@@ -2,7 +2,9 @@
 const nextConfig = {
   productionBrowserSourceMaps: true,
   experimental: {
-    allowedOrigins: [],
+    serverActions: {
+      allowedOrigins: [],
+    },
     serverMinification: false,
   },
   images: {
@@ -17,6 +19,16 @@ const nextConfig = {
     return [
       {
         source: "/",
+        destination: "/booking/menu/seasonal-specials",
+        permanent: true,
+      },
+      {
+        source: "/booking",
+        destination: "/booking/menu/seasonal-specials",
+        permanent: true,
+      },
+      {
+        source: "/booking/menu",
         destination: "/booking/menu/seasonal-specials",
         permanent: true,
       },

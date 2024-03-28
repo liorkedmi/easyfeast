@@ -184,7 +184,7 @@ export default function ShoppingList() {
 
   if (!booking || !shoppingList) {
     return (
-      <h2 className="text-xs tracking-wider opacity-50">
+      <h2 className="text-sm tracking-wider opacity-50">
         Loading shopping list...
       </h2>
     );

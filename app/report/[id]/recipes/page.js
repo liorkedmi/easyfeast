@@ -90,7 +90,7 @@ export async function fetchBooking(id) {
       base("Bookings")
         .select({
           maxRecords: 1,
-          view: "Booking Master",
+          // view: "App View",
           filterByFormula,
         })
         .eachPage(
@@ -136,7 +136,7 @@ async function fetchMenus(ids) {
       .select({
         pageSize: 100,
         maxRecords: 1000,
-        view: "Menu Master",
+        // view: "App View",
         filterByFormula,
       })
       .eachPage(
@@ -182,7 +182,7 @@ async function fetchRecipes(ids) {
       .select({
         pageSize: 100,
         maxRecords: 1000,
-        view: "Recipes Master",
+        // view: "App View",
         filterByFormula,
       })
       .eachPage(
@@ -228,7 +228,7 @@ async function fetchRecipeIngredients(ids) {
       .select({
         pageSize: 100,
         maxRecords: 1000,
-        view: "Recipe Ingredients Master",
+        // view: "App View",
         filterByFormula,
       })
       .eachPage(
@@ -265,8 +265,8 @@ export default async function BookingRecipesPage({ params }) {
   const recipes = await fetchRecipes(booking.fields["All Recipes for Booking"]);
 
   return (
-    <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto text-xs tracking-wider">
-      <div className="font-bold text-xl mt-4 mb-8 uppercase">
+    <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto text-sm tracking-wider">
+      <div className="font-bold text-2xl mt-4 mb-8 uppercase">
         Booking Information
       </div>
 
@@ -279,7 +279,7 @@ export default async function BookingRecipesPage({ params }) {
         </div>
 
         <div
-          className="text-sm bg-yellow-300 p-2 my-8"
+          className="text-base bg-yellow-300 p-2 my-8"
           style={{ WebkitPrintColorAdjust: "exact" }}
         >
           Hi{" "}
@@ -303,7 +303,7 @@ export default async function BookingRecipesPage({ params }) {
         <table className="w-full mb-8">
           <tbody>
             <tr
-              className="text-center text-sm font-bold bg-gray-200"
+              className="text-center text-base font-bold bg-gray-200"
               style={{ WebkitPrintColorAdjust: "exact" }}
             >
               <th className="p-2 text-left" colSpan="2">
@@ -332,7 +332,7 @@ export default async function BookingRecipesPage({ params }) {
         <table className="w-full mb-8">
           <tbody>
             <tr
-              className="text-center text-sm font-bold bg-gray-200"
+              className="text-center text-base font-bold bg-gray-200"
               style={{ WebkitPrintColorAdjust: "exact" }}
             >
               <th className="p-2 text-left" colSpan="2">
@@ -355,7 +355,7 @@ export default async function BookingRecipesPage({ params }) {
         <table className="w-full mb-8">
           <tbody>
             <tr
-              className="text-center text-sm font-bold bg-gray-200"
+              className="text-center text-base font-bold bg-gray-200"
               style={{ WebkitPrintColorAdjust: "exact" }}
             >
               <th className="p-2 text-left" colSpan="2">
@@ -388,7 +388,7 @@ export default async function BookingRecipesPage({ params }) {
         <table className="w-full mb-8">
           <tbody>
             <tr
-              className="text-center text-sm font-bold bg-gray-200"
+              className="text-center text-base font-bold bg-gray-200"
               style={{ WebkitPrintColorAdjust: "exact" }}
             >
               <th className="p-2 text-left" colSpan="2">
@@ -437,7 +437,7 @@ export default async function BookingRecipesPage({ params }) {
         <table className="w-full mb-8">
           <tbody>
             <tr
-              className="text-center text-sm font-bold bg-gray-200"
+              className="text-center text-base font-bold bg-gray-200"
               style={{ WebkitPrintColorAdjust: "exact" }}
             >
               <th className="p-2 text-left" colSpan="2">
@@ -472,7 +472,7 @@ export default async function BookingRecipesPage({ params }) {
         </table>
       </main>
 
-      <div className="font-bold text-xl mt-4 mb-8 uppercase">Recipes</div>
+      <div className="font-bold text-2xl mt-4 mb-8 uppercase">Recipes</div>
 
       {recipes.map(async (recipe, index) => {
         const ingredients = await fetchRecipeIngredients(
@@ -482,7 +482,7 @@ export default async function BookingRecipesPage({ params }) {
         return (
           <section key={recipe}>
             <div className="mb-4">
-              <div className="text-sm font-bold mb-4 underline">
+              <div className="text-base font-bold mb-4 underline">
                 {recipe.fields["Recipe"]}
               </div>
               <div className="mb-4">
@@ -504,7 +504,7 @@ export default async function BookingRecipesPage({ params }) {
             </div>
 
             <div className="mb-4">
-              <div className="text-xs font-bold mb-4">Recipe Ingredients:</div>
+              <div className="text-sm font-bold mb-4">Recipe Ingredients:</div>
               <div className="mb-4 whitespace-pre-line">
                 <ul className="list-disc pl-8">
                   {ingredients.map((ingredient) => (
@@ -517,7 +517,7 @@ export default async function BookingRecipesPage({ params }) {
             </div>
 
             <div className="mb-4">
-              <div className="text-xs font-bold mb-4">Pictures</div>
+              <div className="text-sm font-bold mb-4">Pictures</div>
               <div className="mb-4">
                 <div className="flex flex-row flex-wrap justify-start gap-8">
                   {recipe.fields["Picture"]?.map((picture) => {
@@ -537,21 +537,21 @@ export default async function BookingRecipesPage({ params }) {
             </div>
 
             <div className="mb-4">
-              <div className="text-xs font-bold mb-4">Cooking Directions</div>
+              <div className="text-sm font-bold mb-4">Cooking Directions</div>
               <div className="mb-4 whitespace-pre-line">
                 {recipe.fields["Cooking Directions"]}
               </div>
             </div>
 
             <div className="mb-4">
-              <div className="text-xs font-bold mb-4">Storage Instructions</div>
+              <div className="text-sm font-bold mb-4">Storage Instructions</div>
               <div className="mb-4 whitespace-pre-line">
                 {recipe.fields["Storage Instructions"]}
               </div>
             </div>
 
             <div className="mb-4">
-              <div className="text-xs font-bold mb-4">Notes</div>
+              <div className="text-sm font-bold mb-4">Notes</div>
               <div className="mb-4 whitespace-pre-line">
                 {recipe.fields["Notes"]}
               </div>

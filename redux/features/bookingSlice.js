@@ -26,6 +26,7 @@ export const booking = createSlice({
         portionSize,
         clientAddress,
         clientName,
+        clientRole,
         chefName,
         chefEmail,
       } = action.payload;
@@ -38,6 +39,7 @@ export const booking = createSlice({
       state.portionSize = portionSize;
       state.clientAddress = clientAddress;
       state.clientName = clientName;
+      state.clientRole = clientRole;
       state.chefName = chefName;
       state.chefEmail = chefEmail;
     },

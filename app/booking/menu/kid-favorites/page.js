@@ -13,7 +13,7 @@ export default function KidFavoritesPage({ searchParams }) {
 
         <Suspense
           fallback={
-            <h2 className="text-xs tracking-wider">Loading menus...</h2>
+            <h2 className="text-sm tracking-wider">Loading menus...</h2>
           }
         >
           <KidsMenu searchParams={searchParams} />

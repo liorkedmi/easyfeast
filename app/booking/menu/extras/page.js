@@ -13,7 +13,7 @@ export default function ExtrasPage({ searchParams }) {
 
         <Suspense
           fallback={
-            <h2 className="text-xs tracking-wider opacity-50">
+            <h2 className="text-sm tracking-wider opacity-50">
               Loading menus...
             </h2>
           }

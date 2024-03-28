@@ -1,7 +1,4 @@
 {
-  "components.additionalRequests.form.message.label": {
-    "defaultMessage": "Your message"
-  },
   "components.additionalRequests.title": {
     "defaultMessage": "Additional Requests"
   },
@@ -11,11 +8,29 @@
   "components.basket.submit": {
     "defaultMessage": "Proceed to grocery shopping list"
   },
+  "components.basket.title": {
+    "defaultMessage": "Selections for your booking {bookingDate}"
+  },
+  "components.booking.toast.add.message": {
+    "defaultMessage": "Your booking for {bookingDate} has been confirmed."
+  },
+  "components.booking.toast.add.title": {
+    "defaultMessage": "You are all set!"
+  },
+  "components.chefShops.button.submit": {
+    "defaultMessage": "Submit"
+  },
   "components.clientShops.button.print": {
-    "defaultMessage": "Click to Print"
+    "defaultMessage": "Print"
+  },
+  "components.clientShops.button.submit": {
+    "defaultMessage": "Submit"
   },
   "components.clientShops.message": {
     "defaultMessage": "Please find the grocery shopping list for your booking on {bookingDate}. Please purchase each of the items on the list or check that you have the items already in stock at home"
+  },
+  "components.clientShops.message2": {
+    "defaultMessage": "Don't hesitate to reach out if you have any questions. Thank you and Easy Feasting!"
   },
   "components.customizations.title": {
     "defaultMessage": "Customizations"
@@ -30,13 +45,13 @@
     "defaultMessage": "Portions"
   },
   "components.meal.form.portions.large": {
-    "defaultMessage": "Large (6 portions)"
+    "defaultMessage": "Large (~6 servings)"
   },
   "components.meal.form.portions.medium": {
-    "defaultMessage": "Medium (4 portions)"
+    "defaultMessage": "Medium (~4 servings)"
   },
   "components.meal.form.portions.small": {
-    "defaultMessage": "Small (2 portions)"
+    "defaultMessage": "Small (~2 servings)"
   },
   "components.meal.note.extras.limit": {
     "defaultMessage": "You have reached the limit of extras"
@@ -51,10 +66,10 @@
     "defaultMessage": "Yum :)"
   },
   "components.notes.chef.title": {
-    "defaultMessage": "Client requested the following adjustments, please update the grocery shopping list accordingly"
+    "defaultMessage": "You also requested the following adjustments be made to your recipes, your chef will update the grocery shopping list accordingly and omit irrelevant ingredients."
   },
   "components.notes.client.title": {
-    "defaultMessage": "You requested the following adjustments, please update the grocery shopping list accordingly"
+    "defaultMessage": "You requested the following adjustments be made to your meals, please make sure to update your grocery shopping list accordingly and omit irrelevant ingredients."
   },
   "components.requiredSelections.title": {
     "defaultMessage": "Required selections"

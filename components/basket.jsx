@@ -86,75 +86,92 @@ export default function Basket() {
         </div>
       </PopoverTrigger>
       <PopoverContent>
-        {basket.items.length === 0 ? (
-          <div className="text-xs">
+        <>
+          <div className="text-center text-sm font-semibold tracking-wider mb-6">
             <FormattedMessage
-              id="components.basket.empty.message"
-              defaultMessage="Your basket is empty"
+              id="components.basket.title"
+              defaultMessage="Selections for your booking {bookingDate}"
+              values={{
+                bookingDate: (
+                  <span>
+                    {new Date(booking.datetime).toLocaleDateString("en-US", {
+                      dateStyle: "full",
+                    })}
+                  </span>
+                ),
+              }}
             />
           </div>
-        ) : (
-          <div>
-            <div className="mb-4">
-              {basket.items.map((item, index) => {
-                return (
-                  <div key={`basket-${item.id}`}>
-                    <div className="flex justify-between">
-                      <div className="grow shrink-1 pr-2">
-                        <div className="text-xs mb-2">{item.name}</div>
-                        {item.requiredSelections.map((item) => (
-                          <div
-                            key={`basket-menu-item-${item.id}`}
-                            className="text-xs pl-2"
+          {basket.items.length === 0 ? (
+            <div className="text-center text-sm">
+              <FormattedMessage
+                id="components.basket.empty.message"
+                defaultMessage="Your basket is empty"
+              />
+            </div>
+          ) : (
+            <div>
+              <div className="mb-6">
+                {basket.items.map((item, index) => {
+                  return (
+                    <div key={`basket-${item.id}`}>
+                      <div className="flex justify-between">
+                        <div className="grow shrink-1 pr-2">
+                          <div className="text-sm mb-2">{item.name}</div>
+                          {item.requiredSelections.map((item) => (
+                            <div
+                              key={`basket-menu-item-${item.id}`}
+                              className="text-sm pl-2"
+                            >
+                              - {item}
+                            </div>
+                          ))}
+                          {item.variations.map((item) => (
+                            <div
+                              key={`basket-menu-item-${item.id}`}
+                              className="text-sm pl-2"
+                            >
+                              - {item}
+                            </div>
+                          ))}
+                          {item.additionalRequests && (
+                            <div className="text-sm pl-2">
+                              - {item.additionalRequests}
+                            </div>
+                          )}
+                        </div>
+                        <div className="grow-0 shrink-0">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeMenuItem(item.id)}
                           >
-                            - {item}
-                          </div>
-                        ))}
-                        {item.variations.map((item) => (
-                          <div
-                            key={`basket-menu-item-${item.id}`}
-                            className="text-xs pl-2"
-                          >
-                            - {item}
-                          </div>
-                        ))}
-                        {item.additionalRequests && (
-                          <div className="text-xs pl-2">
-                            - {item.additionalRequests}
-                          </div>
-                        )}
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="grow-0 shrink-0">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => removeMenuItem(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+
+                      {index < basket.items.length - 1 && (
+                        <Separator className="my-4" />
+                      )}
                     </div>
+                  );
+                })}
+              </div>
 
-                    {index < basket.items.length - 1 && (
-                      <Separator className="my-4" />
-                    )}
-                  </div>
-                );
-              })}
+              <div className="flex justify-center">
+                <PopoverClose asChild>
+                  <Button size="sm" onClick={() => submitMenu()}>
+                    <FormattedMessage
+                      id="components.basket.submit"
+                      defaultMessage="Proceed to grocery shopping list"
+                    />
+                  </Button>
+                </PopoverClose>
+              </div>
             </div>
-
-            <div className="flex justify-center">
-              <PopoverClose asChild>
-                <Button size="sm" onClick={() => submitMenu()}>
-                  <FormattedMessage
-                    id="components.basket.submit"
-                    defaultMessage="Proceed to grocery shopping list"
-                  />
-                </Button>
-              </PopoverClose>
-            </div>
-          </div>
-        )}
+          )}
+        </>
       </PopoverContent>
     </Popover>
   );

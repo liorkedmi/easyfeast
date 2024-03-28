@@ -1,10 +1,4 @@
 {
-  "components.additionalRequests.form.message.label": [
-    {
-      "type": 0,
-      "value": "Your message"
-    }
-  ],
   "components.additionalRequests.title": [
     {
       "type": 0,
@@ -23,10 +17,52 @@
       "value": "Proceed to grocery shopping list"
     }
   ],
+  "components.basket.title": [
+    {
+      "type": 0,
+      "value": "Selections for your booking "
+    },
+    {
+      "type": 1,
+      "value": "bookingDate"
+    }
+  ],
+  "components.booking.toast.add.message": [
+    {
+      "type": 0,
+      "value": "Your booking for "
+    },
+    {
+      "type": 1,
+      "value": "bookingDate"
+    },
+    {
+      "type": 0,
+      "value": " has been confirmed."
+    }
+  ],
+  "components.booking.toast.add.title": [
+    {
+      "type": 0,
+      "value": "You are all set!"
+    }
+  ],
+  "components.chefShops.button.submit": [
+    {
+      "type": 0,
+      "value": "Submit"
+    }
+  ],
   "components.clientShops.button.print": [
     {
       "type": 0,
-      "value": "Click to Print"
+      "value": "Print"
+    }
+  ],
+  "components.clientShops.button.submit": [
+    {
+      "type": 0,
+      "value": "Submit"
     }
   ],
   "components.clientShops.message": [
@@ -41,6 +77,12 @@
     {
       "type": 0,
       "value": ". Please purchase each of the items on the list or check that you have the items already in stock at home"
+    }
+  ],
+  "components.clientShops.message2": [
+    {
+      "type": 0,
+      "value": "Don't hesitate to reach out if you have any questions. Thank you and Easy Feasting!"
     }
   ],
   "components.customizations.title": [
@@ -70,19 +112,19 @@
   "components.meal.form.portions.large": [
     {
       "type": 0,
-      "value": "Large (6 portions)"
+      "value": "Large (~6 servings)"
     }
   ],
   "components.meal.form.portions.medium": [
     {
       "type": 0,
-      "value": "Medium (4 portions)"
+      "value": "Medium (~4 servings)"
     }
   ],
   "components.meal.form.portions.small": [
     {
       "type": 0,
-      "value": "Small (2 portions)"
+      "value": "Small (~2 servings)"
     }
   ],
   "components.meal.note.extras.limit": [
@@ -112,13 +154,13 @@
   "components.notes.chef.title": [
     {
       "type": 0,
-      "value": "Client requested the following adjustments, please update the grocery shopping list accordingly"
+      "value": "You also requested the following adjustments be made to your recipes, your chef will update the grocery shopping list accordingly and omit irrelevant ingredients."
     }
   ],
   "components.notes.client.title": [
     {
       "type": 0,
-      "value": "You requested the following adjustments, please update the grocery shopping list accordingly"
+      "value": "You requested the following adjustments be made to your meals, please make sure to update your grocery shopping list accordingly and omit irrelevant ingredients."
     }
   ],
   "components.requiredSelections.title": [

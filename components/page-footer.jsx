@@ -13,7 +13,7 @@ function PageFooter() {
       <nav>
         <menu>
           <ul>
-            <li className="uppercase text-xs font-semibold tracking-wider">
+            <li className="uppercase text-sm font-semibold tracking-wider">
               <a
                 href="https://www.easyfeast.com/contact-2"
                 target="_blank"

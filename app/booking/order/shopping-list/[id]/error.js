@@ -8,7 +8,7 @@ export default function Error({ error, reset }) {
   }, [error]);
 
   return (
-    <section className="flex flex-col items-start justify-between p-4 max-w-4xl m-auto text-xs tracking-wider">
+    <section className="flex flex-col items-start justify-between p-4 max-w-4xl m-auto text-sm tracking-wider">
       <div className="mb-2">Something went wrong!</div>
       <button
         onClick={

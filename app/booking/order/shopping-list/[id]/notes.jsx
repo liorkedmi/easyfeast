@@ -8,7 +8,7 @@ export default function ShoppingListNotes({ notes, shopper }) {
   }
 
   return (
-    <div className="text-xs tracking-wider">
+    <div className="text-sm tracking-wider">
       <div className="font-medium">
         {shopper === "Chef" ? (
           <FormattedMessage

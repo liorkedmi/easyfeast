@@ -33,7 +33,7 @@ export default function Filters({ filters }) {
 
   return (
     <div className="flex items-center justify-center gap-4">
-      <span className="text-xs tracking-wider underline">Filters By:</span>
+      <span className="text-sm tracking-wider underline">Filters By:</span>
       <div className="flex items-center justify-center gap-1">
         <ToggleGroup
           type="multiple"
@@ -53,14 +53,14 @@ export default function Filters({ filters }) {
               value={filter}
               aria-label={`Toggle ${filter}`}
             >
-              <span className="text-xs tracking-wider">{filter}</span>
+              <span className="text-sm tracking-wider">{filter}</span>
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
 
         <Button variant="ghost" size="sm" onClick={() => resetFilters()}>
           <Trash2 className="h-4 w-4 mr-1" />
-          <span className="text-xs tracking-wider">Reset</span>
+          <span className="text-sm tracking-wider">Reset</span>
         </Button>
       </div>
     </div>

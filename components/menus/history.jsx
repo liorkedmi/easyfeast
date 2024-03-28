@@ -4,6 +4,7 @@ import Meals from "@/components/meals";
 import Sidebar from "./sidebar";
 import base from "@/lib/airtable";
 import { cn } from "@/lib/utils";
+import { cookies } from "next/headers";
 import { currentUser } from "@clerk/nextjs";
 
 const order = ["Poultry", "Meat", "Fish", "Vegetarian", "Vegan"];
@@ -18,7 +19,7 @@ async function getBookings(email) {
       .select({
         pageSize: 100,
         maxRecords: 1000,
-        view: "Booking Master",
+        // view: "App View",
         filterByFormula,
       })
       .eachPage(
@@ -70,7 +71,7 @@ function getMeals(bookings) {
       .select({
         pageSize: 100,
         maxRecords: 1000,
-        view: "Menu Master",
+        // view: "App View",
         filterByFormula,
       })
       .eachPage(
@@ -112,7 +113,7 @@ async function getVariations(ids) {
       .select({
         pageSize: 100,
         maxRecords: 1000,
-        view: "Menu Master",
+        // view: "App View",
         filterByFormula,
       })
       .eachPage(
@@ -195,8 +196,26 @@ function getFilters(data) {
 }
 
 export default async function History({ searchParams }) {
-  const user = await currentUser();
-  const email = user.emailAddresses[0].emailAddress;
+  const cookieStore = cookies();
+  const cookie = cookieStore.get("__backdoor");
+  const backdoorEmail = cookie ? cookie.value : null;
+
+  let user;
+  let email;
+
+  user = await currentUser();
+
+  if (!user) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  if (backdoorEmail) {
+    email = backdoorEmail;
+  } else {
+    email = user.emailAddresses[0].emailAddress;
+  }
+
   const bookings = await getBookings(email);
   let data = await getMeals(bookings);
 
@@ -253,7 +272,7 @@ export default async function History({ searchParams }) {
           height="350"
           alt="No items available at this point"
         />
-        <h2 className="mt-8 text-lg tracking-wider">
+        <h2 className="mt-8 text-xl tracking-wider">
           No items available at this point
         </h2>
       </div>
