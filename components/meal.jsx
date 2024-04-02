@@ -239,7 +239,7 @@ export default function Meal({
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="w-[180px]">
+                          <SelectTrigger className="w-[200px]">
                             <SelectValue placeholder="Select portion" />
                           </SelectTrigger>
                         </FormControl>
