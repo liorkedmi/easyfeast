@@ -368,7 +368,7 @@ export default async function BookingRecipesPage({ params }) {
               </td>
               <td className="p-2 w-2/3 border-b border-slate-200 whitespace-pre-line">
                 {menus
-                  .map((menu) => {
+                  ?.map((menu) => {
                     return menu.fields["Your Menu"];
                   })
                   .join(", ")}
@@ -474,7 +474,7 @@ export default async function BookingRecipesPage({ params }) {
 
       <div className="font-bold text-2xl mt-4 mb-8 uppercase">Recipes</div>
 
-      {recipes.map(async (recipe, index) => {
+      {recipes?.map(async (recipe, index) => {
         const ingredients = await fetchRecipeIngredients(
           recipe.fields["Recipe Ingredients"]
         );
@@ -507,7 +507,7 @@ export default async function BookingRecipesPage({ params }) {
               <div className="text-sm font-bold mb-4">Recipe Ingredients:</div>
               <div className="mb-4 whitespace-pre-line">
                 <ul className="list-disc pl-8">
-                  {ingredients.map((ingredient) => (
+                  {ingredients?.map((ingredient) => (
                     <li key={ingredient}>
                       {ingredient.fields["Ingredient List"]}
                     </li>

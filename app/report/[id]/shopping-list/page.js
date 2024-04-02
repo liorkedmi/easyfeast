@@ -175,7 +175,8 @@ export default async function BookingShoppingListPage({ params }) {
             </p>
           </div>
         )}
-        {result.map((group) => {
+
+        {result?.map((group) => {
           return (
             <div className="mb-4" key={group.section}>
               <div className="font-semibold">{group.section}</div>

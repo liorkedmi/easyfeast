@@ -95,7 +95,7 @@ export default async function BookingReheatingTipsPage({ params }) {
         Reheating Tips
       </div>
 
-      {menus.map((menu, index) => (
+      {menus?.map((menu, index) => (
         <div key={index} className="w-full">
           <div className="text-2xl font-bold mb-4 underline">
             {menu.fields["Your Menu"]}
