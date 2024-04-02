@@ -11,6 +11,28 @@
       "value": "Your basket is empty"
     }
   ],
+  "components.basket.selectionsLeft": [
+    {
+      "type": 0,
+      "value": "You may select "
+    },
+    {
+      "type": 1,
+      "value": "numberOfMeals"
+    },
+    {
+      "type": 0,
+      "value": " more meals and "
+    },
+    {
+      "type": 1,
+      "value": "numberOfExtras"
+    },
+    {
+      "type": 0,
+      "value": " more extras"
+    }
+  ],
   "components.basket.submit": [
     {
       "type": 0,

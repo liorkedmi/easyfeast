@@ -21,6 +21,14 @@ export default function Basket() {
   const router = useRouter();
   const booking = useSelector((state) => state.booking);
   const basket = useSelector((state) => state.basket);
+  const numberOfMealsInBasket = useSelector(
+    (state) =>
+      state.basket.items.filter((item) => item.type !== "extras").length
+  );
+  const numberOfExtrasInBasket = useSelector(
+    (state) =>
+      state.basket.items.filter((item) => item.type === "extras").length
+  );
 
   function removeMenuItem(id) {
     dispatch(removeItem(id));
@@ -99,6 +107,16 @@ export default function Basket() {
                     })}
                   </span>
                 ),
+              }}
+            />
+          </div>
+          <div className="text-center text-xs tracking-wider mb-6">
+            <FormattedMessage
+              id="components.basket.selectionsLeft"
+              defaultMessage="You may select {numberOfMeals} more meals and {numberOfExtras} more extras"
+              values={{
+                numberOfMeals: booking.numberOfMeals - numberOfMealsInBasket,
+                numberOfExtras: booking.numberOfExtras - numberOfExtrasInBasket,
               }}
             />
           </div>
