@@ -20,7 +20,7 @@ export default function Variations({ form, data }) {
           {data.map((item) => {
             const id = item.id;
 
-            if (item.fields["Variation Name"].length > 1) {
+            if (item.fields["Variation Name"]?.length > 1) {
               //
             } else {
               const name = item.fields["Variation Name"][0];
