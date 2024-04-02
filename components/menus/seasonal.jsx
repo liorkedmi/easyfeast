@@ -216,7 +216,7 @@ export default async function SeasonalMenu({ searchParams }) {
       <div className={cn(categories?.length > 0 ? "w-4/5" : "w-full")}>
         <div className="flex flex-col gap-4 w-full">
           {filters?.length > 0 && (
-            <div className="flex gap-4 flex-row">
+            <div className="flex items-center justify-start gap-4 flex-row">
               <Filters filters={filters} />
             </div>
           )}
