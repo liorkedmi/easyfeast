@@ -111,6 +111,7 @@ export default function Meal({
     let meal = {
       id,
       name,
+      type,
       shoppingList: shoppingList["primary"][data.portion],
       recipes: recipes["primary"][data.portion],
       portion: data.portion,
