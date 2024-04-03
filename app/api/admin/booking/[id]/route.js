@@ -9,7 +9,7 @@ const fetchBooking = async (id) => {
       base("Bookings")
         .select({
           maxRecords: 1,
-          // view: "App View",
+          view: "App View",
           filterByFormula,
         })
         .eachPage(
