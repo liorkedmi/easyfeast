@@ -31,6 +31,8 @@ export const booking = createSlice({
         chefEmail,
       } = action.payload;
 
+      console.log("Booking", action.payload);
+
       state.id = booking.id;
       state.datetime = booking.fields[FIELD_BOOKING_TIMESTAMP];
       state.shopper = booking.fields[FIELD_SHOPPER];
