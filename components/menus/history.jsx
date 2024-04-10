@@ -192,7 +192,9 @@ function getFilters(data) {
     });
   });
 
-  return result;
+  const sortedResult = result.sort();
+
+  return sortedResult;
 }
 
 export default async function History({ searchParams }) {

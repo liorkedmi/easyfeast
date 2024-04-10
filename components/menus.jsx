@@ -40,10 +40,10 @@ export default function Menus() {
             href={menuItem.href}
             key={menuItem.href}
             className={cn(
-              "flex p-2 items-center justify-center px-4 text-center text-sm tracking-wider transition-colors hover:text-primary",
+              "flex p-2 items-center justify-center px-4 text-center text-sm tracking-wider transition-colors hover:text-primary border-b-4 border-transparent",
               pathname?.startsWith(menuItem.href) ||
                 (index === 0 && pathname === "/")
-                ? "bg-muted font-medium text-primary"
+                ? "bg-muted font-medium text-primary border-primary/70"
                 : "text-muted-foreground hover:bg-muted/50"
             )}
           >

@@ -139,7 +139,9 @@ function getFilters(data) {
     });
   });
 
-  return result;
+  const sortedResult = result.sort();
+
+  return sortedResult;
 }
 
 export default async function SeasonalMenu({ searchParams }) {
@@ -174,19 +176,21 @@ export default async function SeasonalMenu({ searchParams }) {
     const aIndex = order.indexOf(a.fields["Category"]);
     const bIndex = order.indexOf(b.fields["Category"]);
 
-    if (aIndex === -1 && bIndex === -1) {
-      return 0;
+    // First, sort by Category
+    if (aIndex !== bIndex) {
+      if (aIndex === -1) return 1; // a goes after b
+      if (bIndex === -1) return -1; // a goes before b
+      return aIndex - bIndex; // sort by the order of Category
     }
 
-    if (aIndex === -1) {
-      return 1;
-    }
+    // If Categories are the same, sort by "Your Menu"
+    // Assuming "Your Menu" is a string - adjust comparison for different data types
+    const aMenu = a.fields["Your Menu"];
+    const bMenu = b.fields["Your Menu"];
 
-    if (bIndex === -1) {
-      return -1;
-    }
-
-    return aIndex - bIndex;
+    // Use localeCompare for string comparison to handle unicode characters correctly
+    // and ensure consistent behavior across different environments
+    return aMenu.localeCompare(bMenu);
   });
 
   if (result.length === 0) {

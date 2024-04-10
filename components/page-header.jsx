@@ -42,7 +42,9 @@ function PageHeader({ bookingInfo, menu, mode }) {
       <header className="w-full">
         <div className="flex items-center justify-between gap-4 mb-4">
           <>
-            <div className="w-1/2 flex items-center justify-start">
+            <div className="w-1/3 flex items-center justify-center">&nbsp;</div>
+
+            <div className="w-1/3 flex items-center justify-center">
               <Link href="/" className="hover:opacity-75 transition-all">
                 <Image
                   className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
@@ -55,7 +57,7 @@ function PageHeader({ bookingInfo, menu, mode }) {
               </Link>
             </div>
 
-            <div className="w-1/2 flex items-center justify-center">
+            <div className="w-1/3 flex items-center justify-center">
               {menu && (
                 <div className="w-full print:hidden">
                   <div className="flex items-center justify-end w-full gap-4">

@@ -8,7 +8,6 @@ import ClientShops from "./client-shops";
 import { useSelector } from "react-redux";
 
 // TODO:
-//  V Show a clear error message when there are no available bookings
 //  - How to configure a variation with both a required selection and other type of customizations? Each one will have their own menu...
 //  - Strings
 //  - Design (mobile compatible)
@@ -61,6 +60,7 @@ export default function ShoppingList() {
     })
       .then((response) => response.json())
       .then((data) => {
+        // TODO: sometimes this throws an error, maybe because the "Ingredient Display" is missing?
         const sortedList = data.sort((a, b) => {
           if (
             a.fields["Ingredient Display"][0] <

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "../ui/button";
-import { Trash2 } from "lucide-react";
+import { ListRestart } from "lucide-react";
 import { createUrl } from "@/lib/utils";
 
 export default function Filters({ filters }) {
@@ -33,44 +33,40 @@ export default function Filters({ filters }) {
   }
 
   return (
-    // <div className="flex items-center justify-center gap-4">
-    //   <span className="shrink-0 text-sm tracking-wider underline">
-    //     Filters By:
-    //   </span>
-    //   <div className="flex items-center justify-center gap-1">
-    //   </div>
-    // </div>
     <>
-      <ScrollArea className="w-full whitespace-nowrap">
-        <ToggleGroup
-          type="multiple"
-          size="sm"
-          variant="outline"
-          value={currentFilters}
-          onValueChange={(value) => {
-            const newParams = new URLSearchParams(searchParams.toString());
-            newParams.set("filter", value);
-            router.push(createUrl(document.location.pathname, newParams));
-            setCurrentFilters(value);
-          }}
-        >
-          {filters.map((filter) => (
-            <ToggleGroupItem
-              key={`filter-${filter}`}
-              value={filter}
-              aria-label={`Toggle ${filter}`}
-            >
-              <span className="text-sm tracking-wider">{filter}</span>
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+      <ToggleGroup
+        type="multiple"
+        size="sm"
+        variant="outline"
+        value={currentFilters}
+        onValueChange={(value) => {
+          const newParams = new URLSearchParams(searchParams.toString());
+          newParams.set("filter", value);
+          router.push(createUrl(document.location.pathname, newParams));
+          setCurrentFilters(value);
+        }}
+      >
+        {/* <div className="flex items-center justify-center gap-4">
+          <span className="shrink-0 text-sm tracking-wider underline mr-4">
+            Filters By:
+          </span>
+        </div> */}
 
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-      <Button variant="ghost" size="sm" onClick={() => resetFilters()}>
-        <Trash2 className="h-4 w-4 mr-1" />
-        <span className="text-sm tracking-wider">Reset</span>
-      </Button>
+        {filters.map((filter) => (
+          <ToggleGroupItem
+            key={`filter-${filter}`}
+            value={filter}
+            aria-label={`Toggle ${filter}`}
+          >
+            <span className="text-sm tracking-wider">{filter}</span>
+          </ToggleGroupItem>
+        ))}
+
+        <Button variant="ghost" size="sm" onClick={() => resetFilters()}>
+          <ListRestart className="h-4 w-4 mr-1" />
+          <span className="text-sm tracking-wider">Reset</span>
+        </Button>
+      </ToggleGroup>
     </>
   );
 }

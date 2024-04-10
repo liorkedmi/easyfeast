@@ -229,12 +229,13 @@ export default function Meal({
                   name="portion"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <div className="text-base">
                         <FormattedMessage
                           id="components.meal.form.portions.label"
                           defaultMessage="Portions"
                         />
-                      </FormLabel>
+                      </div>
+
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}

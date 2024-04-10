@@ -1,16 +1,32 @@
 "use client";
 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import Notes from "./notes";
+import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
-import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 
-export default function ClientShops({ booking, notes, shoppingList }) {
+export default function ChefShops({ booking, notes, shoppingList }) {
   const router = useRouter();
   const intl = useIntl();
+
+  const form = useForm({
+    defaultValues: {
+      ingredients: [],
+    },
+  });
+  const { getValues } = form;
 
   const onPrint = () => {
     window.print();
@@ -45,11 +61,8 @@ export default function ClientShops({ booking, notes, shoppingList }) {
     router.push(`/`);
   };
 
-  function updateShoppingList() {
-    const values = shoppingList
-      .map((group) => group.ingredients)
-      .flat()
-      .map((item) => item.id);
+  async function updateShoppingList() {
+    const values = getValues();
     const allShoppingList = [];
     const finalShoppingList = [];
 
@@ -57,7 +70,7 @@ export default function ClientShops({ booking, notes, shoppingList }) {
       group.ingredients.forEach((item) => {
         allShoppingList.push(item.id);
 
-        if (!values.includes(item.id)) {
+        if (!values.ingredients.includes(item.id)) {
           finalShoppingList.push(item.id);
         }
       });
@@ -76,92 +89,139 @@ export default function ClientShops({ booking, notes, shoppingList }) {
     });
   }
 
-  useEffect(() => {
-    updateShoppingList();
-  });
-
   return (
     <>
-      <div className="flex flex-col gap-2">
-        <div className="mt-4">
-          <div className="text-sm tracking-wider">
-            <p className="mb-4">
-              <FormattedMessage
-                id="components.clientShops.message"
-                defaultMessage="Please find the grocery shopping list for your booking on {bookingDate}. Please purchase each of the items on the list or check that you have the items already in stock at home"
-                values={{
-                  bookingDate: (
-                    <span className="font-bold">
-                      {new Date(booking.datetime).toLocaleDateString("en-US", {
-                        dateStyle: "full",
-                      })}
-                    </span>
-                  ),
-                }}
-              />
-            </p>
+      {shoppingList && (
+        <>
+          <div className="flex flex-col gap-2">
+            <div className="mt-4">
+              <div className="text-sm tracking-wider">
+                <p className="mb-4">
+                  <FormattedMessage
+                    id="components.clientShops.message"
+                    defaultMessage="Please find the grocery shopping list for your booking on {bookingDate}. Please purchase each of the items on the list or check that you have the items already in stock at home"
+                    values={{
+                      bookingDate: (
+                        <span className="font-bold">
+                          {new Date(booking.datetime).toLocaleDateString(
+                            "en-US",
+                            {
+                              dateStyle: "full",
+                            }
+                          )}
+                        </span>
+                      ),
+                    }}
+                  />
+                </p>
 
-            {notes.length > 0 ? (
-              <div className="mb-4">
-                <Notes notes={notes} shopper="Client" />
+                {notes.length > 0 ? (
+                  <div className="mb-4">
+                    <Notes notes={notes} shopper="Chef" />
+                  </div>
+                ) : null}
+
+                <p className="mb-4">
+                  <FormattedMessage
+                    id="components.clientShops.message2"
+                    defaultMessage="Don't hesitate to reach out if you have any questions. Thank you and  Easy Feasting!"
+                  />
+                </p>
               </div>
-            ) : null}
-
-            <p className="mb-4">
-              <FormattedMessage
-                id="components.clientShops.message2"
-                defaultMessage="Don't hesitate to reach out if you have any questions. Thank you and  Easy Feasting!"
-              />
-            </p>
-          </div>
-        </div>
-
-        {shoppingList.map((group) => {
-          return (
-            <div className="mt-4" key={group.section}>
-              <div className="font-bold">{group.section}</div>
-              <ul>
-                {group.ingredients.map((item) => {
-                  const id = item.id;
-
-                  return (
-                    <ol key={id} className="text-sm tracking-wider">
-                      {item.ingredient} - {item.amount} {item.unit}{" "}
-                      {item.description}
-                    </ol>
-                  );
-                })}
-              </ul>
             </div>
-          );
-        })}
-      </div>
 
-      <div className="flex justify-center gap-2 mt-10 print:hidden">
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={() => onPrint()}
-        >
-          <FormattedMessage
-            id="components.clientShops.button.print"
-            defaultMessage="Print"
-          />
-        </Button>
+            <div id="shopping-list" className="mt-4">
+              <Form {...form}>
+                <form className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="ingredients"
+                    render={() => (
+                      <>
+                        {shoppingList.map((group) => (
+                          <FormItem key={group.section}>
+                            <div className="mb-4">
+                              <FormLabel className="text-lg">
+                                {group.section}
+                              </FormLabel>
+                            </div>
+                            {group.ingredients.map((item) => {
+                              const id = item.id;
 
-        <Button
-          type="button"
-          size="sm"
-          variant="default"
-          onClick={() => onSubmit()}
-        >
-          <FormattedMessage
-            id="components.clientShops.button.submit"
-            defaultMessage="Submit"
-          />
-        </Button>
-      </div>
+                              return (
+                                <FormField
+                                  key={id}
+                                  control={form.control}
+                                  name="ingredients"
+                                  render={({ field }) => {
+                                    return (
+                                      <FormItem
+                                        key={id}
+                                        className="flex flex-row items-center space-x-3 space-y-0"
+                                      >
+                                        <FormControl>
+                                          <Checkbox
+                                            checked={field.value?.includes(id)}
+                                            onCheckedChange={(checked) => {
+                                              const result = checked
+                                                ? field.onChange([
+                                                    ...field.value,
+                                                    id,
+                                                  ])
+                                                : field.onChange(
+                                                    field.value?.filter(
+                                                      (value) => value !== id
+                                                    )
+                                                  );
+
+                                              updateShoppingList();
+
+                                              return result;
+                                            }}
+                                          />
+                                        </FormControl>
+                                        <FormLabel
+                                          className={cn(
+                                            "font-normal",
+                                            field.value?.includes(id)
+                                              ? "line-through"
+                                              : ""
+                                          )}
+                                        >
+                                          {item.ingredient} - {item.amount}{" "}
+                                          {item.unit} {item.description}
+                                        </FormLabel>
+                                      </FormItem>
+                                    );
+                                  }}
+                                />
+                              );
+                            })}
+                          </FormItem>
+                        ))}
+                      </>
+                    )}
+                  />
+                </form>
+              </Form>
+            </div>
+          </div>
+
+          <div className="flex justify-center gap-2 mt-10 print:hidden">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => onPrint()}
+            >
+              <FormattedMessage
+                id="components.clientShops.button.print"
+                defaultMessage="Print"
+              />
+            </Button>
+          </div>
+        </>
+      )}
     </>
   );
 }

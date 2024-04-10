@@ -21,6 +21,31 @@ export default function Meals({ type, data }) {
     return mealsMap;
   };
 
+  const getVariations = (menu) => {
+    const variations = menu.fields["Link to the Variations of this Meal"];
+    return variations;
+    // const requiredSelections = menu.fields["Required Selections"];
+    // let result = variations;
+
+    // if (variations && requiredSelections) {
+    //   result = variations.filter((record) => {
+    //     // return !record.fields["Variation Name"].some((name) =>
+    //     //   requiredSelections.includes(name)
+    //     // );
+    //     if (
+    //       record.fields["Variation Name"].length === 1 &&
+    //       requiredSelections.indexOf(record.fields["Variation Name"][0]) !== -1
+    //     ) {
+    //       return false;
+    //     }
+
+    //     return true;
+    //   });
+    // }
+
+    // return result;
+  };
+
   const params = new URLSearchParams(searchParams.toString());
 
   let filter;

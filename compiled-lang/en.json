@@ -81,12 +81,6 @@
       "value": "Print"
     }
   ],
-  "components.clientShops.button.submit": [
-    {
-      "type": 0,
-      "value": "Submit"
-    }
-  ],
   "components.clientShops.message": [
     {
       "type": 0,
@@ -212,15 +206,7 @@
   "components.welcomeMessage.prefix": [
     {
       "type": 0,
-      "value": "Greetings, "
-    },
-    {
-      "type": 1,
-      "value": "name"
-    },
-    {
-      "type": 0,
-      "value": "! Please select your "
+      "value": "Greetings! Please select your "
     },
     {
       "type": 1,

@@ -26,9 +26,6 @@
   "components.clientShops.button.print": {
     "defaultMessage": "Print"
   },
-  "components.clientShops.button.submit": {
-    "defaultMessage": "Submit"
-  },
   "components.clientShops.message": {
     "defaultMessage": "Please find the grocery shopping list for your booking on {bookingDate}. Please purchase each of the items on the list or check that you have the items already in stock at home"
   },
@@ -87,6 +84,6 @@
     "defaultMessage": "Loading next available booking"
   },
   "components.welcomeMessage.prefix": {
-    "defaultMessage": "Greetings, {name}! Please select your {upcomingMenu} from any of the categories below:"
+    "defaultMessage": "Greetings! Please select your {upcomingMenu} from any of the categories below:"
   }
 }
