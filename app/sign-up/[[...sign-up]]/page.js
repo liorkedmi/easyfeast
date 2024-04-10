@@ -7,7 +7,7 @@ import Image from "next/image";
 import SignUpForm from "./form";
 
 export default function Page() {
-  const [isPermitted, setIsPermitted] = useState(false);
+  const [isPermitted, setIsPermitted] = useState(true);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
