@@ -133,9 +133,13 @@ export default function Meal({
     const selectedVariation = variationName.sort().join();
 
     for (let i = 0; i < variationsOptions.length; i++) {
-      const currentVariation = variationsOptions[i].fields["Variation Name"]
-        .sort()
-        .join();
+      let currentVariation = "";
+
+      if (variationsOptions[i].fields["Variation Name"]) {
+        currentVariation = variationsOptions[i].fields["Variation Name"]
+          .sort()
+          .join();
+      }
 
       if (selectedVariation === currentVariation) {
         meal.id = variationsOptions[i].id;
