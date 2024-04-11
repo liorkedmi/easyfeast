@@ -21,29 +21,30 @@ export default function Meals({ type, data }) {
     return mealsMap;
   };
 
+  const getRequiredSelections = (menu) => {
+    return menu.fields["Required Selections"];
+  };
+
   const getVariations = (menu) => {
     const variations = menu.fields["Link to the Variations of this Meal"];
-    return variations;
-    // const requiredSelections = menu.fields["Required Selections"];
-    // let result = variations;
+    const requiredSelections = menu.fields["Required Selections"];
 
-    // if (variations && requiredSelections) {
-    //   result = variations.filter((record) => {
-    //     // return !record.fields["Variation Name"].some((name) =>
-    //     //   requiredSelections.includes(name)
-    //     // );
-    //     if (
-    //       record.fields["Variation Name"].length === 1 &&
-    //       requiredSelections.indexOf(record.fields["Variation Name"][0]) !== -1
-    //     ) {
-    //       return false;
-    //     }
+    let result = variations;
 
-    //     return true;
-    //   });
-    // }
+    if (variations && requiredSelections) {
+      result = variations.filter((record) => {
+        if (
+          record.fields["Variation Name"].length === 1 &&
+          requiredSelections.indexOf(record.fields["Variation Name"][0]) !== -1
+        ) {
+          return false;
+        }
 
-    // return result;
+        return true;
+      });
+    }
+
+    return result;
   };
 
   const params = new URLSearchParams(searchParams.toString());
@@ -135,6 +136,9 @@ export default function Meals({ type, data }) {
                 }
               }
 
+              const requiredSelectionsOptions = getRequiredSelections(menu);
+              const variationsOptions = getVariations(menu);
+
               return (
                 <div key={`menu-${menu.id}`} className="pb-4">
                   <Meal
@@ -144,12 +148,8 @@ export default function Meals({ type, data }) {
                     ingredients={menu.fields["Ingredients"]}
                     shoppingList={shoppingList}
                     recipes={recipes}
-                    requiredSelectionsOptions={
-                      menu.fields["Required Selections"]
-                    }
-                    variationsOptions={
-                      menu.fields["Link to the Variations of this Meal"]
-                    }
+                    requiredSelectionsOptions={requiredSelectionsOptions}
+                    variationsOptions={variationsOptions}
                   />
                 </div>
               );

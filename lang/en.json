@@ -84,6 +84,6 @@
     "defaultMessage": "Loading next available booking"
   },
   "components.welcomeMessage.prefix": {
-    "defaultMessage": "Greetings! Please select your {upcomingMenu} from any of the categories below:"
+    "defaultMessage": "Greetings, {name}! Please select your {upcomingMenu} from any of the categories below:"
   }
 }

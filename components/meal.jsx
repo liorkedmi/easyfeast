@@ -120,21 +120,30 @@ export default function Meal({
       additionalRequests: data.additionalRequests,
     };
 
-    if (data.variations.length > 0) {
-      const variationName = data.variations.join(",");
+    let variationName = [];
 
-      for (let i = 0; i < variationsOptions.length; i++) {
-        if (
-          variationsOptions[i].fields["Variation Name"].join(",") ===
-          variationName
-        ) {
-          meal.id = variationsOptions[i].id;
-          meal.name = variationsOptions[i].fields["Your Menu"];
-          meal.shoppingList = shoppingList[variationName][data.portion];
-          meal.recipes = recipes[variationName][data.portion];
-          meal.originalId = id;
-          break;
-        }
+    if (data.requiredSelections.length > 0) {
+      variationName = [...variationName, ...data.requiredSelections];
+    }
+
+    if (data.variations.length > 0) {
+      variationName = [...variationName, ...data.variations];
+    }
+
+    const selectedVariation = variationName.sort().join();
+
+    for (let i = 0; i < variationsOptions.length; i++) {
+      const currentVariation = variationsOptions[i].fields["Variation Name"]
+        .sort()
+        .join();
+
+      if (selectedVariation === currentVariation) {
+        meal.id = variationsOptions[i].id;
+        meal.name = variationsOptions[i].fields["Your Menu"];
+        meal.shoppingList = shoppingList[currentVariation][data.portion];
+        meal.recipes = recipes[currentVariation][data.portion];
+        meal.originalId = id;
+        break;
       }
     }
 

@@ -25,6 +25,7 @@ export const booking = createSlice({
         numberOfExtras,
         portionSize,
         clientAddress,
+        clientNameForChef,
         clientName,
         clientRole,
         chefName,
@@ -40,6 +41,7 @@ export const booking = createSlice({
       state.numberOfExtras = numberOfExtras;
       state.portionSize = portionSize;
       state.clientAddress = clientAddress;
+      state.clientNameForChef = clientNameForChef;
       state.clientName = clientName;
       state.clientRole = clientRole;
       state.chefName = chefName;

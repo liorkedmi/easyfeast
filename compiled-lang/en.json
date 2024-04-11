@@ -206,7 +206,15 @@
   "components.welcomeMessage.prefix": [
     {
       "type": 0,
-      "value": "Greetings! Please select your "
+      "value": "Greetings, "
+    },
+    {
+      "type": 1,
+      "value": "name"
+    },
+    {
+      "type": 0,
+      "value": "! Please select your "
     },
     {
       "type": 1,

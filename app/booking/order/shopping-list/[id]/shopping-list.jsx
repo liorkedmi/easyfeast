@@ -157,7 +157,7 @@ export default function ShoppingList() {
       const reheatingTipsUrl = `${document.location.origin}/report/${booking.id}/reheating-tips`;
       const shoppingListUrl = `${document.location.origin}/report/${booking.id}/shopping-list`;
       const recipesUrl = `${document.location.origin}/report/${booking.id}/recipes`;
-      const clientName = booking.clientName;
+      const clientNameForChef = booking.clientNameForChef;
       const clientAddress = booking.clientAddress;
       const chefEmail = booking.chefEmail;
       const startTime = new Date(booking.datetime);
@@ -167,7 +167,7 @@ export default function ShoppingList() {
       formData.append("reheating_tips_url", reheatingTipsUrl);
       formData.append("shopping_list_url", shoppingListUrl);
       formData.append("recipes_url", recipesUrl);
-      formData.append("client", clientName);
+      formData.append("client", clientNameForChef);
       formData.append("location", clientAddress);
       formData.append("recipient", chefEmail);
       formData.append("start_time", startTime.getTime());

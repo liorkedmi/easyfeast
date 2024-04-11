@@ -54,8 +54,9 @@ export default function WelcomeMessage({ bookingInfo, mode }) {
                     <span className="text-base print:hidden">
                       <FormattedMessage
                         id="components.welcomeMessage.prefix"
-                        defaultMessage="Greetings! Please select your {upcomingMenu} from any of the categories below:"
+                        defaultMessage="Greetings, {name}! Please select your {upcomingMenu} from any of the categories below:"
                         values={{
+                          name: booking.clientName,
                           upcomingMenu: (
                             <Tooltip>
                               <TooltipTrigger asChild>
