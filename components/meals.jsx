@@ -33,11 +33,13 @@ export default function Meals({ type, data }) {
 
     if (variations && requiredSelections) {
       result = variations.filter((record) => {
-        if (
-          record.fields["Variation Name"].length === 1 &&
-          requiredSelections.indexOf(record.fields["Variation Name"][0]) !== -1
-        ) {
-          return false;
+        if (record.fields["Variation Name"]?.length === 1) {
+          if (
+            requiredSelections.indexOf(record.fields["Variation Name"][0]) !==
+            -1
+          ) {
+            return false;
+          }
         }
 
         return true;
