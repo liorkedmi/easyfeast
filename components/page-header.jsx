@@ -2,18 +2,29 @@
 
 import * as React from "react";
 
+import { LogOut, User } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 import Basket from "@/components/basket";
 import Image from "next/image";
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { UserButton } from "@clerk/nextjs";
 import WelcomeMessage from "@/components/welcome-message";
+import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useUser } from "@clerk/nextjs";
 
 function PageHeader({ bookingInfo, menu, mode }) {
   const { user } = useUser();
+  const [impersonateOther, setImpersonateOther] = React.useState(false);
   const [backdoorEmail, setBackdoorEmail] = React.useState("");
   const userRole = useSelector((state) => state.booking.clientRole);
+  const pathname = usePathname();
 
   React.useEffect(() => {
     if (document.cookie.indexOf("__backdoor") !== -1) {
@@ -25,18 +36,73 @@ function PageHeader({ bookingInfo, menu, mode }) {
     }
   }, []);
 
+  function stopImpersonation() {
+    document.cookie =
+      "__backdoor=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.location.reload();
+  }
+
+  function toggleImpersonateOther() {
+    setImpersonateOther(!impersonateOther);
+  }
+
+  function handleBackdoorKeyDown(e) {
+    if (e.key === "Enter") {
+      document.cookie = `__backdoor=${e.target.value}; Path=/;`;
+      document.location.reload();
+    }
+  }
+
   return (
     <>
       {userRole === "Admin" && (
         <>
-          {backdoorEmail && (
-            <div className="w-full flex items-center justify-center my-4">
-              <div className="p-4 bg-slate-200">
-                Impersonating{" "}
-                <strong className="font-semibold">{backdoorEmail}</strong>
-              </div>
+          <div className="flex items-center justify-center gap-4 p-2 text-xs bg-slate-200 fixed bottom-0 right-0 h-[38px]">
+            <>
+              {!impersonateOther && backdoorEmail && (
+                <div>
+                  <span>Impersonating: </span>
+                  <strong className="font-semibold">{backdoorEmail}</strong>
+                </div>
+              )}
+            </>
+            <>
+              {impersonateOther && (
+                <>
+                  <span>Impersonate: </span>
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    className="text-sm h-auto p-0"
+                    onKeyDown={(e) => handleBackdoorKeyDown(e)}
+                  />
+                </>
+              )}
+            </>
+
+            <div className="flex gap-2">
+              {backdoorEmail && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <LogOut
+                      className="w-4 h-4 hover:opacity-75 transition-opacity cursor-pointer"
+                      onClick={() => stopImpersonation()}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent>Exit</TooltipContent>
+                </Tooltip>
+              )}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <User
+                    className="w-4 h-4 hover:opacity-75 transition-opacity cursor-pointer"
+                    onClick={() => toggleImpersonateOther()}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>Impersonate Other</TooltipContent>
+              </Tooltip>
             </div>
-          )}
+          </div>
         </>
       )}
       <header className="w-full">
@@ -62,7 +128,8 @@ function PageHeader({ bookingInfo, menu, mode }) {
                 <div className="w-full print:hidden">
                   <div className="flex items-center justify-end w-full gap-4">
                     {user ? <UserButton afterSignOutUrl="/" /> : null}
-                    <Basket />
+                    {pathname.indexOf("/booking/order/shopping-list") ===
+                      -1 && <Basket />}
                   </div>
                 </div>
               )}
@@ -70,12 +137,14 @@ function PageHeader({ bookingInfo, menu, mode }) {
           </>
         </div>
 
-        <div
-          className="bg-[#004c45] text-white p-2"
-          style={{ WebkitPrintColorAdjust: "exact" }}
-        >
-          <WelcomeMessage bookingInfo={bookingInfo} mode={mode} />
-        </div>
+        {pathname.indexOf("/booking/order/shopping-list") === -1 && (
+          <div
+            className="bg-[#004c45] text-white p-2"
+            style={{ WebkitPrintColorAdjust: "exact" }}
+          >
+            <WelcomeMessage bookingInfo={bookingInfo} mode={mode} />
+          </div>
+        )}
       </header>
     </>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { FormattedMessage, useIntl } from "react-intl";
 import { selectIngredients, selectNotes } from "@/redux/features/basketSlice";
 import { useEffect, useState } from "react";
 
@@ -146,6 +147,21 @@ export default function ShoppingList() {
         setShoppingList(result);
       })
       .catch((error) => {
+        toast({
+          variant: "destructive",
+          title: intl.formatMessage({
+            id: "components.shoppingList.toast.error.title",
+            defaultMessage: "Something went wrong :(",
+          }),
+          description: (
+            <div className="mt-2">
+              <FormattedMessage
+                id="components.shoppingList.toast.error.message"
+                defaultMessage="Please reach out to us directly for assistance."
+              />
+            </div>
+          ),
+        });
         console.error("Error fetching data:", error);
       });
   }, [ingredients]);
