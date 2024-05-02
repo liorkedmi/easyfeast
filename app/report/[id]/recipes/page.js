@@ -367,11 +367,14 @@ export default async function BookingRecipesPage({ params }) {
                 Menu:
               </td>
               <td className="p-2 w-2/3 border-b border-slate-200 whitespace-pre-line">
-                {menus
-                  ?.map((menu) => {
-                    return menu.fields["Your Menu"];
-                  })
-                  .join(", ")}
+                <ul className="list-disc pl-8">
+                  {/* Make bullets - also, the bullets and the recipes should follow the same order */}
+                  {menus?.map((menu) => (
+                    <li key={menu.fields["Your Menu"]}>
+                      {menu.fields["Your Menu"]}
+                    </li>
+                  ))}
+                </ul>
               </td>
             </tr>
             <tr>
