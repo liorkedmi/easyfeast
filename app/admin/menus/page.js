@@ -7,7 +7,7 @@ async function getMenus() {
     base("Menus")
       .select({
         pageSize: 100,
-        maxRecords: 1000,
+        maxRecords: 10000,
         // view: "App View",
         filterByFormula: "FIND('Current Seasonal Menu', {Tag}) > 0",
       })
