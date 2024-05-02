@@ -104,22 +104,22 @@ export default async function AdminMenus() {
 
         if (!variation.fields["Variation Name"]) {
           variationStatus.valid = false;
-          variationStatus.error.push("Variation Name is empty");
+          variationStatus.error.push("`Variation Name` is missing");
         }
 
         if (!variation.fields["Recipes - Small"]) {
           variationStatus.valid = false;
-          variationStatus.error.push("Variation Small Recipes missing");
+          variationStatus.error.push("`Recipes - Small` is missing");
         }
 
         if (!variation.fields["Recipes - Medium"]) {
           variationStatus.valid = false;
-          variationStatus.error.push("Variation Medium Recipes missing");
+          variationStatus.error.push("`Recipes - Medium` is missing");
         }
 
         if (!variation.fields["Recipes - Large"]) {
           variationStatus.valid = false;
-          variationStatus.error.push("Variation Large Recipes missing");
+          variationStatus.error.push("`Recipes - Large` is missing");
         }
 
         status[menu.fields["Your Menu"]].variations.push(variationStatus);
@@ -159,11 +159,3 @@ export default async function AdminMenus() {
     </section>
   );
 }
-
-// 1. Go through all the meals in the database
-
-// 2. For each meal, if it has the "Current Seasonal Menu" tag, then
-
-// 2.1 For each "Link to the Variations of this Meal", fetch variation
-
-// 2.1.1. And make sure the "Variation Name" is not empty
