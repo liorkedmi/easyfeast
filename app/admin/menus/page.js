@@ -84,9 +84,9 @@ async function getVariations(ids) {
 }
 
 export default async function AdminMenus() {
-  if (!(await isLoggedInUserAdmin())) {
-    return <div>Unauthorized</div>;
-  }
+  // if (!(await isLoggedInUserAdmin())) {
+  //   return <div>Unauthorized</div>;
+  // }
 
   const menus = await getMenus();
   const status = [];
