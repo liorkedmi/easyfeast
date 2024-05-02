@@ -6,7 +6,7 @@ async function getMenus() {
   const result = [];
 
   const promise = new Promise((resolve, reject) => {
-    const filterByFormula = `OR({Variation Name}=BLANK(), {Recipes - Small}=BLANK(), {Recipes - Medium}=BLANK(),  {Recipes - Large}=BLANK())`;
+    const filterByFormula = `AND(OR({Variation Name}=BLANK(), {Recipes - Small}=BLANK(), {Recipes - Medium}=BLANK(),  {Recipes - Large}=BLANK()), NOT({Link to the Variations of this Meal})=BLANK())`;
 
     base("Menus")
       .select({
