@@ -158,6 +158,8 @@ export async function getSessionInfo(id = null, backdoorEmail = null) {
   try {
     let user;
     let email;
+    let loggedInUserEmail;
+    let loggedInUserRole = "User";
 
     user = await currentUser();
 
@@ -168,8 +170,10 @@ export async function getSessionInfo(id = null, backdoorEmail = null) {
 
     if (backdoorEmail) {
       email = backdoorEmail;
+      loggedInUserEmail = user.email;
     } else {
       email = user.emailAddresses[0].emailAddress;
+      loggedInUserEmail = email;
     }
 
     let booking = null;
@@ -178,6 +182,10 @@ export async function getSessionInfo(id = null, backdoorEmail = null) {
       booking = await fetchBooking(id);
     } else {
       booking = await fetchNextAvailableBooking(email);
+    }
+
+    if (loggedInUserEmail !== email) {
+      loggedInUserRole = "Admin";
     }
 
     const client = await fetchClient(email);
@@ -201,6 +209,8 @@ export async function getSessionInfo(id = null, backdoorEmail = null) {
       clientNameForChef: client.fields["Name for Chef Display"],
       clientName: client.fields["Name for Receipt"],
       clientRole: client.fields["Role"],
+      loggedInUserEmail,
+      loggedInUserRole,
       chefName: chef.fields["Name"],
       chefEmail: chef.fields["Email Address"],
     };

@@ -30,6 +30,8 @@ export const booking = createSlice({
         clientRole,
         chefName,
         chefEmail,
+        loggedInUserEmail,
+        loggedInUserRole,
       } = action.payload;
 
       console.log("Booking", action.payload);
@@ -46,6 +48,8 @@ export const booking = createSlice({
       state.clientRole = clientRole;
       state.chefName = chefName;
       state.chefEmail = chefEmail;
+      state.loggedInUserEmail = loggedInUserEmail;
+      state.loggedInUserRole = loggedInUserRole;
     },
   },
 });

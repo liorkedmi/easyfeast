@@ -23,7 +23,7 @@ function PageHeader({ bookingInfo, menu, mode }) {
   const { user } = useUser();
   const [impersonateOther, setImpersonateOther] = React.useState(false);
   const [backdoorEmail, setBackdoorEmail] = React.useState("");
-  const userRole = useSelector((state) => state.booking.clientRole);
+  const userRole = useSelector((state) => state.booking.loggedInUserRole);
   const pathname = usePathname();
 
   React.useEffect(() => {
