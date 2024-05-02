@@ -95,21 +95,34 @@ export default async function AdminMenus() {
       );
 
       for (const variation of variations) {
-        if (variation.fields["Variation Name"]) {
-          status[menu.fields["Your Menu"]].variations.push({
-            id: variation.id,
-            name: variation.fields["Your Menu"],
-            valid: true,
-            status: "",
-          });
-        } else {
-          status[menu.fields["Your Menu"]].variations.push({
-            id: variation.id,
-            name: variation.fields["Your Menu"],
-            valid: false,
-            status: "Variation Name is empty",
-          });
+        const variationStatus = {
+          id: variation.id,
+          name: variation.fields["Your Menu"],
+          valid: true,
+          error: [],
+        };
+
+        if (!variation.fields["Variation Name"]) {
+          variationStatus.valid = false;
+          variationStatus.error.push("Variation Name is empty");
         }
+
+        if (!variation.fields["Recipes - Small"]) {
+          variationStatus.valid = false;
+          variationStatus.error.push("Variation Small Recipes missing");
+        }
+
+        if (!variation.fields["Recipes - Medium"]) {
+          variationStatus.valid = false;
+          variationStatus.error.push("Variation Medium Recipes missing");
+        }
+
+        if (!variation.fields["Recipes - Large"]) {
+          variationStatus.valid = false;
+          variationStatus.error.push("Variation Large Recipes missing");
+        }
+
+        status[menu.fields["Your Menu"]].variations.push(variationStatus);
       }
     }
   }
@@ -132,7 +145,7 @@ export default async function AdminMenus() {
                         <>{variation.name}</>
                       ) : (
                         <>
-                          {variation.name} - {variation.status}
+                          {variation.name} - {variation.error.join(", ")}
                         </>
                       )}
                     </span>
