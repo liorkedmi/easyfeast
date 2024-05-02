@@ -159,7 +159,7 @@ export async function getSessionInfo(id = null, backdoorEmail = null) {
     let user;
     let email;
     let loggedInUserEmail;
-    let loggedInUserRole = "User";
+    let loggedInUserRole;
 
     user = await currentUser();
 
@@ -184,12 +184,14 @@ export async function getSessionInfo(id = null, backdoorEmail = null) {
       booking = await fetchNextAvailableBooking(email);
     }
 
-    if (loggedInUserEmail !== email) {
-      loggedInUserRole = "Admin";
-    }
-
     const client = await fetchClient(email);
     const chef = await fetchChef(booking.fields["Chef"][0]);
+
+    if (loggedInUserEmail !== email) {
+      loggedInUserRole = "Admin";
+    } else {
+      loggedInUserRole = client.fields["Role"];
+    }
 
     console.log("Booking:" + JSON.stringify(booking.fields));
     console.log("Client:" + JSON.stringify(client.fields));
