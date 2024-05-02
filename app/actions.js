@@ -222,3 +222,16 @@ export async function getSessionInfo(id = null, backdoorEmail = null) {
     return { error: true, error: ex.message };
   }
 }
+
+export async function isLoggedInUserAdmin() {
+  const user = await currentUser();
+
+  if (!user) {
+    return false;
+  }
+
+  const email = user.emailAddresses[0].emailAddress;
+  const client = await fetchClient(email);
+
+  return client.fields["Role"] === "Admin";
+}

@@ -1,4 +1,6 @@
 import base from "@/lib/airtable";
+import { currentUser } from "@clerk/nextjs";
+import { isLoggedInUserAdmin } from "@/app/actions";
 
 async function getMenus() {
   const result = [];
@@ -80,6 +82,10 @@ async function getVariations(ids) {
 }
 
 export default async function AdminMenus() {
+  if (!(await isLoggedInUserAdmin())) {
+    return <div>Unauthorized</div>;
+  }
+
   const menus = await getMenus();
   const status = [];
 
