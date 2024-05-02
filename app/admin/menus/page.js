@@ -79,47 +79,6 @@ async function getVariations(ids) {
   });
 }
 
-async function validateMenu(menu) {
-  const result = [];
-
-  if (menu.fields["Link to the Variations of this Meal"]) {
-    const variations = await getVariations(
-      menu.fields["Link to the Variations of this Meal"]
-    );
-
-    for (const variation of variations) {
-      const variationStatus = {
-        id: variation.id,
-        name: variation.fields["Your Menu"],
-        valid: true,
-        error: [],
-      };
-
-      if (!variation.fields["Variation Name"]) {
-        variationStatus.valid = false;
-        variationStatus.error.push("Variation Name is empty");
-      }
-
-      if (!variation.fields["Recipes - Small"]) {
-        variationStatus.valid = false;
-        variationStatus.error.push("Variation Small Recipes missing");
-      }
-
-      if (!variation.fields["Recipes - Medium"]) {
-        variationStatus.valid = false;
-        variationStatus.error.push("Variation Medium Recipes missing");
-      }
-
-      if (!variation.fields["Recipes - Large"]) {
-        variationStatus.valid = false;
-        variationStatus.error.push("Variation Large Recipes missing");
-      }
-
-      result.push(variationStatus);
-    }
-  }
-}
-
 export default async function AdminMenus() {
   const menus = await getMenus();
   const status = [];
@@ -127,43 +86,84 @@ export default async function AdminMenus() {
   for (const menu of menus) {
     status[menu.fields["Your Menu"]] = {
       menu,
-      variations: await validateMenu(menu),
+      variations: [],
     };
+
+    if (menu.fields["Link to the Variations of this Meal"]) {
+      const variations = await getVariations(
+        menu.fields["Link to the Variations of this Meal"]
+      );
+
+      for (const variation of variations) {
+        const variationStatus = {
+          id: variation.id,
+          name: variation.fields["Your Menu"],
+          valid: true,
+          error: [],
+        };
+
+        if (!variation.fields["Variation Name"]) {
+          variationStatus.valid = false;
+          variationStatus.error.push("Variation Name is empty");
+        }
+
+        if (!variation.fields["Recipes - Small"]) {
+          variationStatus.valid = false;
+          variationStatus.error.push("Variation Small Recipes missing");
+        }
+
+        if (!variation.fields["Recipes - Medium"]) {
+          variationStatus.valid = false;
+          variationStatus.error.push("Variation Medium Recipes missing");
+        }
+
+        if (!variation.fields["Recipes - Large"]) {
+          variationStatus.valid = false;
+          variationStatus.error.push("Variation Large Recipes missing");
+        }
+
+        status[menu.fields["Your Menu"]].variations.push(variationStatus);
+      }
+    }
   }
 
   return (
-    <>
-      <section className="p-4">
-        <div className="font-bold text-2xl mt-4 mb-8 uppercase">
-          Current Seasonal Menus
-        </div>
+    <section className="p-4">
+      <div className="font-bold text-2xl mt-4 mb-8 uppercase">Menus</div>
 
-        {Object.keys(status).map((key) => {
-          return (
-            <div key={key} className="mb-4">
-              <h2 className="text-lg font-bold">{key}</h2>
-              <ul>
-                {status[key].variations.map((variation) => {
-                  return (
-                    <li key={variation.id}>
-                      {variation.valid ? "✅" : "❌"}
-                      <span className="ml-2">
-                        {variation.valid ? (
-                          <>{variation.name}</>
-                        ) : (
-                          <>
-                            {variation.name} - {variation.error.join(", ")}
-                          </>
-                        )}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          );
-        })}
-      </section>
-    </>
+      {Object.keys(status).map((key) => {
+        return (
+          <div key={key} className="mb-4">
+            <h2 className="text-lg font-bold">{key}</h2>
+            <ul>
+              {status[key].variations.map((variation) => {
+                return (
+                  <li key={variation.id}>
+                    {variation.valid ? "✅" : "❌"}
+                    <span className="ml-2">
+                      {variation.valid ? (
+                        <>{variation.name}</>
+                      ) : (
+                        <>
+                          {variation.name} - {variation.error.join(", ")}
+                        </>
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })}
+    </section>
   );
 }
+
+// 1. Go through all the meals in the database
+
+// 2. For each meal, if it has the "Current Seasonal Menu" tag, then
+
+// 2.1 For each "Link to the Variations of this Meal", fetch variation
+
+// 2.1.1. And make sure the "Variation Name" is not empty
