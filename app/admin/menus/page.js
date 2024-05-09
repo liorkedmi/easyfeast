@@ -146,7 +146,7 @@ export default async function AdminMenus({ searchParams }) {
       <div className="font-bold text-2xl mt-4 mb-8 uppercase">Menus</div>
 
       <div>
-        Page {page + 1}/{Math.abs(Math.floor(menus.length / pageSize - 1))}
+        Page {page + 1}/{Math.abs(Math.ceil(menus.length / pageSize))}
       </div>
 
       {Object.keys(status).map((key) => {
