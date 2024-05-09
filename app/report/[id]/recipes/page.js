@@ -262,7 +262,7 @@ export default async function BookingRecipesPage({ params }) {
   const client = await fetchClient(booking.fields["Email"]);
   const chef = await fetchChef(booking.fields["Chef"]);
   const menus = await fetchMenus(booking.fields["Final Menu"]);
-  const recipes = await fetchRecipes(booking.fields["All Recipes for Booking"]);
+  const recipes = await fetchRecipes(booking.fields["All Recipes for Booking"]); // Should be saved in the right order
 
   return (
     <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto text-sm tracking-wider">

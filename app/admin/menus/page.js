@@ -1,19 +1,15 @@
-import base from "@/lib/airtable";
-import { currentUser } from "@clerk/nextjs";
 import { isLoggedInUserAdmin } from "@/app/actions";
+import base from "@/lib/airtable";
 
 async function getMenus() {
   const result = [];
 
   const promise = new Promise((resolve, reject) => {
-    const filterByFormula = `AND(OR({Variation Name}=BLANK(), {Recipes - Small}=BLANK(), {Recipes - Medium}=BLANK(),  {Recipes - Large}=BLANK()), NOT({Link to the Variations of this Meal})=BLANK())`;
-
     base("Menus")
       .select({
         pageSize: 100,
         maxRecords: 10000,
         // view: "App View",
-        filterByFormula,
       })
       .eachPage(
         function page(records, fetchNextPage) {
@@ -83,65 +79,105 @@ async function getVariations(ids) {
   });
 }
 
-export default async function AdminMenus() {
+export default async function AdminMenus({ searchParams }) {
   // if (!(await isLoggedInUserAdmin())) {
   //   return <div>Unauthorized</div>;
   // }
 
+  const page = parseInt(searchParams?.page) || 0;
+  const pageSize = 50;
   const menus = await getMenus();
   const status = [];
 
-  for (const variation of menus) {
-    const variationStatus = {
-      id: variation.id,
-      name: variation.fields["Your Menu"],
-      valid: true,
-      error: [],
-    };
+  for (
+    let i = page * pageSize;
+    i < (page + 1) * pageSize && i < menus.length * pageSize;
+    i++
+  ) {
+    let menu = menus[i];
 
-    if (!variation.fields["Variation Name"]) {
-      variationStatus.valid = false;
-      variationStatus.error.push("`Variation Name` is missing");
+    if (menu) {
+      status[menu.fields["Your Menu"]] = {
+        menu,
+        variations: [],
+      };
+
+      if (menu.fields["Link to the Variations of this Meal"]) {
+        const variations = await getVariations(
+          menu.fields["Link to the Variations of this Meal"]
+        );
+
+        for (const variation of variations) {
+          const variationStatus = {
+            id: variation.id,
+            name: variation.fields["Your Menu"],
+            valid: true,
+            error: [],
+          };
+
+          if (!variation.fields["Variation Name"]) {
+            variationStatus.valid = false;
+            variationStatus.error.push("`Variation Name` is missing");
+          }
+
+          if (!variation.fields["Recipes - Small"]) {
+            variationStatus.valid = false;
+            variationStatus.error.push("`Recipes - Small` is missing");
+          }
+
+          if (!variation.fields["Recipes - Medium"]) {
+            variationStatus.valid = false;
+            variationStatus.error.push("`Recipes - Medium` is missing");
+          }
+
+          if (!variation.fields["Recipes - Large"]) {
+            variationStatus.valid = false;
+            variationStatus.error.push("`Recipes - Large` is missing");
+          }
+
+          status[menu.fields["Your Menu"]].variations.push(variationStatus);
+        }
+      }
     }
-
-    if (!variation.fields["Recipes - Small"]) {
-      variationStatus.valid = false;
-      variationStatus.error.push("`Recipes - Small` is missing");
-    }
-
-    if (!variation.fields["Recipes - Medium"]) {
-      variationStatus.valid = false;
-      variationStatus.error.push("`Recipes - Medium` is missing");
-    }
-
-    if (!variation.fields["Recipes - Large"]) {
-      variationStatus.valid = false;
-      variationStatus.error.push("`Recipes - Large` is missing");
-    }
-
-    status.push(variationStatus);
   }
 
   return (
     <section className="p-4">
       <div className="font-bold text-2xl mt-4 mb-8 uppercase">Menus</div>
 
-      {status.map((variation) => {
+      {Object.keys(status).map((key) => {
         return (
-          <li key={variation.id}>
-            {variation.valid ? "✅" : "❌"}
-            <span className="ml-2">
-              {variation.valid ? (
-                <>{variation.name}</>
-              ) : (
-                <>
-                  {variation.name} - {variation.error.join(", ")}
-                </>
-              )}
-            </span>
-          </li>
+          <div key={key} className="mb-4">
+            <h2 className="text-lg font-bold">{key}</h2>
+            <ul>
+              {status[key].variations.map((variation) => {
+                return (
+                  <li key={variation.id}>
+                    {variation.valid ? "✅" : "❌"}
+                    <span className="ml-2">
+                      {variation.valid ? (
+                        <>{variation.name}</>
+                      ) : (
+                        <>
+                          {variation.name} - {variation.error.join(", ")}
+                        </>
+                      )}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         );
       })}
+
+      <div className="flex gap-2">
+        {page > 0 && <a href={`?page=${page - 1}`}>Previous</a>}
+
+        {page < menus.length / pageSize - 1 && (
+          <a href={`?page=${page + 1}`}>Next</a>
+        )}
+      </div>
     </section>
   );
 }
