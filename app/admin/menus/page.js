@@ -145,7 +145,7 @@ export default async function AdminMenus({ searchParams }) {
     <section className="p-4">
       <div className="font-bold text-2xl mt-4 mb-8 uppercase">Menus</div>
 
-      <div>
+      <div className="mb-4">
         Page {page + 1}/{Math.abs(Math.ceil(menus.length / pageSize))}
       </div>
 
