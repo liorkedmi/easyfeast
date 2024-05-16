@@ -14,7 +14,17 @@ export default async function MenuLayout({ children, params }) {
         <div className="pb-4">{children}</div>
       ) : (
         <section className="flex flex-col items-start justify-between p-4 max-w-4xl m-auto">
-          <div className="pb-4 text-sm tracking-wider">No bookings found</div>
+          <div className="pb-4 text-sm tracking-wider">
+            Oops! There&apos;s been an error loading our menu. <br />
+            Please contact us at{" "}
+            <a
+              href="mailto:hi@easyfeast.com?subject=Error loading menu"
+              className="underline"
+            >
+              hi@easyfeast.com
+            </a>{" "}
+            so we can get this straightened out for you.
+          </div>
         </section>
       )}
     </>
