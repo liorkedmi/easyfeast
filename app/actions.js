@@ -154,7 +154,6 @@ export async function fetchNextAvailableBooking(email) {
 }
 
 export async function getSessionInfo(id = null, backdoorEmail = null) {
-  // For testing purposes, we allow passing the user email address as a parameter
   try {
     let user;
     let email;

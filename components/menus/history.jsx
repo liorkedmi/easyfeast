@@ -227,22 +227,36 @@ export default async function History({ searchParams }) {
         ?.split(",")
         .map((item) => item.trim());
 
-      return params.some((filter) => item.fields["Filters"]?.includes(filter));
+      return params.every((filter) => item.fields["Filters"]?.includes(filter));
     }
 
     return true;
   });
 
+  // Collect all the variation IDs
+  const variationIds = [];
+  for (const item of data) {
+    if (item.fields["Link to the Variations of this Meal"]?.length > 0) {
+      variationIds.push(...item.fields["Link to the Variations of this Meal"]);
+    }
+  }
+
   const categories = getCategories(data);
   const filters = getFilters(data);
   const result = JSON.parse(JSON.stringify(data));
 
+  // Fetch all the variations at once
+  const variations = await getVariations(variationIds);
+
+  // Map the variations to their corresponding menu items
   for (const item of result) {
     if (item.fields["Link to the Variations of this Meal"]?.length > 0) {
-      const variations = await getVariations(
-        item.fields["Link to the Variations of this Meal"]
+      item.fields["Link to the Variations of this Meal"] = variations.filter(
+        (variation) =>
+          item.fields["Link to the Variations of this Meal"].includes(
+            variation.id
+          )
       );
-      item.fields["Link to the Variations of this Meal"] = variations;
     }
   }
 

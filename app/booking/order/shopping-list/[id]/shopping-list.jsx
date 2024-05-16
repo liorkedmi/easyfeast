@@ -9,7 +9,6 @@ import ClientShops from "./client-shops";
 import { useSelector } from "react-redux";
 
 // TODO:
-//  - How to configure a variation with both a required selection and other type of customizations? Each one will have their own menu...
 //  - Strings
 //  - Design (mobile compatible)
 //  - Handoff:

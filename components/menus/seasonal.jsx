@@ -61,7 +61,6 @@ async function getVariations(ids) {
       .select({
         pageSize: 100,
         maxRecords: 1000,
-        // view: "App View",
         filterByFormula,
       })
       .eachPage(
@@ -159,16 +158,30 @@ export default async function SeasonalMenu({ searchParams }) {
     return true;
   });
 
+  // Collect all the variation IDs
+  const variationIds = [];
+  for (const item of data) {
+    if (item.fields["Link to the Variations of this Meal"]?.length > 0) {
+      variationIds.push(...item.fields["Link to the Variations of this Meal"]);
+    }
+  }
+
   const categories = getCategories(data);
   const filters = getFilters(data);
   const result = JSON.parse(JSON.stringify(data));
 
+  // Fetch all the variations at once
+  const variations = await getVariations(variationIds);
+
+  // Map the variations to their corresponding menu items
   for (const item of result) {
     if (item.fields["Link to the Variations of this Meal"]?.length > 0) {
-      const variations = await getVariations(
-        item.fields["Link to the Variations of this Meal"]
+      item.fields["Link to the Variations of this Meal"] = variations.filter(
+        (variation) =>
+          item.fields["Link to the Variations of this Meal"].includes(
+            variation.id
+          )
       );
-      item.fields["Link to the Variations of this Meal"] = variations;
     }
   }
 
