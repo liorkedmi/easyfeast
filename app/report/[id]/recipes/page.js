@@ -262,7 +262,41 @@ export default async function BookingRecipesPage({ params }) {
   const client = await fetchClient(booking.fields["Email"]);
   const chef = await fetchChef(booking.fields["Chef"]);
   const menus = await fetchMenus(booking.fields["Final Menu"]);
-  const recipes = await fetchRecipes(booking.fields["All Recipes for Booking"]); // Should be saved in the right order
+  const recipeIds = [];
+
+  if (booking.fields["1st Recipe"]) {
+    recipeIds.push(booking.fields["1st Recipe"][0]);
+  }
+  if (booking.fields["2nd Recipe"]) {
+    recipeIds.push(booking.fields["2nd Recipe"][0]);
+  }
+  if (booking.fields["3rd Recipe"]) {
+    recipeIds.push(booking.fields["3rd Recipe"][0]);
+  }
+  if (booking.fields["4th Recipe"]) {
+    recipeIds.push(booking.fields["4th Recipe"][0]);
+  }
+  if (booking.fields["5th Recipe"]) {
+    recipeIds.push(booking.fields["5th Recipe"][0]);
+  }
+  if (booking.fields["6th Recipe"]) {
+    recipeIds.push(booking.fields["6th Recipe"][0]);
+  }
+  if (booking.fields["7th Recipe"]) {
+    recipeIds.push(booking.fields["7th Recipe"][0]);
+  }
+  if (booking.fields["8th Recipe"]) {
+    recipeIds.push(booking.fields["8th Recipe"][0]);
+  }
+  if (booking.fields["9th Recipe"]) {
+    recipeIds.push(booking.fields["9th Recipe"][0]);
+  }
+  if (booking.fields["10th Recipe"]) {
+    recipeIds.push(booking.fields["10th Recipe"][0]);
+  }
+
+  const recipes = await fetchRecipes(recipeIds);
+  recipes.sort((a, b) => recipeIds.indexOf(a.id) - recipeIds.indexOf(b.id));
 
   return (
     <section className="flex flex-col items-center justify-between px-4 max-w-4xl m-auto text-sm tracking-wider">
