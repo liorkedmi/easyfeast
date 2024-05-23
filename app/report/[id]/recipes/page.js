@@ -519,9 +519,27 @@ export default async function BookingRecipesPage({ params }) {
         return (
           <section key={recipe}>
             <div className="mb-4">
-              <div className="text-base font-bold mb-4 underline">
+              <div className="text-lg font-bold mb-4 underline">
                 {recipe.fields["Recipe"]}
               </div>
+
+              <div className="mb-4">
+                <div className="flex flex-row flex-wrap justify-start gap-8">
+                  {recipe.fields["Picture"]?.map((picture) => {
+                    return (
+                      <Image
+                        key={picture.id}
+                        src={picture.thumbnails.large.url}
+                        className="mb-4"
+                        width={picture.thumbnails.large.width / 3}
+                        height={picture.thumbnails.large.height / 3}
+                        alt=""
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
               <div className="mb-4">
                 <span className="font-bold">Active Time:</span>{" "}
                 {recipe.fields["Active Time (Min)"] ? (
@@ -541,7 +559,7 @@ export default async function BookingRecipesPage({ params }) {
             </div>
 
             <div className="mb-4">
-              <div className="text-sm font-bold mb-4">Recipe Ingredients:</div>
+              <div className="text-sm font-bold mb-4">Ingredients:</div>
               <div className="mb-4 whitespace-pre-line">
                 <ul className="list-disc pl-8">
                   {ingredients?.map((ingredient) => (
@@ -554,27 +572,7 @@ export default async function BookingRecipesPage({ params }) {
             </div>
 
             <div className="mb-4">
-              <div className="text-sm font-bold mb-4">Pictures</div>
-              <div className="mb-4">
-                <div className="flex flex-row flex-wrap justify-start gap-8">
-                  {recipe.fields["Picture"]?.map((picture) => {
-                    return (
-                      <Image
-                        key={picture.id}
-                        src={picture.thumbnails.large.url}
-                        className="mb-4"
-                        width={picture.thumbnails.large.width / 2}
-                        height={picture.thumbnails.large.height / 2}
-                        alt=""
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-4">
-              <div className="text-sm font-bold mb-4">Cooking Directions</div>
+              <div className="text-sm font-bold mb-4">Directions</div>
               <div className="mb-4 whitespace-pre-line">
                 {recipe.fields["Cooking Directions"]}
               </div>
