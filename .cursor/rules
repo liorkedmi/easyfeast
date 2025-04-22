@@ -1,0 +1,70 @@
+# .cursor/rules
+
+[general]
+preferred_framework = "Next.js"
+component_library = "shadcn/ui"
+language = "typescript"
+monorepo_tool = "Turborepo"
+
+[monorepo]
+package_manager = "pnpm"
+use_workspaces = true
+build_system = "Turborepo"
+parallel_execution = true
+caching_enabled = true
+
+[ui]
+style = "TailwindCSS"
+component_structure = "modular"
+prefer_server_components = true
+
+[folders]
+pages_dir = "app"
+components_dir = "components"
+lib_dir = "lib"
+hooks_dir = "hooks"
+types_dir = "types"
+
+[conventions]
+use_app_router = true
+use_server_components = true
+use_client_directive = true
+route_layouts = true
+
+[auth]
+authentication_provider = "Clerk"
+use_auth_middleware = true
+protect_routes = true
+
+[api]
+use_next_api_routes = true
+external_api_usage = ["Airtable"]
+
+[shadcn]
+use_dialog = true
+use_card = true
+use_button = true
+use_input = true
+use_form = true
+use_select = true
+use_table = true
+
+[routing]
+preferred_navigation = "next/link"
+use_dynamic_routes = true
+
+[forms]
+validation_library = "zod"
+form_library = "react-hook-form"
+
+[state]
+server_state_library = "TanStack Query"
+client_state_library = "Zustand"
+prefer_tanstack_query_for_server_data = true
+prefer_zustand_for_ui_drafts_and_global_client_state = true
+use_context_for_simple_state = true
+
+[database]
+use_external_database = true
+external_database = "Airtable"
+orm = "none"
