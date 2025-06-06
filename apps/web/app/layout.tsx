@@ -1,14 +1,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
-
 import "@workspace/ui/globals.css";
 import { Providers } from "@/components/providers";
-import {
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { UserPreferencesWrapper } from "@/components/providers/user-preferences-wrapper";
+import { CartProvider } from "@/contexts/cart-context";
+import { Toaster } from "@workspace/ui/components/sonner";
+import { BookingScheduleWrapper } from "@/components/providers/booking-schedule-wrapper";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -20,28 +16,24 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
+        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
-        <Providers>
-          <header className="flex justify-end items-center p-4 gap-4 h-16">
-            <SignedOut>
-              <SignInButton />
-              <SignUpButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </header>
-          {children}
-        </Providers>
+        <CartProvider>
+          <UserPreferencesWrapper>
+            <BookingScheduleWrapper>
+              <Providers>{children}</Providers>
+            </BookingScheduleWrapper>
+          </UserPreferencesWrapper>
+        </CartProvider>
+        <Toaster />
       </body>
     </html>
   );
