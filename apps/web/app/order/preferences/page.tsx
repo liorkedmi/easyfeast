@@ -5,8 +5,8 @@ export default async function PreferencesPage() {
   const filterOptions = await getFilterOptions();
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
-      <div className="z-10 max-w-5xl w-full">
+    <main className="flex min-h-screen flex-col items-center p-24 bg-background">
+      <div className="z-10 max-w-5xl w-full bg-white shadow-lg p-10">
         <h1 className="text-4xl font-bold mb-8">Household Preferences</h1>
         <p className="text-lg mb-8">
           We will customize your service based on the selections you make below.

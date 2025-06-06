@@ -33,7 +33,7 @@ export default async function RootLayout({
             </BookingScheduleWrapper>
           </UserPreferencesWrapper>
         </CartProvider>
-        <Toaster />
+        <Toaster position="bottom-center" />
       </body>
     </html>
   );

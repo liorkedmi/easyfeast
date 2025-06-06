@@ -2,7 +2,7 @@
 
 import { createContext, useContext, ReactNode, useState } from "react";
 
-interface UserPreferences {
+export interface UserPreferences {
   preferredPortionSize?: string;
   proteinPreferences?: { id: string; name: string }[];
   categoryPreferences?: { id: string; name: string }[];
