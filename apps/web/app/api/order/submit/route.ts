@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import Airtable from "airtable";
 import { sendEmail } from "@/lib/email";
 import { OrderConfirmationEmail } from "@workspace/transactional/emails/OrderConfirmationEmail";
@@ -9,6 +9,30 @@ import { NewOrderNotificationEmail } from "@workspace/transactional/emails/NewOr
 const airtable = new Airtable({
   apiKey: process.env.AIRTABLE_API_KEY,
 }).base(process.env.AIRTABLE_BASE_ID!);
+
+interface MenuItemSelection {
+  menuItem: {
+    name: string;
+  };
+  selections: {
+    portionSize: string;
+    singleChoice?: string;
+    multipleChoices: string[];
+    sides: string[];
+    additionalNotes?: string;
+  };
+}
+
+interface Preference {
+  name: string;
+}
+
+interface OrderRequest {
+  items: MenuItemSelection[];
+  booking: string;
+  culinaryPreferences?: Preference[];
+  groceryPreferences?: Preference[];
+}
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +48,7 @@ export async function POST(request: Request) {
       booking,
       culinaryPreferences = [],
       groceryPreferences = [],
-    } = await request.json();
+    } = (await request.json()) as OrderRequest;
 
     // First, find the user in Online_Users table
     const userRecords = await airtable("Online_Users")
@@ -35,13 +59,11 @@ export async function POST(request: Request) {
       .all();
 
     if (userRecords.length === 0) {
-      console.log("User not found in Online_Users table");
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     const userRecord = userRecords[0];
     if (!userRecord) {
-      console.log("User record is undefined");
       return NextResponse.json(
         { error: "Invalid user record" },
         { status: 500 }
@@ -52,7 +74,6 @@ export async function POST(request: Request) {
       !userRecord.fields["Link to Online_Clients"] ||
       !Array.isArray(userRecord.fields["Link to Online_Clients"])
     ) {
-      console.log("No client link found in user record");
       return NextResponse.json(
         { error: "No client associated with user" },
         { status: 500 }
@@ -70,13 +91,11 @@ export async function POST(request: Request) {
       .all();
 
     if (clientRecords.length === 0) {
-      console.log("Client record not found for user");
       return NextResponse.json({ error: "Client not found" }, { status: 404 });
     }
 
     const clientRecord = clientRecords[0];
     if (!clientRecord) {
-      console.log("Client record is undefined");
       return NextResponse.json(
         { error: "Invalid client record" },
         { status: 500 }
@@ -85,7 +104,7 @@ export async function POST(request: Request) {
 
     // Create a text representation of the menu selections
     let menuSelections = items
-      .map((item: any) => {
+      .map((item) => {
         const selections = [
           `Item: ${item.menuItem.name}`,
           `Portion: ${item.selections.portionSize}`,
@@ -115,10 +134,10 @@ export async function POST(request: Request) {
 
     // Add culinary and grocery preferences to the menuSelections string
     if (culinaryPreferences.length > 0) {
-      menuSelections += `\n\nCulinary Preferences: ${culinaryPreferences.map((p: any) => p.name).join(", ")}`;
+      menuSelections += `\n\nCulinary Preferences: ${culinaryPreferences.map((p) => p.name).join(", ")}`;
     }
     if (groceryPreferences.length > 0) {
-      menuSelections += `\nGrocery Preferences: ${groceryPreferences.map((p: any) => p.name).join(", ")}`;
+      menuSelections += `\nGrocery Preferences: ${groceryPreferences.map((p) => p.name).join(", ")}`;
     }
 
     // Create the booking record
@@ -152,8 +171,8 @@ export async function POST(request: Request) {
       subject: "Order Confirmation - EasyFeast",
       react: OrderConfirmationEmail({
         menuSelections,
-        culinaryPreferences: culinaryPreferences.map((p: any) => p.name),
-        groceryPreferences: groceryPreferences.map((p: any) => p.name),
+        culinaryPreferences: culinaryPreferences.map((p) => p.name),
+        groceryPreferences: groceryPreferences.map((p) => p.name),
       }),
     });
 
@@ -165,17 +184,18 @@ export async function POST(request: Request) {
         react: NewOrderNotificationEmail({
           menuSelections,
           clientEmail: userEmail,
-          culinaryPreferences: culinaryPreferences.map((p: any) => p.name),
-          groceryPreferences: groceryPreferences.map((p: any) => p.name),
+          culinaryPreferences: culinaryPreferences.map((p) => p.name),
+          groceryPreferences: groceryPreferences.map((p) => p.name),
         }),
       });
     }
 
     return NextResponse.json({ success: true, bookingId: bookingRecord.id });
   } catch (error) {
-    console.error("Error submitting order:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to submit order" },
+      { error: "Failed to submit order", details: errorMessage },
       { status: 500 }
     );
   }

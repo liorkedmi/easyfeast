@@ -86,7 +86,6 @@ export function FilterSection({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const { preferences } = useUserPreferences();
   const proteinButtonRef = useRef<HTMLButtonElement>(null);
   const dietaryButtonRef = useRef<HTMLButtonElement>(null);
   const cuisineButtonRef = useRef<HTMLButtonElement>(null);

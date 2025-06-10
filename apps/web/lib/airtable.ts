@@ -18,7 +18,7 @@ export interface MenuItem {
   tags: string[];
   seasons: string[];
   ingredients: string;
-  picture?: { url: string }[];
+  picture: string;
   restriction_Dairy_Free?: string;
   restriction_Gluten_Free?: string;
   restriction_Tree_Nut_Free?: string;
@@ -91,13 +91,23 @@ export const getMenuItems = cache(
               ? seasons.split(",").map((s) => s.trim())
               : [],
           ingredients: record.get("Ingredients_Display") as string,
-          picture: record.get("Picture")
-            ? (
-                record.get("Picture") as {
-                  thumbnails: { large: { url: string } };
-                }[]
-              )?.[0].url
-            : "/img/placeholder.png",
+          picture: (() => {
+            const picture = record.get("Picture");
+            if (!picture || !Array.isArray(picture) || !picture.length) {
+              return "/img/placeholder.png";
+            }
+            // @ts-ignore - We know this is safe at runtime
+            const firstAttachment = picture[0] as unknown as {
+              thumbnails?: {
+                large?: {
+                  url?: string;
+                };
+              };
+            };
+            return (
+              firstAttachment?.thumbnails?.large?.url || "/img/placeholder.png"
+            );
+          })(),
           restriction_Dairy_Free: record.get(
             "Restriction_Dairy-Free"
           ) as string,
@@ -238,7 +248,17 @@ export async function getUserPreferences(
       return null;
     }
 
-    const clientId = userRecord.fields["Link to Online_Clients"][0];
+    const clientLinks = userRecord.fields?.["Link to Online_Clients"];
+    if (
+      !clientLinks ||
+      !Array.isArray(clientLinks) ||
+      clientLinks.length === 0
+    ) {
+      console.log("No client links found for user");
+      return null;
+    }
+
+    const clientId = clientLinks[0];
 
     // Then, find the corresponding client record
     const clientRecords = await airtable("Online_Clients")

@@ -6,7 +6,6 @@ import {
   CollapsibleTrigger,
 } from "@workspace/ui/components/collapsible";
 import { Button } from "@workspace/ui/components/button";
-import { Badge } from "@workspace/ui/components/badge";
 import { ChevronDown, ShoppingCart, X, Pencil } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/contexts/cart-context";

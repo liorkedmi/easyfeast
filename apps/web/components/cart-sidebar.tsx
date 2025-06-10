@@ -1,6 +1,5 @@
 "use client";
 
-import { useUserPreferences } from "@/contexts/user-preferences-context";
 import { useBookingSchedule } from "@/contexts/booking-schedule-context";
 import { UserPreferencesSection } from "@/components/user-preferences-section";
 import { UserCart } from "@/components/cart-section";
@@ -19,7 +18,6 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 export function CartSidebar() {
-  const { preferences } = useUserPreferences();
   const { schedule, isLoading, error } = useBookingSchedule();
 
   return (

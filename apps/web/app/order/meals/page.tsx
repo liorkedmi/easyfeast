@@ -1,8 +1,4 @@
-import {
-  getMenuItems,
-  getFilterOptions,
-  getFilteredMenuItems,
-} from "@/lib/airtable";
+import { getFilterOptions, getFilteredMenuItems } from "@/lib/airtable";
 import { FilterSection } from "@/components/filter-section";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -17,9 +13,12 @@ import { FilterSummaryBar } from "@/components/filter-summary-bar";
 import { VirtualizedMenuGrid } from "@/components/virtualized-menu-grid";
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     [key: string]: string | string[] | undefined;
-  };
+  }>;
+  params: Promise<{
+    [key: string]: string | string[] | undefined;
+  }>;
 }
 
 function EmptyState({ type }: { type: "Main" | "Add-on" }) {
@@ -43,7 +42,12 @@ function EmptyState({ type }: { type: "Main" | "Add-on" }) {
 async function MenuItems({
   searchParams,
   type,
-}: PageProps & { type: "Main" | "Add-on" }) {
+}: {
+  searchParams: {
+    [key: string]: string | string[] | undefined;
+  };
+  type: "Main" | "Add-on";
+}) {
   const [filterOptions] = await Promise.all([getFilterOptions()]);
 
   // Create maps for lookups
@@ -162,7 +166,7 @@ async function MenuItems({
 
 export default async function OrderPage({ searchParams }: PageProps) {
   const { proteinTypes, dietaryRestrictions, cuisines, categories, tags } =
-    searchParams;
+    await searchParams;
 
   return (
     <main className="">

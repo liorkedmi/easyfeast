@@ -84,9 +84,10 @@ export async function GET() {
 
     return NextResponse.json({ schedule });
   } catch (error) {
-    console.error("Error fetching booking schedule:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to fetch booking schedule" },
+      { error: "Failed to fetch booking schedule", details: errorMessage },
       { status: 500 }
     );
   }

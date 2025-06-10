@@ -16,9 +16,8 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { Checkbox } from "@workspace/ui/components/checkbox";
-import { Label } from "@workspace/ui/components/label";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useUserPreferences } from "@/contexts/user-preferences-context";
 import { useBookingSchedule } from "@/contexts/booking-schedule-context";
 import { zodResolver } from "@hookform/resolvers/zod";

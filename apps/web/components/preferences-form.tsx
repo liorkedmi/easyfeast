@@ -1,9 +1,8 @@
 "use client";
 
 import { useUserPreferences } from "@/contexts/user-preferences-context";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { Checkbox } from "@workspace/ui/components/checkbox";
-import { Button } from "@workspace/ui/components/button";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Label } from "@workspace/ui/components/label";
 import {
@@ -20,7 +19,6 @@ import {
   SelectValue,
 } from "@workspace/ui/components/select";
 import { useUser } from "@clerk/nextjs";
-import { updateUserPreferences } from "@/lib/airtable";
 import { toast } from "sonner";
 // @ts-expect-error: No type definitions for lodash.debounce
 import debounce from "lodash.debounce";
@@ -46,7 +44,6 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
   const { preferences, updatePreferences } = useUserPreferences();
   const { user } = useUser();
   const [isSaving, setIsSaving] = useState(false);
-  const debouncedSaveRef = useRef<any>();
 
   const savePreferences = async (user: any, newPrefs: any) => {
     toast.dismiss();

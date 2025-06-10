@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Card, CardHeader, CardTitle } from "@workspace/ui/components/card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { OrderDialog } from "./order-dialog";
 
 interface MenuItemProps {
