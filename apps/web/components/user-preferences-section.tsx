@@ -7,9 +7,10 @@ import {
   CollapsibleTrigger,
 } from "@workspace/ui/components/collapsible";
 import { Button } from "@workspace/ui/components/button";
-import { ChevronDown, Settings2 } from "lucide-react";
+import { ChevronDown, Settings2, Pencil } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@workspace/ui/components/badge";
+import Link from "next/link";
 
 export function UserPreferencesSection() {
   const { preferences } = useUserPreferences();
@@ -30,16 +31,23 @@ export function UserPreferencesSection() {
           <Settings2 className="h-5 w-5" />
           <h2 className="text-lg font-semibold">Your Preferences</h2>
         </div>
-        <CollapsibleTrigger asChild>
-          <Button variant="ghost" size="sm" className="w-9 p-0">
-            <ChevronDown
-              className={`h-4 w-4 transition-transform ${
-                isOpen ? "transform rotate-180" : ""
-              }`}
-            />
-            <span className="sr-only">Toggle preferences</span>
-          </Button>
-        </CollapsibleTrigger>
+        <div className="flex items-center gap-2">
+          <Link href="/order/preferences" passHref>
+            <Button variant="ghost" size="sm" className="w-9 p-0">
+              <Pencil className="w-4 h-4" />
+            </Button>
+          </Link>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="w-9 p-0">
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${
+                  isOpen ? "transform rotate-180" : ""
+                }`}
+              />
+              <span className="sr-only">Toggle preferences</span>
+            </Button>
+          </CollapsibleTrigger>
+        </div>
       </div>
       <CollapsibleContent className="space-y-2">
         <div className="rounded-md border p-4">
@@ -156,7 +164,7 @@ export function UserPreferencesSection() {
                 <dt className="text-sm font-medium text-gray-500">
                   Chef Equipment
                 </dt>
-                <dd className="text-sm text-gray-900">
+                <dd className="text-xs text-gray-900">
                   {preferences.canChefBringEquipment
                     ? "Can bring equipment"
                     : "Cannot bring equipment"}
@@ -169,7 +177,7 @@ export function UserPreferencesSection() {
                 <dt className="text-sm font-medium text-gray-500">
                   Trash Disposal Instructions
                 </dt>
-                <dd className="text-sm text-gray-900">
+                <dd className="text-xs text-gray-900">
                   {preferences.trashDisposal}
                 </dd>
               </div>
@@ -180,7 +188,7 @@ export function UserPreferencesSection() {
                 <dt className="text-sm font-medium text-gray-500">
                   Additional Notes
                 </dt>
-                <dd className="text-sm text-gray-900">{preferences.notes}</dd>
+                <dd className="text-xs text-gray-900">{preferences.notes}</dd>
               </div>
             )}
           </dl>

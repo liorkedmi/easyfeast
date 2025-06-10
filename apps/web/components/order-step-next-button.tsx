@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@workspace/ui/components/button";
 import { useCart } from "@/contexts/cart-context";
+import { useBookingSchedule } from "@/contexts/booking-schedule-context";
 
 const steps = [
   {
@@ -23,13 +24,15 @@ export function OrderStepNextButton() {
   const pathname = usePathname();
   const router = useRouter();
   const { items } = useCart();
+  const { schedule } = useBookingSchedule();
   const currentStepIdx = steps.findIndex((s) => pathname.startsWith(s.href));
   const nextStep = steps[currentStepIdx + 1];
 
   if (!nextStep) return null;
 
   const isSubmitStep = nextStep.href === "/order/submit";
-  const isDisabled = isSubmitStep && items.length === 0;
+  const isDisabled =
+    (isSubmitStep && items.length === 0) || (isSubmitStep && !schedule);
 
   return (
     <div className="flex justify-end mt-12">

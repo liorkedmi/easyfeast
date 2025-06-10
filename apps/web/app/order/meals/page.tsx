@@ -1,4 +1,8 @@
-import { getMenuItems, getFilterOptions } from "@/lib/airtable";
+import {
+  getMenuItems,
+  getFilterOptions,
+  getFilteredMenuItems,
+} from "@/lib/airtable";
 import { FilterSection } from "@/components/filter-section";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/loading-spinner";
@@ -9,8 +13,8 @@ import {
   TabsTrigger,
 } from "@workspace/ui/components/tabs";
 import { UtensilsCrossed } from "lucide-react";
-import { MenuItem } from "@/components/menu-item";
 import { FilterSummaryBar } from "@/components/filter-summary-bar";
+import { VirtualizedMenuGrid } from "@/components/virtualized-menu-grid";
 
 interface PageProps {
   searchParams: {
@@ -40,9 +44,7 @@ async function MenuItems({
   searchParams,
   type,
 }: PageProps & { type: "Main" | "Add-on" }) {
-  const [filterOptions] = await Promise.all([
-    getFilterOptions(),
-  ]);
+  const [filterOptions] = await Promise.all([getFilterOptions()]);
 
   // Create maps for lookups
   const proteinTypeMap = new Map(
@@ -78,72 +80,54 @@ async function MenuItems({
       return restrictionName?.toLowerCase().includes("kosher");
     });
 
-  // Filter menu items based on URL params
-  const selectedProteinType =
-    typeof searchParams.proteinTypes === "string"
-      ? searchParams.proteinTypes
-      : "";
-  const selectedDietaryRestriction =
-    typeof searchParams.dietaryRestrictions === "string"
-      ? searchParams.dietaryRestrictions
-      : "";
-  const selectedCuisine =
-    typeof searchParams.cuisines === "string" ? searchParams.cuisines : "";
-  const selectedCategories =
-    typeof searchParams.categories === "string" ? searchParams.categories : "";
-  const selectedTags =
-    typeof searchParams.tags === "string" ? searchParams.tags : "";
-
-  // Get menu items based on Kosher preference
-  const menu = await getMenuItems(type, isKosher);
-
-  const filteredMenuItems = menu.filter((item) => {
-    // If no filters are selected, show all items
-    if (
-      !selectedProteinType &&
-      !selectedDietaryRestriction &&
-      !selectedCuisine &&
-      !selectedCategories &&
-      !selectedTags
-    ) {
-      return true;
-    }
-
-    // Check if item matches all selected filters
-    const matchesProteinType =
-      !selectedProteinType ||
-      selectedProteinType
-        .split(",")
-        .some((type) => item.proteinTypes.includes(type));
-
-    const matchesDietaryRestriction =
-      !selectedDietaryRestriction ||
-      !item.dietaryRestrictions.includes(selectedDietaryRestriction);
-
-    const matchesCuisine =
-      !selectedCuisine ||
-      selectedCuisine
-        .split(",")
-        .some((cuisine) => item.cuisine.includes(cuisine));
-
-    const matchesCategories =
-      !selectedCategories ||
-      item.categories.some((category) =>
-        selectedCategories.split(",").includes(category)
-      );
-
-    const matchesTags =
-      !selectedTags ||
-      item.tags.some((tag) => selectedTags.split(",").includes(tag));
-
-    return (
-      matchesProteinType &&
-      matchesDietaryRestriction &&
-      matchesCuisine &&
-      matchesCategories &&
-      matchesTags
-    );
+  // Get filtered menu items using server-side filtering
+  const filteredMenuItems = await getFilteredMenuItems(type, isKosher, {
+    proteinTypes:
+      typeof searchParams.proteinTypes === "string"
+        ? searchParams.proteinTypes
+        : undefined,
+    dietaryRestrictions:
+      typeof searchParams.dietaryRestrictions === "string"
+        ? searchParams.dietaryRestrictions
+        : undefined,
+    cuisines:
+      typeof searchParams.cuisines === "string"
+        ? searchParams.cuisines
+        : undefined,
+    categories:
+      typeof searchParams.categories === "string"
+        ? searchParams.categories
+        : undefined,
+    tags: typeof searchParams.tags === "string" ? searchParams.tags : undefined,
+    seasons:
+      typeof searchParams.seasons === "string"
+        ? searchParams.seasons
+        : undefined,
   });
+
+  // Transform the items to include mapped names
+  const transformedItems = filteredMenuItems.map((item) => ({
+    ...item,
+    proteinTypes: item.proteinTypes
+      ? item.proteinTypes.map((id) => proteinTypeMap.get(id) || id)
+      : [],
+    dietaryRestrictions: item.dietaryRestrictions
+      ? item.dietaryRestrictions.map(
+          (id) => dietaryRestrictionMap.get(id) || id
+        )
+      : [],
+    categories: item.categories
+      ? item.categories.map((id) => categoryMap.get(id) || id)
+      : [],
+    tags: item.tags ? item.tags.map((id) => tagMap.get(id) || id) : [],
+    cuisine: item.cuisine
+      ? item.cuisine.map((id) => cuisineMap.get(id) || id)
+      : [],
+    picture: Array.isArray(item.picture)
+      ? item.picture[0]?.url || "/img/placeholder.png"
+      : item.picture || "/img/placeholder.png",
+    sides: item.sides ? item.sides.map((id) => sideMap.get(id) || id) : [],
+  }));
 
   return (
     <>
@@ -153,6 +137,8 @@ async function MenuItems({
         cuisines={filterOptions.cuisines}
         categories={filterOptions.categories}
         tags={filterOptions.tags}
+        seasons={filterOptions.seasons}
+        currentSeason={filterOptions.currentSeason}
       />
       <FilterSummaryBar
         filterOptions={{
@@ -161,54 +147,14 @@ async function MenuItems({
           cuisines: filterOptions.cuisines,
           categories: filterOptions.categories,
           tags: filterOptions.tags,
+          seasons: filterOptions.seasons,
         }}
-        resultCount={filteredMenuItems.length}
+        resultCount={transformedItems.length} // This will be updated by each tab
       />
-      {/* Menu Items Grid */}
       {filteredMenuItems.length === 0 ? (
         <EmptyState type={type} />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMenuItems.map((item) => (
-            <MenuItem
-              key={item.id}
-              item={{
-                ...item,
-                proteinTypes: item.proteinTypes
-                  ? item.proteinTypes.map((id) => proteinTypeMap.get(id) || id)
-                  : [],
-                dietaryRestrictions: item.dietaryRestrictions
-                  ? item.dietaryRestrictions.map(
-                      (id) => dietaryRestrictionMap.get(id) || id
-                    )
-                  : [],
-                categories: item.categories
-                  ? item.categories.map((id) => categoryMap.get(id) || id)
-                  : [],
-                tags: item.tags
-                  ? item.tags.map((id) => tagMap.get(id) || id)
-                  : [],
-                cuisine: item.cuisine
-                  ? item.cuisine.map((id) => cuisineMap.get(id) || id)
-                  : [],
-                picture: Array.isArray(item.picture)
-                  ? item.picture[0]?.url || "/img/placeholder.png"
-                  : item.picture || "/img/placeholder.png",
-                restriction_Dairy_Free: item.restriction_Dairy_Free,
-                restriction_Gluten_Free: item.restriction_Gluten_Free,
-                restriction_Tree_Nut_Free: item.restriction_Tree_Nut_Free,
-                restriction_Peanut_Free: item.restriction_Peanut_Free,
-                restriction_Egg_Free: item.restriction_Egg_Free,
-                restriction_Sesame_Free: item.restriction_Sesame_Free,
-                choices_Select_1: item.choices_Select_1,
-                choices_Select_Multiple: item.choices_Select_Multiple,
-                sides: item.sides
-                  ? item.sides.map((id) => sideMap.get(id) || id)
-                  : [],
-              }}
-            />
-          ))}
-        </div>
+        <VirtualizedMenuGrid items={transformedItems} />
       )}
     </>
   );
@@ -216,7 +162,7 @@ async function MenuItems({
 
 export default async function OrderPage({ searchParams }: PageProps) {
   const { proteinTypes, dietaryRestrictions, cuisines, categories, tags } =
-    await searchParams;
+    searchParams;
 
   return (
     <main className="">

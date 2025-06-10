@@ -48,7 +48,7 @@ export default function OrderLayout({
           </SignedIn>
         </div>
       </header>
-      <div className="grid grid-cols-[1fr_20rem] h-full min-h-0">
+      <div className="grid grid-cols-[1fr_24rem] h-full min-h-0">
         <div className="overflow-y-auto min-h-0">{children}</div>
         <CartSidebar />
       </div>

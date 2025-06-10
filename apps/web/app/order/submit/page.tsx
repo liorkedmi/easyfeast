@@ -6,10 +6,12 @@ import { useState } from "react";
 import { Button } from "@workspace/ui/components/button";
 import { toast } from "sonner";
 import { useBookingSchedule } from "@/contexts/booking-schedule-context";
+import { useUserPreferences } from "@/contexts/user-preferences-context";
 
 export default function ReviewPage() {
   const { items, clearCart } = useCart();
   const { schedule, refreshSchedule } = useBookingSchedule();
+  const { preferences } = useUserPreferences();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -34,6 +36,8 @@ export default function ReviewPage() {
         body: JSON.stringify({
           items,
           booking: schedule.id,
+          culinaryPreferences: preferences?.culinaryPreferences || [],
+          groceryPreferences: preferences?.groceryPreferences || [],
         }),
       });
 

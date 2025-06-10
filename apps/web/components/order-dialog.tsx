@@ -20,6 +20,7 @@ import { Label } from "@workspace/ui/components/label";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { useState, useEffect } from "react";
 import { useUserPreferences } from "@/contexts/user-preferences-context";
+import { useBookingSchedule } from "@/contexts/booking-schedule-context";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -75,6 +76,7 @@ interface OrderDialogProps {
 
 export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
   const { preferences } = useUserPreferences();
+  const { schedule } = useBookingSchedule();
   const { addItem, updateItem } = useCart();
   const singleChoices = item.menuItem.choices_Select_1 || [];
   const multipleChoices = item.menuItem.choices_Select_Multiple || [];
@@ -499,7 +501,7 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
               )}
             />
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={!schedule}>
               {item.selections?.portionSize ? "Update" : "Add to Cart"}
             </Button>
           </form>

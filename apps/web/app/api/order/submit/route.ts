@@ -19,7 +19,12 @@ export async function POST(request: Request) {
     }
 
     const userEmail = user.emailAddresses[0].emailAddress;
-    const { items, booking } = await request.json();
+    const {
+      items,
+      booking,
+      culinaryPreferences = [],
+      groceryPreferences = [],
+    } = await request.json();
 
     // First, find the user in Online_Users table
     const userRecords = await airtable("Online_Users")
@@ -79,7 +84,7 @@ export async function POST(request: Request) {
     }
 
     // Create a text representation of the menu selections
-    const menuSelections = items
+    let menuSelections = items
       .map((item: any) => {
         const selections = [
           `Item: ${item.menuItem.name}`,
@@ -107,6 +112,14 @@ export async function POST(request: Request) {
         return selections.join("\n");
       })
       .join("\n\n");
+
+    // Add culinary and grocery preferences to the menuSelections string
+    if (culinaryPreferences.length > 0) {
+      menuSelections += `\n\nCulinary Preferences: ${culinaryPreferences.map((p: any) => p.name).join(", ")}`;
+    }
+    if (groceryPreferences.length > 0) {
+      menuSelections += `\nGrocery Preferences: ${groceryPreferences.map((p: any) => p.name).join(", ")}`;
+    }
 
     // Create the booking record
     const bookingRecord = await airtable("Online_Bookings").create({
@@ -137,7 +150,11 @@ export async function POST(request: Request) {
     await sendEmail({
       to: userEmail,
       subject: "Order Confirmation - EasyFeast",
-      react: OrderConfirmationEmail({ menuSelections }),
+      react: OrderConfirmationEmail({
+        menuSelections,
+        culinaryPreferences: culinaryPreferences.map((p: any) => p.name),
+        groceryPreferences: groceryPreferences.map((p: any) => p.name),
+      }),
     });
 
     // Send notification email to owner
@@ -148,6 +165,8 @@ export async function POST(request: Request) {
         react: NewOrderNotificationEmail({
           menuSelections,
           clientEmail: userEmail,
+          culinaryPreferences: culinaryPreferences.map((p: any) => p.name),
+          groceryPreferences: groceryPreferences.map((p: any) => p.name),
         }),
       });
     }

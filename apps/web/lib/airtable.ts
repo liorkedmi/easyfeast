@@ -1,4 +1,5 @@
 import Airtable from "airtable";
+import { cache } from "react";
 
 // Initialize Airtable
 const airtable = new Airtable({
@@ -29,121 +30,106 @@ export interface MenuItem {
   sides?: string[];
 }
 
-export async function getMenuItems(
-  type: "Main" | "Add-on" = "Main",
-  isKosher: boolean = false
-): Promise<MenuItem[]> {
-  try {
-    // First, get the current season from Online_Settings
-    const settingsRecords = await airtable("Online_Settings")
-      .select({
-        maxRecords: 1,
-      })
-      .all();
+export const getMenuItems = cache(
+  async (
+    type: "Main" | "Add-on" = "Main",
+    isKosher: boolean = false
+  ): Promise<MenuItem[]> => {
+    try {
+      // Get menu items filtered by type and menu only
+      const records = await airtable("Online_Menu")
+        .select({
+          filterByFormula: `AND(
+            {Type} = '${type}',
+            {Menu} = '${isKosher ? "Kosher Menu" : "Main Menu"}'
+          )`,
+        })
+        .all();
 
-    if (settingsRecords.length === 0) {
-      console.error("No settings found in Online_Settings table");
+      return records.map((record): MenuItem => {
+        // Handle multi-select fields that come as arrays
+        const proteinTypes = record.get("Protein Type");
+        const dietaryRestrictions = record.get("Dietary Restrictions");
+        const categories = record.get("Categories");
+        const tags = record.get("Tags");
+        const seasons = record.get("Seasons");
+        const cusines = record.get("Cuisine");
+
+        return {
+          id: record.id,
+          name: record.get("Name") as string,
+          type: record.get("Type") as string,
+          menu: record.get("Menu") as "Main Menu" | "Kosher",
+          proteinTypes: Array.isArray(proteinTypes)
+            ? proteinTypes
+            : typeof proteinTypes === "string"
+              ? proteinTypes.split(",").map((s) => s.trim())
+              : [],
+          dietaryRestrictions: Array.isArray(dietaryRestrictions)
+            ? dietaryRestrictions
+            : typeof dietaryRestrictions === "string"
+              ? dietaryRestrictions.split(",").map((s) => s.trim())
+              : [],
+          categories: Array.isArray(categories)
+            ? categories
+            : typeof categories === "string"
+              ? categories.split(",").map((s) => s.trim())
+              : [],
+          cuisine: Array.isArray(cusines)
+            ? cusines
+            : typeof cusines === "string"
+              ? cusines.split(",").map((s) => s.trim())
+              : [],
+          tags: Array.isArray(tags)
+            ? tags
+            : typeof tags === "string"
+              ? tags.split(",").map((s) => s.trim())
+              : [],
+          seasons: Array.isArray(seasons)
+            ? seasons
+            : typeof seasons === "string"
+              ? seasons.split(",").map((s) => s.trim())
+              : [],
+          ingredients: record.get("Ingredients_Display") as string,
+          picture: record.get("Picture")
+            ? (
+                record.get("Picture") as {
+                  thumbnails: { large: { url: string } };
+                }[]
+              )?.[0].url
+            : "/img/placeholder.png",
+          restriction_Dairy_Free: record.get(
+            "Restriction_Dairy-Free"
+          ) as string,
+          restriction_Gluten_Free: record.get(
+            "Restriction_Gluten-Free"
+          ) as string,
+          restriction_Tree_Nut_Free: record.get(
+            "Restriction_Tree-Nut Free"
+          ) as string,
+          restriction_Peanut_Free: record.get(
+            "Restriction_Peanut-Free"
+          ) as string,
+          restriction_Egg_Free: record.get("Restriction_Egg-Free") as string,
+          restriction_Sesame_Free: record.get(
+            "Restriction_Sesame-Free"
+          ) as string,
+          choices_Select_1: record.get("Choices (Select 1)") as string[],
+          choices_Select_Multiple: record.get(
+            "Choices (Select Multiple)"
+          ) as string[],
+          sides: record.get("Sides") as string[],
+        };
+      });
+    } catch (error) {
+      console.error("Error fetching menu items:", error);
       return [];
     }
-
-    const currentSeason = settingsRecords[0].get("Current Season") as string;
-    if (!currentSeason) {
-      console.error("No current season set in Online_Settings table");
-      return [];
-    }
-
-    // Then get menu items filtered by type, menu, and season
-    const records = await airtable("Online_Menu")
-      .select({
-        filterByFormula: `AND(
-          {Type} = '${type}',
-          {Menu} = '${isKosher ? "Kosher Menu" : "Main Menu"}',
-          FIND('${currentSeason}', {Seasons}) > 0
-        )`,
-      })
-      .all();
-
-    return records.map((record): MenuItem => {
-      // Handle multi-select fields that come as arrays
-      const proteinTypes = record.get("Protein Type");
-      const dietaryRestrictions = record.get("Dietary Restrictions");
-      const categories = record.get("Categories");
-      const tags = record.get("Tags");
-      const seasons = record.get("Seasons");
-      const cusines = record.get("Cuisine");
-
-      return {
-        id: record.id,
-        name: record.get("Name") as string,
-        type: record.get("Type") as string,
-        menu: record.get("Menu") as "Main Menu" | "Kosher",
-        proteinTypes: Array.isArray(proteinTypes)
-          ? proteinTypes
-          : typeof proteinTypes === "string"
-            ? proteinTypes.split(",").map((s) => s.trim())
-            : [],
-        dietaryRestrictions: Array.isArray(dietaryRestrictions)
-          ? dietaryRestrictions
-          : typeof dietaryRestrictions === "string"
-            ? dietaryRestrictions.split(",").map((s) => s.trim())
-            : [],
-        categories: Array.isArray(categories)
-          ? categories
-          : typeof categories === "string"
-            ? categories.split(",").map((s) => s.trim())
-            : [],
-        cuisine: Array.isArray(cusines)
-          ? cusines
-          : typeof cusines === "string"
-            ? cusines.split(",").map((s) => s.trim())
-            : [],
-        tags: Array.isArray(tags)
-          ? tags
-          : typeof tags === "string"
-            ? tags.split(",").map((s) => s.trim())
-            : [],
-        seasons: Array.isArray(seasons)
-          ? seasons
-          : typeof seasons === "string"
-            ? seasons.split(",").map((s) => s.trim())
-            : [],
-        ingredients: record.get("Ingredients_Display") as string,
-        picture: record.get("Picture")
-          ? (
-              record.get("Picture") as {
-                thumbnails: { large: { url: string } };
-              }[]
-            )?.[0].url
-          : "/img/placeholder.png",
-        restriction_Dairy_Free: record.get("Restriction_Dairy-Free") as string,
-        restriction_Gluten_Free: record.get(
-          "Restriction_Gluten-Free"
-        ) as string,
-        restriction_Tree_Nut_Free: record.get(
-          "Restriction_Tree-Nut Free"
-        ) as string,
-        restriction_Peanut_Free: record.get(
-          "Restriction_Peanut-Free"
-        ) as string,
-        restriction_Egg_Free: record.get("Restriction_Egg-Free") as string,
-        restriction_Sesame_Free: record.get(
-          "Restriction_Sesame-Free"
-        ) as string,
-        choices_Select_1: record.get("Choices (Select 1)") as string[],
-        choices_Select_Multiple: record.get(
-          "Choices (Select Multiple)"
-        ) as string[],
-        sides: record.get("Sides") as string[],
-      };
-    });
-  } catch (error) {
-    console.error("Error fetching menu items:", error);
-    return [];
   }
-}
+);
 
 // Get all available filter options
-export async function getFilterOptions() {
+export const getFilterOptions = cache(async () => {
   const [
     proteinTypes,
     dietaryRestrictions,
@@ -153,6 +139,7 @@ export async function getFilterOptions() {
     culinaryPreferences,
     groceryPreferences,
     sides,
+    settings,
   ] = await Promise.all([
     airtable("Online_Filter_Proteins").select().all(),
     airtable("Online_Filter_Dietary Restrictions").select().all(),
@@ -166,7 +153,11 @@ export async function getFilterOptions() {
         filterByFormula: "{Type} = 'Side'",
       })
       .all(),
+    airtable("Online_Settings").select().all(),
   ]);
+
+  // Get the current season from settings
+  const currentSeason = settings[0]?.get("Current Season") as string;
 
   return {
     proteinTypes: proteinTypes.map((record) => ({
@@ -201,8 +192,15 @@ export async function getFilterOptions() {
       id: record.id,
       name: record.get("Name") as string,
     })),
+    seasons: [
+      { id: "Winter", name: "Winter" },
+      { id: "Spring", name: "Spring" },
+      { id: "Summer", name: "Summer" },
+      { id: "Fall", name: "Fall" },
+    ],
+    currentSeason,
   };
-}
+});
 
 export interface UserPreferences {
   preferredPortionSize: string;
@@ -593,3 +591,85 @@ export async function getBookingSchedule(email: string) {
     throw error;
   }
 }
+
+export interface FilterParams {
+  proteinTypes?: string;
+  dietaryRestrictions?: string;
+  cuisines?: string;
+  categories?: string;
+  tags?: string;
+  seasons?: string;
+}
+
+export const getFilteredMenuItems = cache(
+  async (
+    type: "Main" | "Add-on",
+    isKosher: boolean,
+    filterParams: FilterParams
+  ): Promise<MenuItem[]> => {
+    try {
+      // Get all menu items first
+      const menuItems = await getMenuItems(type, isKosher);
+
+      // Apply filters
+      return menuItems.filter((item) => {
+        // If no filters are selected, show all items
+        if (
+          !filterParams.proteinTypes &&
+          !filterParams.dietaryRestrictions &&
+          !filterParams.cuisines &&
+          !filterParams.categories &&
+          !filterParams.tags &&
+          !filterParams.seasons
+        ) {
+          return true;
+        }
+
+        // Check if item matches all selected filters
+        const matchesProteinType =
+          !filterParams.proteinTypes ||
+          filterParams.proteinTypes
+            .split(",")
+            .some((type) => item.proteinTypes.includes(type));
+
+        const matchesDietaryRestriction =
+          !filterParams.dietaryRestrictions ||
+          !item.dietaryRestrictions.includes(filterParams.dietaryRestrictions);
+
+        const matchesCuisine =
+          !filterParams.cuisines ||
+          filterParams.cuisines
+            .split(",")
+            .some((cuisine) => item.cuisine.includes(cuisine));
+
+        const matchesCategories =
+          !filterParams.categories ||
+          item.categories.some((category) =>
+            filterParams.categories!.split(",").includes(category)
+          );
+
+        const matchesTags =
+          !filterParams.tags ||
+          item.tags.some((tag) => filterParams.tags!.split(",").includes(tag));
+
+        const matchesSeasons =
+          !filterParams.seasons ||
+          filterParams.seasons
+            .split(",")
+            .some((season) => item.seasons.includes(season));
+
+        return (
+          matchesProteinType &&
+          matchesDietaryRestriction &&
+          matchesCuisine &&
+          matchesCategories &&
+          matchesTags &&
+          matchesSeasons
+        );
+      });
+    } catch (error) {
+      console.error("Error filtering menu items:", error);
+      return [];
+    }
+  }
+);

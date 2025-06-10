@@ -23,10 +23,10 @@ export function CartSidebar() {
   const { schedule, isLoading, error } = useBookingSchedule();
 
   return (
-    <aside className="w-full h-full border-l bg-background p-6 flex flex-col justify-between">
-      <div className="space-y-6">
+    <aside className="w-full h-full border-l bg-background p-6 flex flex-col justify-between bg-white">
+      <div className="space-y-4">
         {/* Booking Date */}
-        <div className="bg-muted p-4 rounded-lg">
+        <div className="rounded-lg">
           <h3 className="text-sm font-medium mb-1">Next Booking</h3>
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading...</p>
@@ -40,12 +40,14 @@ export function CartSidebar() {
               {dateFormatter.format(new Date(schedule.bookingDate))}
             </p>
           ) : (
-            <div className="flex items-center gap-2 text-sm text-destructive">
+            <div className="bg-red-50 border border-red-300 rounded-md px-3 py-2 flex items-center gap-2 text-sm text-destructive">
               <AlertCircle className="h-4 w-4" />
               <span>No upcoming bookings scheduled</span>
             </div>
           )}
         </div>
+
+        <Separator />
 
         {/* Preferences Section */}
         <UserPreferencesSection />

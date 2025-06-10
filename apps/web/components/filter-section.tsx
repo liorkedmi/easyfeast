@@ -31,6 +31,8 @@ interface FilterSectionProps {
   cuisines: FilterOption[];
   categories: FilterOption[];
   tags: FilterOption[];
+  seasons: FilterOption[];
+  currentSeason: string;
 }
 
 // Custom scrollable popover with gradient indicators
@@ -78,6 +80,8 @@ export function FilterSection({
   cuisines,
   categories,
   tags,
+  seasons,
+  currentSeason,
 }: FilterSectionProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -88,12 +92,14 @@ export function FilterSection({
   const cuisineButtonRef = useRef<HTMLButtonElement>(null);
   const categoryButtonRef = useRef<HTMLButtonElement>(null);
   const tagButtonRef = useRef<HTMLButtonElement>(null);
+  const seasonButtonRef = useRef<HTMLButtonElement>(null);
 
   const [proteinWidth, setProteinWidth] = useState<number>();
   const [dietaryWidth, setDietaryWidth] = useState<number>();
   const [cuisineWidth, setCuisineWidth] = useState<number>();
   const [categoryWidth, setCategoryWidth] = useState<number>();
   const [tagWidth, setTagWidth] = useState<number>();
+  const [seasonWidth, setSeasonWidth] = useState<number>();
 
   useLayoutEffect(() => {
     if (proteinButtonRef.current) {
@@ -111,39 +117,48 @@ export function FilterSection({
     if (tagButtonRef.current) {
       setTagWidth(tagButtonRef.current.offsetWidth);
     }
-  }, [proteinTypes, dietaryRestrictions, cuisines, categories, tags]);
+    if (seasonButtonRef.current) {
+      setSeasonWidth(seasonButtonRef.current.offsetWidth);
+    }
+  }, [proteinTypes, dietaryRestrictions, cuisines, categories, tags, seasons]);
 
   // Initialize filters with user preferences if available
-  useEffect(() => {
-    if (!preferences) return;
+  // useEffect(() => {
+  //   if (!preferences) return;
 
-    const params = new URLSearchParams(searchParams);
-    let hasChanges = false;
+  //   const params = new URLSearchParams(searchParams);
+  //   let hasChanges = false;
 
-    // Helper function to update params if not already set
-    const updateParamIfNotSet = (
-      key: string,
-      ids: { id: string }[] | undefined
-    ) => {
-      if (ids && ids.length > 0 && !params.has(key)) {
-        params.set(key, ids.map((item) => item.id).join(","));
-        hasChanges = true;
-      }
-    };
+  //   // Helper function to update params if not already set
+  //   const updateParamIfNotSet = (
+  //     key: string,
+  //     ids: { id: string }[] | undefined
+  //   ) => {
+  //     if (ids && ids.length > 0 && !params.has(key)) {
+  //       params.set(key, ids.map((item) => item.id).join(","));
+  //       hasChanges = true;
+  //     }
+  //   };
 
-    // Update each filter type if not already set in URL
-    updateParamIfNotSet("proteinTypes", preferences.proteinPreferences);
-    updateParamIfNotSet("dietaryRestrictions", preferences.dietaryRestrictions);
-    updateParamIfNotSet("cuisines", preferences.cuisinePreferences);
-    updateParamIfNotSet("categories", preferences.categoryPreferences);
+  //   // Update each filter type if not already set in URL
+  //   updateParamIfNotSet("proteinTypes", preferences.proteinPreferences);
+  //   updateParamIfNotSet("dietaryRestrictions", preferences.dietaryRestrictions);
+  //   updateParamIfNotSet("cuisines", preferences.cuisinePreferences);
+  //   updateParamIfNotSet("categories", preferences.categoryPreferences);
 
-    // Only update URL if we made changes
-    if (hasChanges) {
-      startTransition(() => {
-        router.push(`?${params.toString()}`);
-      });
-    }
-  }, [preferences]);
+  //   // Set default season if not set
+  //   if (!params.has("seasons")) {
+  //     params.set("seasons", currentSeason);
+  //     hasChanges = true;
+  //   }
+
+  //   // Only update URL if we made changes
+  //   if (hasChanges) {
+  //     startTransition(() => {
+  //       router.push(`?${params.toString()}`);
+  //     });
+  //   }
+  // }, [preferences, currentSeason]);
 
   const updateFilter = useCallback(
     (key: string, value: string | null) => {
@@ -153,6 +168,9 @@ export function FilterSection({
       } else {
         params.delete(key);
       }
+      // Preserve the tab selection
+      const currentTab = searchParams.get("tab") || "main";
+      params.set("tab", currentTab);
       startTransition(() => {
         router.push(`?${params.toString()}`);
       });
@@ -189,7 +207,104 @@ export function FilterSection({
   return (
     <div className="mt-4 mb-8 p-6 bg-gray-100 rounded-lg border">
       <h2 className="text-xl font-semibold mb-6">Filter Menu</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+            Season
+          </label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                ref={seasonButtonRef}
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between"
+              >
+                <span className="truncate">
+                  {getSelectedNames("seasons", seasons) || "Season"}
+                </span>
+                <div className="flex items-center gap-2">
+                  {getSelectedCount("seasons") > 0 && (
+                    <Badge variant="secondary">
+                      {getSelectedCount("seasons")}
+                    </Badge>
+                  )}
+                  <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                </div>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              sideOffset={0}
+              style={seasonWidth ? { width: seasonWidth } : undefined}
+              className="p-0 mt-1 shadow-lg border border-gray-200 rounded-lg bg-white"
+            >
+              <ScrollablePopover>
+                <div className="p-2 space-y-2">
+                  <div className="flex gap-2 mb-2 pb-2 border-b">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => {
+                        const selected =
+                          searchParams.get("seasons")?.split(",") || [];
+                        if (selected.length === seasons.length) {
+                          handleUnselectAll("seasons");
+                        } else {
+                          handleSelectAll("seasons", seasons);
+                        }
+                      }}
+                    >
+                      {(searchParams.get("seasons")?.split(",") || [])
+                        .length === seasons.length
+                        ? "Unselect All"
+                        : "Select All"}
+                    </Button>
+                  </div>
+                </div>
+                <div className="p-2 space-y-2">
+                  {seasons.map((season) => (
+                    <div
+                      key={season.id}
+                      className="flex items-center space-x-2"
+                    >
+                      <Checkbox
+                        id={`season-${season.id}`}
+                        checked={
+                          searchParams.get("seasons")?.includes(season.id) ||
+                          false
+                        }
+                        onCheckedChange={(checked) => {
+                          const currentValues =
+                            searchParams.get("seasons")?.split(",") || [];
+                          if (checked) {
+                            updateFilter(
+                              "seasons",
+                              [...currentValues, season.id].join(",")
+                            );
+                          } else {
+                            updateFilter(
+                              "seasons",
+                              currentValues
+                                .filter((v) => v !== season.id)
+                                .join(",") || null
+                            );
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor={`season-${season.id}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {season.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </ScrollablePopover>
+            </PopoverContent>
+          </Popover>
+        </div>
         <div className="space-y-2">
           <label className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
             Protein Type
@@ -228,19 +343,20 @@ export function FilterSection({
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onClick={() =>
-                        handleSelectAll("proteinTypes", proteinTypes)
-                      }
+                      onClick={() => {
+                        const selected =
+                          searchParams.get("proteinTypes")?.split(",") || [];
+                        if (selected.length === proteinTypes.length) {
+                          handleUnselectAll("proteinTypes");
+                        } else {
+                          handleSelectAll("proteinTypes", proteinTypes);
+                        }
+                      }}
                     >
-                      Select All
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleUnselectAll("proteinTypes")}
-                    >
-                      Unselect All
+                      {(searchParams.get("proteinTypes")?.split(",") || [])
+                        .length === proteinTypes.length
+                        ? "Unselect All"
+                        : "Select All"}
                     </Button>
                   </div>
                   {proteinTypes.map((type) => (
@@ -323,22 +439,26 @@ export function FilterSection({
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onClick={() =>
-                        handleSelectAll(
-                          "dietaryRestrictions",
-                          dietaryRestrictions
-                        )
-                      }
+                      onClick={() => {
+                        const selected =
+                          searchParams.get("dietaryRestrictions")?.split(",") ||
+                          [];
+                        if (selected.length === dietaryRestrictions.length) {
+                          handleUnselectAll("dietaryRestrictions");
+                        } else {
+                          handleSelectAll(
+                            "dietaryRestrictions",
+                            dietaryRestrictions
+                          );
+                        }
+                      }}
                     >
-                      Select All
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleUnselectAll("dietaryRestrictions")}
-                    >
-                      Unselect All
+                      {(
+                        searchParams.get("dietaryRestrictions")?.split(",") ||
+                        []
+                      ).length === dietaryRestrictions.length
+                        ? "Unselect All"
+                        : "Select All"}
                     </Button>
                   </div>
                   {dietaryRestrictions.map((restriction) => (
@@ -424,17 +544,20 @@ export function FilterSection({
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onClick={() => handleSelectAll("cuisines", cuisines)}
+                      onClick={() => {
+                        const selected =
+                          searchParams.get("cuisines")?.split(",") || [];
+                        if (selected.length === cuisines.length) {
+                          handleUnselectAll("cuisines");
+                        } else {
+                          handleSelectAll("cuisines", cuisines);
+                        }
+                      }}
                     >
-                      Select All
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleUnselectAll("cuisines")}
-                    >
-                      Unselect All
+                      {(searchParams.get("cuisines")?.split(",") || [])
+                        .length === cuisines.length
+                        ? "Unselect All"
+                        : "Select All"}
                     </Button>
                   </div>
                   {cuisines.map((cuisine) => (
@@ -517,17 +640,20 @@ export function FilterSection({
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onClick={() => handleSelectAll("categories", categories)}
+                      onClick={() => {
+                        const selected =
+                          searchParams.get("categories")?.split(",") || [];
+                        if (selected.length === categories.length) {
+                          handleUnselectAll("categories");
+                        } else {
+                          handleSelectAll("categories", categories);
+                        }
+                      }}
                     >
-                      Select All
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleUnselectAll("categories")}
-                    >
-                      Unselect All
+                      {(searchParams.get("categories")?.split(",") || [])
+                        .length === categories.length
+                        ? "Unselect All"
+                        : "Select All"}
                     </Button>
                   </div>
                   {categories.map((category) => (
@@ -611,17 +737,20 @@ export function FilterSection({
                       variant="outline"
                       size="sm"
                       className="flex-1"
-                      onClick={() => handleSelectAll("tags", tags)}
+                      onClick={() => {
+                        const selected =
+                          searchParams.get("tags")?.split(",") || [];
+                        if (selected.length === tags.length) {
+                          handleUnselectAll("tags");
+                        } else {
+                          handleSelectAll("tags", tags);
+                        }
+                      }}
                     >
-                      Select All
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => handleUnselectAll("tags")}
-                    >
-                      Unselect All
+                      {(searchParams.get("tags")?.split(",") || []).length ===
+                      tags.length
+                        ? "Unselect All"
+                        : "Select All"}
                     </Button>
                   </div>
                   {tags.map((tag) => (

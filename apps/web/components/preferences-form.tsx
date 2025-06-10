@@ -128,7 +128,7 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {filterOptions.proteinTypes.map((protein) => (
                 <div key={protein.id} className="flex items-center space-x-2">
                   <Checkbox
@@ -167,7 +167,7 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {filterOptions.categories.map((category) => (
                 <div key={category.id} className="flex items-center space-x-2">
                   <Checkbox
@@ -208,7 +208,7 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {filterOptions.dietaryRestrictions.map((restriction) => (
                 <div
                   key={restriction.id}
@@ -251,7 +251,7 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {filterOptions.cuisines.map((cuisine) => (
                 <div key={cuisine.id} className="flex items-center space-x-2">
                   <Checkbox
@@ -282,14 +282,14 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
         <Card>
           <CardHeader>
             <CardTitle>
-              What are your culinary preferences? cuisines?{" "}
+              What are your culinary preferences?{" "}
               <span className="font-normal text-gray-500">
                 Check all that apply.
               </span>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {filterOptions.culinaryPreferences.map((pref) => (
                 <div key={pref.id} className="flex items-center space-x-2">
                   <Checkbox
@@ -323,7 +323,7 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {filterOptions.groceryPreferences.map((pref) => (
                 <div key={pref.id} className="flex items-center space-x-2">
                   <Checkbox
@@ -415,7 +415,7 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex items-center bg-white rounded-full shadow-lg px-4 py-2 text-gray-700 text-sm border border-gray-200 transition duration-300 ease-out opacity-100 translate-y-0 animate-fade-up">
           <svg
             className="animate-spin h-4 w-4 mr-2 text-primary"
-          xmlns="http://www.w3.org/2000/svg"
+            xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
           >
