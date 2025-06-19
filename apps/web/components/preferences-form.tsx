@@ -91,8 +91,8 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
             <CardTitle>
               How many servings of each meal would you like?{" "}
               <span className="font-normal text-gray-500">
-                You'll be able to modify this selection from week to week as
-                desired.
+                This sets a default portion size for your household, but you'll
+                be able to adjust this each week.
               </span>
             </CardTitle>
           </CardHeader>

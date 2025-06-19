@@ -16,6 +16,8 @@ export interface CartItem {
     cuisine?: string[];
     tags: string[];
     ingredients?: string;
+    restriction_Dairy_Free?: string;
+    restriction_Gluten_Free?: string;
     restriction_Tree_Nut_Free?: string;
     restriction_Peanut_Free?: string;
     restriction_Egg_Free?: string;

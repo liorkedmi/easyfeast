@@ -94,7 +94,7 @@ export const getMenuItems = cache(
           picture: (() => {
             const picture = record.get("Picture");
             if (!picture || !Array.isArray(picture) || !picture.length) {
-              return "/img/placeholder.png";
+              return "/img/logo.png";
             }
             // @ts-ignore - We know this is safe at runtime
             const firstAttachment = picture[0] as unknown as {
@@ -104,9 +104,7 @@ export const getMenuItems = cache(
                 };
               };
             };
-            return (
-              firstAttachment?.thumbnails?.large?.url || "/img/placeholder.png"
-            );
+            return firstAttachment?.thumbnails?.large?.url || "/img/logo.png";
           })(),
           restriction_Dairy_Free: record.get(
             "Restriction_Dairy-Free"

@@ -93,6 +93,7 @@ export function FilterSection({
   const tagButtonRef = useRef<HTMLButtonElement>(null);
   const seasonButtonRef = useRef<HTMLButtonElement>(null);
 
+  const { preferences } = useUserPreferences();
   const [proteinWidth, setProteinWidth] = useState<number>();
   const [dietaryWidth, setDietaryWidth] = useState<number>();
   const [cuisineWidth, setCuisineWidth] = useState<number>();
@@ -122,42 +123,68 @@ export function FilterSection({
   }, [proteinTypes, dietaryRestrictions, cuisines, categories, tags, seasons]);
 
   // Initialize filters with user preferences if available
-  // useEffect(() => {
-  //   if (!preferences) return;
+  useEffect(() => {
+    if (!preferences) return;
 
-  //   const params = new URLSearchParams(searchParams);
-  //   let hasChanges = false;
+    const params = new URLSearchParams(searchParams);
+    let hasChanges = false;
 
-  //   // Helper function to update params if not already set
-  //   const updateParamIfNotSet = (
-  //     key: string,
-  //     ids: { id: string }[] | undefined
-  //   ) => {
-  //     if (ids && ids.length > 0 && !params.has(key)) {
-  //       params.set(key, ids.map((item) => item.id).join(","));
-  //       hasChanges = true;
-  //     }
-  //   };
+    // Check if we have saved filters in sessionStorage
+    const savedFilters = sessionStorage.getItem("menuFilters");
+    let filtersToApply: Record<string, string> = {};
 
-  //   // Update each filter type if not already set in URL
-  //   updateParamIfNotSet("proteinTypes", preferences.proteinPreferences);
-  //   updateParamIfNotSet("dietaryRestrictions", preferences.dietaryRestrictions);
-  //   updateParamIfNotSet("cuisines", preferences.cuisinePreferences);
-  //   updateParamIfNotSet("categories", preferences.categoryPreferences);
+    if (savedFilters) {
+      try {
+        filtersToApply = JSON.parse(savedFilters);
+      } catch (e) {
+        console.warn("Failed to parse saved filters from sessionStorage");
+      }
+    }
 
-  //   // Set default season if not set
-  //   if (!params.has("seasons")) {
-  //     params.set("seasons", currentSeason);
-  //     hasChanges = true;
-  //   }
+    // Helper function to update params if not already set
+    const updateParamIfNotSet = (
+      key: string,
+      ids: { id: string }[] | undefined
+    ) => {
+      if (ids && ids.length > 0 && !params.has(key)) {
+        params.set(key, ids.map((item) => item.id).join(","));
+        hasChanges = true;
+      }
+    };
 
-  //   // Only update URL if we made changes
-  //   if (hasChanges) {
-  //     startTransition(() => {
-  //       router.push(`?${params.toString()}`);
-  //     });
-  //   }
-  // }, [preferences, currentSeason]);
+    // Apply saved filters or preferences if no saved filters exist
+    if (Object.keys(filtersToApply).length > 0) {
+      // Apply saved filters
+      Object.entries(filtersToApply).forEach(([key, value]) => {
+        if (!params.has(key)) {
+          params.set(key, value);
+          hasChanges = true;
+        }
+      });
+    } else {
+      // Apply preferences as fallback
+      updateParamIfNotSet("proteinTypes", preferences.proteinPreferences);
+      updateParamIfNotSet(
+        "dietaryRestrictions",
+        preferences.dietaryRestrictions
+      );
+      updateParamIfNotSet("cuisines", preferences.cuisinePreferences);
+      updateParamIfNotSet("categories", preferences.categoryPreferences);
+    }
+
+    // Set default season if not set
+    if (!params.has("seasons")) {
+      params.set("seasons", currentSeason);
+      hasChanges = true;
+    }
+
+    // Only update URL if we made changes
+    if (hasChanges) {
+      startTransition(() => {
+        router.push(`?${params.toString()}`);
+      });
+    }
+  }, [preferences, currentSeason]);
 
   const updateFilter = useCallback(
     (key: string, value: string | null) => {
@@ -167,9 +194,17 @@ export function FilterSection({
       } else {
         params.delete(key);
       }
-      // Preserve the tab selection
-      const currentTab = searchParams.get("tab") || "main";
-      params.set("tab", currentTab);
+
+      // Save current filters to sessionStorage
+      const currentFilters: Record<string, string> = {};
+      params.forEach((value, key) => {
+        if (key !== "tab") {
+          // Don't save tab selection
+          currentFilters[key] = value;
+        }
+      });
+      sessionStorage.setItem("menuFilters", JSON.stringify(currentFilters));
+
       startTransition(() => {
         router.push(`?${params.toString()}`);
       });

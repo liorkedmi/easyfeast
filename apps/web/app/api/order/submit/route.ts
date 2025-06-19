@@ -168,9 +168,24 @@ export async function POST(request: Request) {
     // Send confirmation email to user
     await sendEmail({
       to: userEmail,
-      subject: "Order Confirmation - EasyFeast",
+      subject: "Your Easyfeast Menu Has Been Received!",
       react: OrderConfirmationEmail({
-        menuSelections,
+        bookingDate: new Date(booking).toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        menuSelections: items.map((item) => {
+          return {
+            name: item.menuItem.name,
+            portion: item.selections.portionSize,
+            singleChoice: item.selections.singleChoice || "",
+            multipleChoices: item.selections.multipleChoices,
+            sides: item.selections.sides,
+            notes: item.selections.additionalNotes || "",
+          };
+        }),
         culinaryPreferences: culinaryPreferences.map((p) => p.name),
         groceryPreferences: groceryPreferences.map((p) => p.name),
       }),

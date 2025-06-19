@@ -128,8 +128,8 @@ async function MenuItems({
       ? item.cuisine.map((id) => cuisineMap.get(id) || id)
       : [],
     picture: Array.isArray(item.picture)
-      ? item.picture[0]?.url || "/img/placeholder.png"
-      : item.picture || "/img/placeholder.png",
+      ? item.picture[0]?.url || "/img/logo.png"
+      : item.picture || "/img/logo.png",
     sides: item.sides ? item.sides.map((id) => sideMap.get(id) || id) : [],
   }));
 

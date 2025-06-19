@@ -49,6 +49,8 @@ interface OrderDialogProps {
       cuisine?: string[];
       tags: string[];
       ingredients?: string;
+      restriction_Dairy_Free?: string;
+      restriction_Gluten_Free?: string;
       restriction_Tree_Nut_Free?: string;
       restriction_Peanut_Free?: string;
       restriction_Egg_Free?: string;
@@ -64,6 +66,8 @@ interface OrderDialogProps {
       sides: string[];
       additionalNotes?: string;
       allergenSelections: {
+        dairyFree: boolean;
+        glutenFree: boolean;
         treeNutFree: boolean;
         peanutFree: boolean;
         eggFree: boolean;
@@ -192,6 +196,8 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
         cuisine: item.menuItem.cuisine,
         tags: item.menuItem.tags,
         ingredients: item.menuItem.ingredients,
+        restriction_Dairy_Free: item.menuItem.restriction_Dairy_Free,
+        restriction_Gluten_Free: item.menuItem.restriction_Gluten_Free,
         restriction_Tree_Nut_Free: item.menuItem.restriction_Tree_Nut_Free,
         restriction_Peanut_Free: item.menuItem.restriction_Peanut_Free,
         restriction_Egg_Free: item.menuItem.restriction_Egg_Free,
@@ -292,13 +298,54 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
               )}
             />
 
-            {(item.menuItem.restriction_Tree_Nut_Free ||
+            {(item.menuItem.restriction_Dairy_Free ||
+              item.menuItem.restriction_Gluten_Free ||
+              item.menuItem.restriction_Tree_Nut_Free ||
               item.menuItem.restriction_Peanut_Free ||
               item.menuItem.restriction_Egg_Free ||
               item.menuItem.restriction_Sesame_Free) && (
               <div>
                 <h3 className="font-semibold mb-2">Allergen Info</h3>
                 <div className="space-y-2">
+                  {item.menuItem.restriction_Dairy_Free && (
+                    <FormField
+                      control={form.control}
+                      name="allergenSelections.dairyFree"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel>
+                            Dairy Free - {item.menuItem.restriction_Dairy_Free}
+                          </FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  {item.menuItem.restriction_Gluten_Free && (
+                    <FormField
+                      control={form.control}
+                      name="allergenSelections.glutenFree"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel>
+                            Gluten Free -{" "}
+                            {item.menuItem.restriction_Gluten_Free}
+                          </FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  )}
                   {item.menuItem.restriction_Tree_Nut_Free && (
                     <FormField
                       control={form.control}
