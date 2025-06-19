@@ -125,6 +125,8 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
       }),
     additionalNotes: z.string().optional(),
     allergenSelections: z.object({
+      dairyFree: z.boolean(),
+      glutenFree: z.boolean(),
       treeNutFree: z.boolean(),
       peanutFree: z.boolean(),
       eggFree: z.boolean(),
@@ -148,6 +150,18 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
       sides: item.selections?.sides || (sides.length === 1 ? sides : []),
       additionalNotes: item.selections?.additionalNotes || "",
       allergenSelections: {
+        dairyFree:
+          item.selections?.allergenSelections?.dairyFree ||
+          preferences?.dietaryRestrictions?.some((restriction) =>
+            restriction.name.toLowerCase().includes("dairy")
+          ) ||
+          false,
+        glutenFree:
+          item.selections?.allergenSelections?.glutenFree ||
+          preferences?.dietaryRestrictions?.some((restriction) =>
+            restriction.name.toLowerCase().includes("gluten")
+          ) ||
+          false,
         treeNutFree:
           item.selections?.allergenSelections?.treeNutFree ||
           preferences?.dietaryRestrictions?.some((restriction) =>

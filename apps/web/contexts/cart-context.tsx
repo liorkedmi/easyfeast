@@ -34,6 +34,8 @@ export interface CartItem {
     sides: string[];
     additionalNotes?: string;
     allergenSelections: {
+      dairyFree: boolean;
+      glutenFree: boolean;
       treeNutFree: boolean;
       peanutFree: boolean;
       eggFree: boolean;
