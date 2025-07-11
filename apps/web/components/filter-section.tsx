@@ -26,7 +26,7 @@ interface FilterOption {
 }
 
 interface FilterSectionProps {
-  proteinTypes: FilterOption[];
+  mealTypes: FilterOption[];
   dietaryRestrictions: FilterOption[];
   cuisines: FilterOption[];
   categories: FilterOption[];
@@ -75,7 +75,7 @@ function ScrollablePopover({
 }
 
 export function FilterSection({
-  proteinTypes,
+  mealTypes,
   dietaryRestrictions,
   cuisines,
   categories,
@@ -86,7 +86,7 @@ export function FilterSection({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const proteinButtonRef = useRef<HTMLButtonElement>(null);
+  const mealTypeButtonRef = useRef<HTMLButtonElement>(null);
   const dietaryButtonRef = useRef<HTMLButtonElement>(null);
   const cuisineButtonRef = useRef<HTMLButtonElement>(null);
   const categoryButtonRef = useRef<HTMLButtonElement>(null);
@@ -94,7 +94,7 @@ export function FilterSection({
   const seasonButtonRef = useRef<HTMLButtonElement>(null);
 
   const { preferences } = useUserPreferences();
-  const [proteinWidth, setProteinWidth] = useState<number>();
+  const [mealTypeWidth, setMealTypeWidth] = useState<number>();
   const [dietaryWidth, setDietaryWidth] = useState<number>();
   const [cuisineWidth, setCuisineWidth] = useState<number>();
   const [categoryWidth, setCategoryWidth] = useState<number>();
@@ -102,8 +102,8 @@ export function FilterSection({
   const [seasonWidth, setSeasonWidth] = useState<number>();
 
   useLayoutEffect(() => {
-    if (proteinButtonRef.current) {
-      setProteinWidth(proteinButtonRef.current.offsetWidth);
+    if (mealTypeButtonRef.current) {
+      setMealTypeWidth(mealTypeButtonRef.current.offsetWidth);
     }
     if (dietaryButtonRef.current) {
       setDietaryWidth(dietaryButtonRef.current.offsetWidth);
@@ -120,7 +120,7 @@ export function FilterSection({
     if (seasonButtonRef.current) {
       setSeasonWidth(seasonButtonRef.current.offsetWidth);
     }
-  }, [proteinTypes, dietaryRestrictions, cuisines, categories, tags, seasons]);
+  }, [mealTypes, dietaryRestrictions, cuisines, categories, tags, seasons]);
 
   // Initialize filters with user preferences if available
   useEffect(() => {
@@ -163,7 +163,7 @@ export function FilterSection({
       });
     } else {
       // Apply preferences as fallback
-      updateParamIfNotSet("proteinTypes", preferences.proteinPreferences);
+      updateParamIfNotSet("mealTypes", preferences.mealTypePreferences);
       updateParamIfNotSet(
         "dietaryRestrictions",
         preferences.dietaryRestrictions
@@ -341,24 +341,23 @@ export function FilterSection({
         </div>
         <div className="space-y-2">
           <label className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
-            Protein Type
+            Meal Type
           </label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
-                ref={proteinButtonRef}
+                ref={mealTypeButtonRef}
                 variant="outline"
                 role="combobox"
                 className="w-full justify-between"
               >
                 <span className="truncate">
-                  {getSelectedNames("proteinTypes", proteinTypes) ||
-                    "Protein Type"}
+                  {getSelectedNames("mealTypes", mealTypes) || "Meal Type"}
                 </span>
                 <div className="flex items-center gap-2">
-                  {getSelectedCount("proteinTypes") > 0 && (
+                  {getSelectedCount("mealTypes") > 0 && (
                     <Badge variant="secondary">
-                      {getSelectedCount("proteinTypes")}
+                      {getSelectedCount("mealTypes")}
                     </Badge>
                   )}
                   <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
@@ -367,7 +366,7 @@ export function FilterSection({
             </PopoverTrigger>
             <PopoverContent
               sideOffset={0}
-              style={proteinWidth ? { width: proteinWidth } : undefined}
+              style={mealTypeWidth ? { width: mealTypeWidth } : undefined}
               className="p-0 mt-1 shadow-lg border border-gray-200 rounded-lg bg-white"
             >
               <ScrollablePopover>
@@ -379,39 +378,39 @@ export function FilterSection({
                       className="flex-1"
                       onClick={() => {
                         const selected =
-                          searchParams.get("proteinTypes")?.split(",") || [];
-                        if (selected.length === proteinTypes.length) {
-                          handleUnselectAll("proteinTypes");
+                          searchParams.get("mealTypes")?.split(",") || [];
+                        if (selected.length === mealTypes.length) {
+                          handleUnselectAll("mealTypes");
                         } else {
-                          handleSelectAll("proteinTypes", proteinTypes);
+                          handleSelectAll("mealTypes", mealTypes);
                         }
                       }}
                     >
-                      {(searchParams.get("proteinTypes")?.split(",") || [])
-                        .length === proteinTypes.length
+                      {(searchParams.get("mealTypes")?.split(",") || [])
+                        .length === mealTypes.length
                         ? "Unselect All"
                         : "Select All"}
                     </Button>
                   </div>
-                  {proteinTypes.map((type) => (
+                  {mealTypes.map((type) => (
                     <div key={type.id} className="flex items-center space-x-2">
                       <Checkbox
-                        id={`protein-${type.id}`}
+                        id={`meal-type-${type.id}`}
                         checked={
-                          searchParams.get("proteinTypes")?.includes(type.id) ||
+                          searchParams.get("mealTypes")?.includes(type.id) ||
                           false
                         }
                         onCheckedChange={(checked) => {
                           const currentValues =
-                            searchParams.get("proteinTypes")?.split(",") || [];
+                            searchParams.get("mealTypes")?.split(",") || [];
                           if (checked) {
                             updateFilter(
-                              "proteinTypes",
+                              "mealTypes",
                               [...currentValues, type.id].join(",")
                             );
                           } else {
                             updateFilter(
-                              "proteinTypes",
+                              "mealTypes",
                               currentValues
                                 .filter((v) => v !== type.id)
                                 .join(",") || null
@@ -420,7 +419,7 @@ export function FilterSection({
                         }}
                       />
                       <label
-                        htmlFor={`protein-${type.id}`}
+                        htmlFor={`meal-type-${type.id}`}
                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                       >
                         {type.name}

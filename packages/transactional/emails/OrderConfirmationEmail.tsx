@@ -21,7 +21,7 @@ interface OrderConfirmationEmailProps {
     portion: string;
     singleChoice: string;
     multipleChoices: string[];
-    sides: string[];
+    sides: { id: string; name: string; ingredients: string }[];
     notes: string;
   }[];
   culinaryPreferences: string[];

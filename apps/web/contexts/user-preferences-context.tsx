@@ -4,7 +4,7 @@ import { createContext, useContext, ReactNode, useState } from "react";
 
 export interface UserPreferences {
   preferredPortionSize?: string;
-  proteinPreferences?: { id: string; name: string }[];
+  mealTypePreferences?: { id: string; name: string }[];
   categoryPreferences?: { id: string; name: string }[];
   dietaryRestrictions?: { id: string; name: string }[];
   cuisinePreferences?: { id: string; name: string }[];
@@ -13,6 +13,8 @@ export interface UserPreferences {
   canChefBringEquipment?: boolean;
   trashDisposal?: string;
   notes?: string;
+  numberOfMeals?: number;
+  numberOfAddons?: number;
 }
 
 interface UserPreferencesContextType {
@@ -41,13 +43,6 @@ export function UserPreferencesProvider({
     newPreferences: Partial<UserPreferences>
   ) => {
     try {
-      // Here you would typically make an API call to update preferences in your database
-      // For example:
-      // await fetch('/api/preferences', {
-      //   method: 'PUT',
-      //   body: JSON.stringify(newPreferences),
-      // });
-
       // For now, we'll just update the local state
       setPreferences((prev) =>
         prev

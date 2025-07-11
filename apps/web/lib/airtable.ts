@@ -8,10 +8,10 @@ const airtable = new Airtable({
 
 export interface MenuItem {
   id: string;
-  name: string;
   type: string;
+  name: string;
   menu: "Main Menu" | "Kosher";
-  proteinTypes: string[];
+  mealTypes: string[];
   dietaryRestrictions: string[];
   categories: string[];
   cuisine: string[];
@@ -25,6 +25,9 @@ export interface MenuItem {
   restriction_Peanut_Free?: string;
   restriction_Egg_Free?: string;
   restriction_Sesame_Free?: string;
+  restriction_Soy_Free?: string;
+  restriction_No_Pork?: string;
+  restriction_No_Shellfish?: string;
   choices_Select_1?: string[];
   choices_Select_Multiple?: string[];
   sides?: string[];
@@ -48,22 +51,22 @@ export const getMenuItems = cache(
 
       return records.map((record): MenuItem => {
         // Handle multi-select fields that come as arrays
-        const proteinTypes = record.get("Protein Type");
+        const mealTypes = record.get("Meal Types");
         const dietaryRestrictions = record.get("Dietary Restrictions");
         const categories = record.get("Categories");
         const tags = record.get("Tags");
         const seasons = record.get("Seasons");
-        const cusines = record.get("Cuisine");
+        const cusines = record.get("Cuisines");
 
         return {
           id: record.id,
-          name: record.get("Name") as string,
           type: record.get("Type") as string,
+          name: record.get("Name") as string,
           menu: record.get("Menu") as "Main Menu" | "Kosher",
-          proteinTypes: Array.isArray(proteinTypes)
-            ? proteinTypes
-            : typeof proteinTypes === "string"
-              ? proteinTypes.split(",").map((s) => s.trim())
+          mealTypes: Array.isArray(mealTypes)
+            ? mealTypes
+            : typeof mealTypes === "string"
+              ? mealTypes.split(",").map((s) => s.trim())
               : [],
           dietaryRestrictions: Array.isArray(dietaryRestrictions)
             ? dietaryRestrictions
@@ -113,7 +116,7 @@ export const getMenuItems = cache(
             "Restriction_Gluten-Free"
           ) as string,
           restriction_Tree_Nut_Free: record.get(
-            "Restriction_Tree-Nut Free"
+            "Restriction_Tree-Nut-Free"
           ) as string,
           restriction_Peanut_Free: record.get(
             "Restriction_Peanut-Free"
@@ -121,6 +124,11 @@ export const getMenuItems = cache(
           restriction_Egg_Free: record.get("Restriction_Egg-Free") as string,
           restriction_Sesame_Free: record.get(
             "Restriction_Sesame-Free"
+          ) as string,
+          restriction_Soy_Free: record.get("Restriction_Soy-Free") as string,
+          restriction_No_Pork: record.get("Restriction_No-Pork") as string,
+          restriction_No_Shellfish: record.get(
+            "Restriction_No-Shellfish"
           ) as string,
           choices_Select_1: record.get("Choices (Select 1)") as string[],
           choices_Select_Multiple: record.get(
@@ -139,7 +147,7 @@ export const getMenuItems = cache(
 // Get all available filter options
 export const getFilterOptions = cache(async () => {
   const [
-    proteinTypes,
+    mealTypes,
     dietaryRestrictions,
     categories,
     cuisines,
@@ -149,13 +157,13 @@ export const getFilterOptions = cache(async () => {
     sides,
     settings,
   ] = await Promise.all([
-    airtable("Online_Filter_Proteins").select().all(),
-    airtable("Online_Filter_Dietary Restrictions").select().all(),
+    airtable("Online_Filter_Meal_Types").select().all(),
+    airtable("Online_Filter_Dietary_Restrictions").select().all(),
     airtable("Online_Filter_Categories").select().all(),
-    airtable("Online_Filter_Cuisine").select().all(),
+    airtable("Online_Filter_Cuisines").select().all(),
     airtable("Online_Filter_Tags").select().all(),
-    airtable("Online_Filter_Culinary Preferences").select().all(),
-    airtable("Online_Filter_Grocery Preferences").select().all(),
+    airtable("Online_Filter_Culinary_Preferences").select().all(),
+    airtable("Online_Filter_Grocery_Preferences").select().all(),
     airtable("Online_Menu")
       .select({
         filterByFormula: "{Type} = 'Side'",
@@ -168,7 +176,7 @@ export const getFilterOptions = cache(async () => {
   const currentSeason = settings[0]?.get("Current Season") as string;
 
   return {
-    proteinTypes: proteinTypes.map((record) => ({
+    mealTypes: mealTypes.map((record) => ({
       id: record.id,
       name: record.get("Name") as string,
     })),
@@ -191,6 +199,7 @@ export const getFilterOptions = cache(async () => {
     sides: sides.map((record) => ({
       id: record.id,
       name: record.get("Name") as string,
+      ingredients: record.get("Ingredients_Display") as string,
     })),
     culinaryPreferences: culinaryPreferences.map((record) => ({
       id: record.id,
@@ -212,7 +221,7 @@ export const getFilterOptions = cache(async () => {
 
 export interface UserPreferences {
   preferredPortionSize: string;
-  proteinPreferences: { id: string; name: string }[];
+  mealTypePreferences: { id: string; name: string }[];
   categoryPreferences: { id: string; name: string }[];
   dietaryRestrictions: { id: string; name: string }[];
   cuisinePreferences: { id: string; name: string }[];
@@ -221,6 +230,8 @@ export interface UserPreferences {
   canChefBringEquipment: boolean;
   trashDisposal: string;
   notes: string;
+  numberOfMeals: number;
+  numberOfAddons: number;
 }
 
 export async function getUserPreferences(
@@ -277,9 +288,10 @@ export async function getUserPreferences(
       return null;
     }
 
-    const proteinPreferenceIds = clientRecord.get("Proteins") as string[];
-    const proteinPreferences =
-      await getProteinPreferencesByIds(proteinPreferenceIds);
+    const mealTypesPreferenceIds = clientRecord.get("Meal Types") as string[];
+    const mealTypePreferences = await getmealTypePreferencesByIds(
+      mealTypesPreferenceIds
+    );
 
     const categoryPreferenceIds = clientRecord.get("Categories") as string[];
     const categoryPreferences = await getCategoryPreferencesByIds(
@@ -310,10 +322,14 @@ export async function getUserPreferences(
     const groceryPreferences =
       await getGroceryPreferencesByIds(groceryPreferenceIds);
 
-    return {
+    const numberOfMeals = (clientRecord.get("Number of Meals") as number) || 0;
+    const numberOfAddons =
+      (clientRecord.get("Number of Add-ons") as number) || 0;
+
+    const result = {
       preferredPortionSize:
         (clientRecord.get("Preferred Portion Size") as string) || "",
-      proteinPreferences,
+      mealTypePreferences,
       categoryPreferences,
       dietaryRestrictions,
       cuisinePreferences,
@@ -323,7 +339,11 @@ export async function getUserPreferences(
         (clientRecord.get("Can Chef Bring Equipment? Y/N") as string) === "Yes",
       trashDisposal: (clientRecord.get("Trash Disposal") as string) || "",
       notes: (clientRecord.get("Notes") as string) || "",
+      numberOfMeals,
+      numberOfAddons,
     };
+
+    return result;
   } catch (error) {
     console.error("Error fetching user preferences:", error);
     return null;
@@ -338,7 +358,7 @@ export async function getDietaryRestrictionsByIds(
   }
 
   const restrictionRecords = await airtable(
-    "Online_Filter_Dietary Restrictions"
+    "Online_Filter_Dietary_Restrictions"
   )
     .select({
       filterByFormula: `OR(${dietaryRestrictionIds.map((id) => `RECORD_ID() = '${id}'`).join(",")})`,
@@ -351,20 +371,20 @@ export async function getDietaryRestrictionsByIds(
   }));
 }
 
-export async function getProteinPreferencesByIds(
-  proteinPreferenceIds: string[]
+export async function getmealTypePreferencesByIds(
+  mealTypesPreferenceIds: string[]
 ): Promise<{ id: string; name: string }[]> {
-  if (!proteinPreferenceIds || proteinPreferenceIds.length === 0) {
+  if (!mealTypesPreferenceIds || mealTypesPreferenceIds.length === 0) {
     return [];
   }
 
-  const proteinRecords = await airtable("Online_Filter_Proteins")
+  const mealTypeRecords = await airtable("Online_Filter_Meal_Types")
     .select({
-      filterByFormula: `OR(${proteinPreferenceIds.map((id) => `RECORD_ID() = '${id}'`).join(",")})`,
+      filterByFormula: `OR(${mealTypesPreferenceIds.map((id) => `RECORD_ID() = '${id}'`).join(",")})`,
     })
     .all();
 
-  return proteinRecords.map((record) => ({
+  return mealTypeRecords.map((record) => ({
     id: record.id,
     name: record.get("Name") as string,
   }));
@@ -396,7 +416,7 @@ export async function getCuisinePreferencesByIds(
     return [];
   }
 
-  const cuisineRecords = await airtable("Online_Filter_Cuisine")
+  const cuisineRecords = await airtable("Online_Filter_Cuisines")
     .select({
       filterByFormula: `OR(${cuisinePreferenceIds.map((id) => `RECORD_ID() = '${id}'`).join(",")})`,
     })
@@ -415,7 +435,7 @@ export async function getCulinaryPreferencesByIds(
     return [];
   }
 
-  const culinaryRecords = await airtable("Online_Filter_Culinary Preferences")
+  const culinaryRecords = await airtable("Online_Filter_Culinary_Preferences")
     .select({
       filterByFormula: `OR(${culinaryPreferenceIds.map((id) => `RECORD_ID() = '${id}'`).join(",")})`,
     })
@@ -434,7 +454,7 @@ export async function getGroceryPreferencesByIds(
     return [];
   }
 
-  const groceryRecords = await airtable("Online_Filter_Grocery Preferences")
+  const groceryRecords = await airtable("Online_Filter_Grocery_Preferences")
     .select({
       filterByFormula: `OR(${groceryPreferenceIds.map((id) => `RECORD_ID() = '${id}'`).join(",")})`,
     })
@@ -493,11 +513,13 @@ export async function updateUserPreferences(
     const fields: Record<string, any> = {};
 
     if (preferences.preferredPortionSize !== undefined) {
-      fields["Preferred Portion Size"] = preferences.preferredPortionSize;
+      if (preferences.preferredPortionSize !== "") {
+        fields["Preferred Portion Size"] = preferences.preferredPortionSize;
+      }
     }
 
-    if (preferences.proteinPreferences !== undefined) {
-      fields["Proteins"] = preferences.proteinPreferences.map((p) => p.id);
+    if (preferences.mealTypePreferences !== undefined) {
+      fields["Meal Types"] = preferences.mealTypePreferences.map((p) => p.id);
     }
 
     if (preferences.categoryPreferences !== undefined) {
@@ -611,7 +633,7 @@ export async function getBookingSchedule(email: string) {
 }
 
 export interface FilterParams {
-  proteinTypes?: string;
+  mealTypes?: string;
   dietaryRestrictions?: string;
   cuisines?: string;
   categories?: string;
@@ -633,7 +655,7 @@ export const getFilteredMenuItems = cache(
       return menuItems.filter((item) => {
         // If no filters are selected, show all items
         if (
-          !filterParams.proteinTypes &&
+          !filterParams.mealTypes &&
           !filterParams.dietaryRestrictions &&
           !filterParams.cuisines &&
           !filterParams.categories &&
@@ -644,11 +666,11 @@ export const getFilteredMenuItems = cache(
         }
 
         // Check if item matches all selected filters
-        const matchesProteinType =
-          !filterParams.proteinTypes ||
-          filterParams.proteinTypes
+        const matchesMealType =
+          !filterParams.mealTypes ||
+          filterParams.mealTypes
             .split(",")
-            .some((type) => item.proteinTypes.includes(type));
+            .some((type) => item.mealTypes.includes(type));
 
         const matchesDietaryRestriction =
           !filterParams.dietaryRestrictions ||
@@ -677,7 +699,7 @@ export const getFilteredMenuItems = cache(
             .some((season) => item.seasons.includes(season));
 
         return (
-          matchesProteinType &&
+          matchesMealType &&
           matchesDietaryRestriction &&
           matchesCuisine &&
           matchesCategories &&

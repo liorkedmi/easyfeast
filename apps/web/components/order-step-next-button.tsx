@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@workspace/ui/components/button";
 import { useCart } from "@/contexts/cart-context";
 import { useBookingSchedule } from "@/contexts/booking-schedule-context";
+import { useUserPreferences } from "@/contexts/user-preferences-context";
 
 const steps = [
   {
@@ -20,19 +21,77 @@ const steps = [
   },
 ];
 
+// Calculate if cart meets meal requirements
+function calculateMealRequirements(
+  mainMenuItems: any[],
+  addonsItems: any[],
+  preferences: any
+): { isValid: boolean; message?: string } {
+  const numberOfMeals = preferences?.numberOfMeals || 0;
+  const numberOfAddons = preferences?.numberOfAddons || 0;
+
+  // Check if main menu items exceed the limit
+  if (mainMenuItems.length > numberOfMeals) {
+    return {
+      isValid: false,
+      message: `You have ${mainMenuItems.length} main meals but only ${numberOfMeals} allowed. Remove some main meals or adjust your preferences.`,
+    };
+  }
+
+  // Calculate how many add-on slots are available
+  // If you select fewer main meals, you can have more add-ons
+  const remainingMainSlots = numberOfMeals - mainMenuItems.length;
+  const availableAddonSlots = numberOfAddons + remainingMainSlots;
+
+  // Calculate how many add-on slots the current add-ons use
+  const addonMealSlots = Math.ceil(addonsItems.length / 2); // 2 add-ons = 1 meal slot
+
+  // Check if add-ons exceed the available slots
+  if (addonMealSlots > availableAddonSlots) {
+    return {
+      isValid: false,
+      message: `You have ${addonsItems.length} add-ons (${addonMealSlots} slots) but only ${availableAddonSlots} add-on slots available. Remove some add-ons or select more main meals.`,
+    };
+  }
+
+  // Check if we have enough items to meet minimum requirements
+  const totalUsedSlots = mainMenuItems.length + addonMealSlots;
+  if (totalUsedSlots < numberOfMeals) {
+    return {
+      isValid: false,
+      message: `You need at least ${numberOfMeals} meal slots filled. You currently have ${totalUsedSlots} (${mainMenuItems.length} main + ${addonMealSlots} add-on slots).`,
+    };
+  }
+
+  return { isValid: true };
+}
+
 export function OrderStepNextButton() {
   const pathname = usePathname();
   const router = useRouter();
   const { items } = useCart();
   const { schedule } = useBookingSchedule();
+  const { preferences } = useUserPreferences();
   const currentStepIdx = steps.findIndex((s) => pathname.startsWith(s.href));
   const nextStep = steps[currentStepIdx + 1];
 
   if (!nextStep) return null;
 
   const isSubmitStep = nextStep.href === "/order/submit";
+  const mainMenuItems = items.filter((item) => item.menuItem.type === "Main");
+  const addonsItems = items.filter((item) => item.menuItem.type === "Add-on");
+
+  // Calculate meal requirements
+  const mealRequirements = calculateMealRequirements(
+    mainMenuItems,
+    addonsItems,
+    preferences
+  );
+
   const isDisabled =
-    (isSubmitStep && items.length === 0) || (isSubmitStep && !schedule);
+    (isSubmitStep && items.length === 0) ||
+    (isSubmitStep && !schedule) ||
+    (isSubmitStep && !mealRequirements.isValid);
 
   return (
     <div className="flex justify-end mt-12">

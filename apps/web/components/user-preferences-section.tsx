@@ -58,42 +58,83 @@ export function UserPreferencesSection() {
                   Preferred Portion Size
                 </dt>
                 <dd className="text-sm text-gray-900">
-                  {preferences.preferredPortionSize}
+                  {preferences.preferredPortionSize === "Small"
+                    ? "Small: feeds 2 people"
+                    : preferences.preferredPortionSize === "Medium"
+                      ? "Medium: feeds 4 people"
+                      : "Large: feeds 6 people"}
                 </dd>
               </div>
             )}
 
-            {preferences.proteinPreferences &&
-              preferences.proteinPreferences.length > 0 && (
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">
-                    Protein Preferences
-                  </dt>
-                  <dd className="flex flex-wrap gap-2 mt-1">
-                    {preferences.proteinPreferences.map((pref) => (
-                      <Badge key={pref.id} variant="secondary">
-                        {pref.name}
-                      </Badge>
-                    ))}
-                  </dd>
-                </div>
-              )}
+            {preferences.categoryPreferences && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Category Preferences
+                </dt>
+                <dd className="flex flex-wrap gap-2 mt-1">
+                  {preferences.categoryPreferences.length > 0 ? (
+                    <>
+                      {preferences.categoryPreferences.map((pref) => (
+                        <Badge key={pref.id} variant="secondary">
+                          {pref.name}
+                        </Badge>
+                      ))}
+                    </>
+                  ) : (
+                    <Badge variant="secondary">
+                      I'd like to see everything!
+                    </Badge>
+                  )}
+                </dd>
+              </div>
+            )}
 
-            {preferences.categoryPreferences &&
-              preferences.categoryPreferences.length > 0 && (
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">
-                    Category Preferences
-                  </dt>
-                  <dd className="flex flex-wrap gap-2 mt-1">
-                    {preferences.categoryPreferences.map((pref) => (
-                      <Badge key={pref.id} variant="secondary">
-                        {pref.name}
-                      </Badge>
-                    ))}
-                  </dd>
-                </div>
-              )}
+            {preferences.mealTypePreferences && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Meal Preferences
+                </dt>
+                <dd className="flex flex-wrap gap-2 mt-1">
+                  {preferences.mealTypePreferences.length > 0 ? (
+                    <>
+                      {preferences.mealTypePreferences.map((pref) => (
+                        <Badge key={pref.id} variant="secondary">
+                          {pref.name}
+                        </Badge>
+                      ))}
+                    </>
+                  ) : (
+                    <Badge variant="secondary">
+                      I'd like to see everything!
+                    </Badge>
+                  )}
+                </dd>
+              </div>
+            )}
+
+            {preferences.cuisinePreferences && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Cuisine Preferences
+                </dt>
+                <dd className="flex flex-wrap gap-2 mt-1">
+                  {preferences.cuisinePreferences.length > 0 ? (
+                    <>
+                      {preferences.cuisinePreferences.map((pref) => (
+                        <Badge key={pref.id} variant="secondary">
+                          {pref.name}
+                        </Badge>
+                      ))}
+                    </>
+                  ) : (
+                    <Badge variant="secondary">
+                      I'd like to see everything!
+                    </Badge>
+                  )}
+                </dd>
+              </div>
+            )}
 
             {preferences.dietaryRestrictions &&
               preferences.dietaryRestrictions.length > 0 && (
@@ -105,22 +146,6 @@ export function UserPreferencesSection() {
                     {preferences.dietaryRestrictions.map((perf) => (
                       <Badge key={perf.id} variant="secondary">
                         {perf.name}
-                      </Badge>
-                    ))}
-                  </dd>
-                </div>
-              )}
-
-            {preferences.cuisinePreferences &&
-              preferences.cuisinePreferences.length > 0 && (
-                <div>
-                  <dt className="text-sm font-medium text-gray-500">
-                    Cuisine Preferences
-                  </dt>
-                  <dd className="flex flex-wrap gap-2 mt-1">
-                    {preferences.cuisinePreferences.map((pref) => (
-                      <Badge key={pref.id} variant="secondary">
-                        {pref.name}
                       </Badge>
                     ))}
                   </dd>

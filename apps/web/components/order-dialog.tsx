@@ -40,10 +40,11 @@ interface OrderDialogProps {
     id: string;
     menuItem: {
       id: string;
+      type: "Main" | "Add-on" | "Side";
       name: string;
       description?: string;
       menu: "Main Menu" | "Kosher";
-      proteinTypes: string[];
+      mealTypes: string[];
       dietaryRestrictions: string[];
       categories: string[];
       cuisine?: string[];
@@ -55,15 +56,18 @@ interface OrderDialogProps {
       restriction_Peanut_Free?: string;
       restriction_Egg_Free?: string;
       restriction_Sesame_Free?: string;
+      restriction_Soy_Free?: string;
+      restriction_No_Pork?: string;
+      restriction_No_Shellfish?: string;
       choices_Select_1?: string[];
       choices_Select_Multiple?: string[];
-      sides?: string[];
+      sides?: { id: string; name: string; ingredients: string }[];
     };
     selections?: {
       portionSize: string;
       singleChoice?: string;
       multipleChoices: string[];
-      sides: string[];
+      sides: { id: string; name: string; ingredients: string }[];
       additionalNotes?: string;
       allergenSelections: {
         dairyFree: boolean;
@@ -72,6 +76,9 @@ interface OrderDialogProps {
         peanutFree: boolean;
         eggFree: boolean;
         sesameFree: boolean;
+        soyFree: boolean;
+        noPork: boolean;
+        noShellfish: boolean;
       };
     };
   };
@@ -80,10 +87,55 @@ interface OrderDialogProps {
 export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
   const { preferences } = useUserPreferences();
   const { schedule } = useBookingSchedule();
-  const { addItem, updateItem } = useCart();
+  const { addItem, updateItem, items } = useCart();
   const singleChoices = item.menuItem.choices_Select_1 || [];
   const multipleChoices = item.menuItem.choices_Select_Multiple || [];
   const sides = item.menuItem.sides || [];
+
+  // Calculate if adding this item would exceed meal limits
+  function wouldExceedMealLimits(): boolean {
+    const numberOfMeals = preferences?.numberOfMeals || 0;
+    const numberOfAddons = preferences?.numberOfAddons || 0;
+
+    // Get current cart items (excluding the item being edited)
+    const currentMainItems = items.filter(
+      (cartItem) => cartItem.menuItem.type === "Main" && cartItem.id !== item.id
+    );
+    const currentAddonItems = items.filter(
+      (cartItem) =>
+        cartItem.menuItem.type === "Add-on" && cartItem.id !== item.id
+    );
+
+    // Calculate what the cart would look like after adding this item
+    const newMainItems =
+      item.menuItem.type === "Main"
+        ? [...currentMainItems, item]
+        : currentMainItems;
+    const newAddonItems =
+      item.menuItem.type === "Add-on"
+        ? [...currentAddonItems, item]
+        : currentAddonItems;
+
+    // Check main meal limit
+    if (newMainItems.length > numberOfMeals) {
+      return true;
+    }
+
+    // Calculate available add-on slots
+    const remainingMainSlots = numberOfMeals - newMainItems.length;
+    const availableAddonSlots = numberOfAddons + remainingMainSlots;
+    const addonMealSlots = Math.ceil(newAddonItems.length / 2);
+
+    // Check add-on limit
+    if (addonMealSlots > availableAddonSlots) {
+      return true;
+    }
+
+    return false;
+  }
+
+  const isAddingNewItem = !item.selections?.portionSize;
+  const wouldExceedLimits = isAddingNewItem && wouldExceedMealLimits();
 
   const formSchema = z.object({
     portionSize: z.string().min(1, "Please select a portion size"),
@@ -112,7 +164,9 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
         }
       }),
     sides: z
-      .array(z.string())
+      .array(
+        z.object({ id: z.string(), name: z.string(), ingredients: z.string() })
+      )
       .optional()
       .superRefine((val, ctx) => {
         // If there are single choices available, a selection is required
@@ -131,6 +185,9 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
       peanutFree: z.boolean(),
       eggFree: z.boolean(),
       sesameFree: z.boolean(),
+      soyFree: z.boolean(),
+      noPork: z.boolean(),
+      noShellfish: z.boolean(),
     }),
   });
 
@@ -165,7 +222,7 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
         treeNutFree:
           item.selections?.allergenSelections?.treeNutFree ||
           preferences?.dietaryRestrictions?.some((restriction) =>
-            restriction.name.toLowerCase().includes("tree nut")
+            restriction.name.toLowerCase().includes("tree-nut")
           ) ||
           false,
         peanutFree:
@@ -186,6 +243,24 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
             restriction.name.toLowerCase().includes("sesame")
           ) ||
           false,
+        soyFree:
+          item.selections?.allergenSelections?.soyFree ||
+          preferences?.dietaryRestrictions?.some((restriction) =>
+            restriction.name.toLowerCase().includes("soy")
+          ) ||
+          false,
+        noPork:
+          item.selections?.allergenSelections?.noPork ||
+          preferences?.dietaryRestrictions?.some((restriction) =>
+            restriction.name.toLowerCase().includes("pork")
+          ) ||
+          false,
+        noShellfish:
+          item.selections?.allergenSelections?.noShellfish ||
+          preferences?.dietaryRestrictions?.some((restriction) =>
+            restriction.name.toLowerCase().includes("shellfish")
+          ) ||
+          false,
       },
     },
   });
@@ -201,10 +276,11 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
       id: item.id,
       menuItem: {
         id: item.menuItem.id,
+        type: item.menuItem.type,
         name: item.menuItem.name,
         description: item.menuItem.description,
         menu: item.menuItem.menu,
-        proteinTypes: item.menuItem.proteinTypes,
+        mealTypes: item.menuItem.mealTypes,
         dietaryRestrictions: item.menuItem.dietaryRestrictions,
         categories: item.menuItem.categories,
         cuisine: item.menuItem.cuisine,
@@ -216,6 +292,9 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
         restriction_Peanut_Free: item.menuItem.restriction_Peanut_Free,
         restriction_Egg_Free: item.menuItem.restriction_Egg_Free,
         restriction_Sesame_Free: item.menuItem.restriction_Sesame_Free,
+        restriction_Soy_Free: item.menuItem.restriction_Soy_Free,
+        restriction_No_Pork: item.menuItem.restriction_No_Pork,
+        restriction_No_Shellfish: item.menuItem.restriction_No_Shellfish,
         choices_Select_1: item.menuItem.choices_Select_1,
         choices_Select_Multiple: item.menuItem.choices_Select_Multiple,
         sides: item.menuItem.sides,
@@ -246,9 +325,7 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
-            {item.selections?.portionSize ? "Edit" : "Add"} {item.menuItem.name}
-          </DialogTitle>
+          <DialogTitle>{item.menuItem.name}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -262,32 +339,6 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
                 <p className="text-gray-600">{item.menuItem.ingredients}</p>
               </div>
             )}
-
-            <div className="flex flex-wrap gap-2">
-              {item.menuItem.proteinTypes.map((type) => (
-                <Badge key={type} variant="outline">
-                  {type}
-                </Badge>
-              ))}
-              {item.menuItem.dietaryRestrictions.map((restriction) => (
-                <Badge key={restriction} variant="outline">
-                  {restriction}
-                </Badge>
-              ))}
-              {item.menuItem.categories.map((category) => (
-                <Badge key={category} variant="outline">
-                  {category}
-                </Badge>
-              ))}
-              {item.menuItem.tags.map((tag) => (
-                <Badge key={tag} variant="outline">
-                  {tag}
-                </Badge>
-              ))}
-              {item.menuItem.cuisine && (
-                <Badge variant="outline">{item.menuItem.cuisine}</Badge>
-              )}
-            </div>
 
             <FormField
               control={form.control}
@@ -317,7 +368,10 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
               item.menuItem.restriction_Tree_Nut_Free ||
               item.menuItem.restriction_Peanut_Free ||
               item.menuItem.restriction_Egg_Free ||
-              item.menuItem.restriction_Sesame_Free) && (
+              item.menuItem.restriction_Sesame_Free ||
+              item.menuItem.restriction_Soy_Free ||
+              item.menuItem.restriction_No_Pork ||
+              item.menuItem.restriction_No_Shellfish) && (
               <div>
                 <h3 className="font-semibold mb-2">Allergen Info</h3>
                 <div className="space-y-2">
@@ -334,7 +388,7 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
                             />
                           </FormControl>
                           <FormLabel>
-                            Dairy Free - {item.menuItem.restriction_Dairy_Free}
+                            Dairy Free: {item.menuItem.restriction_Dairy_Free}
                           </FormLabel>
                         </FormItem>
                       )}
@@ -353,8 +407,7 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
                             />
                           </FormControl>
                           <FormLabel>
-                            Gluten Free -{" "}
-                            {item.menuItem.restriction_Gluten_Free}
+                            Gluten Free: {item.menuItem.restriction_Gluten_Free}
                           </FormLabel>
                         </FormItem>
                       )}
@@ -373,7 +426,7 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
                             />
                           </FormControl>
                           <FormLabel>
-                            Tree Nut Free -{" "}
+                            Tree-Nut Free:{" "}
                             {item.menuItem.restriction_Tree_Nut_Free}
                           </FormLabel>
                         </FormItem>
@@ -393,8 +446,7 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
                             />
                           </FormControl>
                           <FormLabel>
-                            Peanut Free -{" "}
-                            {item.menuItem.restriction_Peanut_Free}
+                            Peanut Free: {item.menuItem.restriction_Peanut_Free}
                           </FormLabel>
                         </FormItem>
                       )}
@@ -413,7 +465,7 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
                             />
                           </FormControl>
                           <FormLabel>
-                            Egg Free - {item.menuItem.restriction_Egg_Free}
+                            Egg Free: {item.menuItem.restriction_Egg_Free}
                           </FormLabel>
                         </FormItem>
                       )}
@@ -432,8 +484,65 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
                             />
                           </FormControl>
                           <FormLabel>
-                            Sesame Free -{" "}
-                            {item.menuItem.restriction_Sesame_Free}
+                            Sesame Free: {item.menuItem.restriction_Sesame_Free}
+                          </FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  {item.menuItem.restriction_Soy_Free && (
+                    <FormField
+                      control={form.control}
+                      name="allergenSelections.soyFree"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel>
+                            Soy Free: {item.menuItem.restriction_Soy_Free}
+                          </FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  {item.menuItem.restriction_No_Pork && (
+                    <FormField
+                      control={form.control}
+                      name="allergenSelections.noPork"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel>
+                            No Pork: {item.menuItem.restriction_No_Pork}
+                          </FormLabel>
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  {item.menuItem.restriction_No_Shellfish && (
+                    <FormField
+                      control={form.control}
+                      name="allergenSelections.noShellfish"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormLabel>
+                            No Shellfish:{" "}
+                            {item.menuItem.restriction_No_Shellfish}
                           </FormLabel>
                         </FormItem>
                       )}
@@ -517,26 +626,44 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
                   <FormItem>
                     <FormLabel>Sides</FormLabel>
                     <div className="space-y-2">
-                      {sides.map((side) => (
-                        <FormItem
-                          key={side}
-                          className="flex items-center space-x-2"
-                        >
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(side) || false}
-                              onCheckedChange={(checked) => {
-                                const currentValue = field.value || [];
-                                const newValue = checked
-                                  ? [...currentValue, side]
-                                  : currentValue.filter((s) => s !== side);
-                                field.onChange(newValue);
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel>{side}</FormLabel>
-                        </FormItem>
-                      ))}
+                      {sides.map(
+                        (side: {
+                          id: string;
+                          name: string;
+                          ingredients: string;
+                        }) => (
+                          <FormItem
+                            key={side.id}
+                            className="flex items-center space-x-2"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={
+                                  field.value?.some((s) => s.id === side.id) ||
+                                  false
+                                }
+                                onCheckedChange={(checked) => {
+                                  const currentValue = field.value || [];
+                                  const newValue = checked
+                                    ? [...currentValue, side]
+                                    : currentValue.filter(
+                                        (s) => s.id !== side.id
+                                      );
+                                  field.onChange(newValue);
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel>
+                              <div>
+                                {side.name}{" "}
+                                <span className="text-xs text-gray-600">
+                                  ({side.ingredients})
+                                </span>
+                              </div>
+                            </FormLabel>
+                          </FormItem>
+                        )
+                      )}
                     </div>
                     <FormMessage />
                   </FormItem>
@@ -561,7 +688,21 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={!schedule}>
+            {wouldExceedLimits && (
+              <div className="p-3 bg-orange-50 border border-orange-200 rounded-md">
+                <p className="text-sm text-orange-800">
+                  <strong>Cannot add to cart:</strong> This would exceed your
+                  meal limits. Please remove some items from your cart or adjust
+                  your meal preferences.
+                </p>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={!schedule || wouldExceedLimits}
+            >
               {item.selections?.portionSize ? "Update" : "Add to Cart"}
             </Button>
           </form>

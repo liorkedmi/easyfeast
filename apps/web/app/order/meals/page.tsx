@@ -51,8 +51,8 @@ async function MenuItems({
   const [filterOptions] = await Promise.all([getFilterOptions()]);
 
   // Create maps for lookups
-  const proteinTypeMap = new Map(
-    filterOptions.proteinTypes.map((type) => [type.id, type.name])
+  const mealTypeMap = new Map(
+    filterOptions.mealTypes.map((type) => [type.id, type.name])
   );
 
   const dietaryRestrictionMap = new Map(
@@ -73,7 +73,10 @@ async function MenuItems({
   const tagMap = new Map(filterOptions.tags.map((tag) => [tag.id, tag.name]));
 
   const sideMap = new Map(
-    filterOptions.sides.map((side) => [side.id, side.name])
+    filterOptions.sides.map((side) => [
+      side.id,
+      { id: side.id, name: side.name, ingredients: side.ingredients },
+    ])
   );
 
   // Check if Kosher is selected in dietary restrictions
@@ -86,9 +89,9 @@ async function MenuItems({
 
   // Get filtered menu items using server-side filtering
   const filteredMenuItems = await getFilteredMenuItems(type, isKosher, {
-    proteinTypes:
-      typeof searchParams.proteinTypes === "string"
-        ? searchParams.proteinTypes
+    mealTypes:
+      typeof searchParams.mealTypes === "string"
+        ? searchParams.mealTypes
         : undefined,
     dietaryRestrictions:
       typeof searchParams.dietaryRestrictions === "string"
@@ -112,8 +115,8 @@ async function MenuItems({
   // Transform the items to include mapped names
   const transformedItems = filteredMenuItems.map((item) => ({
     ...item,
-    proteinTypes: item.proteinTypes
-      ? item.proteinTypes.map((id) => proteinTypeMap.get(id) || id)
+    mealTypes: item.mealTypes
+      ? item.mealTypes.map((id) => mealTypeMap.get(id) || id)
       : [],
     dietaryRestrictions: item.dietaryRestrictions
       ? item.dietaryRestrictions.map(
@@ -136,7 +139,7 @@ async function MenuItems({
   return (
     <>
       <FilterSection
-        proteinTypes={filterOptions.proteinTypes}
+        mealTypes={filterOptions.mealTypes}
         dietaryRestrictions={filterOptions.dietaryRestrictions}
         cuisines={filterOptions.cuisines}
         categories={filterOptions.categories}
@@ -146,7 +149,7 @@ async function MenuItems({
       />
       <FilterSummaryBar
         filterOptions={{
-          proteinTypes: filterOptions.proteinTypes,
+          mealTypes: filterOptions.mealTypes,
           dietaryRestrictions: filterOptions.dietaryRestrictions,
           cuisines: filterOptions.cuisines,
           categories: filterOptions.categories,
@@ -165,7 +168,7 @@ async function MenuItems({
 }
 
 export default async function OrderPage({ searchParams }: PageProps) {
-  const { proteinTypes, dietaryRestrictions, cuisines, categories, tags } =
+  const { mealTypes, dietaryRestrictions, cuisines, categories, tags } =
     await searchParams;
 
   return (
@@ -188,7 +191,7 @@ export default async function OrderPage({ searchParams }: PageProps) {
               <Suspense fallback={<LoadingSpinner />}>
                 <MenuItems
                   searchParams={{
-                    proteinTypes,
+                    mealTypes,
                     dietaryRestrictions,
                     cuisines,
                     categories,
@@ -202,7 +205,7 @@ export default async function OrderPage({ searchParams }: PageProps) {
               <Suspense fallback={<LoadingSpinner />}>
                 <MenuItems
                   searchParams={{
-                    proteinTypes,
+                    mealTypes,
                     dietaryRestrictions,
                     cuisines,
                     categories,

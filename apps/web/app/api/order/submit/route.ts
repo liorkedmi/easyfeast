@@ -18,7 +18,7 @@ interface MenuItemSelection {
     portionSize: string;
     singleChoice?: string;
     multipleChoices: string[];
-    sides: string[];
+    sides: { id: string; name: string; ingredients: string }[];
     additionalNotes?: string;
   };
 }
@@ -42,13 +42,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userEmail = user.emailAddresses[0].emailAddress;
     const {
       items,
       booking,
       culinaryPreferences = [],
       groceryPreferences = [],
     } = (await request.json()) as OrderRequest;
+
+    const userEmail = user.emailAddresses[0].emailAddress;
 
     // First, find the user in Online_Users table
     const userRecords = await airtable("Online_Users")
@@ -154,56 +155,7 @@ export async function POST(request: Request) {
       Status: "Submitted",
     });
 
-    // Get the menus email from settings
-    const settingsRecords = await airtable("Online_Settings")
-      .select({
-        maxRecords: 1,
-      })
-      .all();
-
-    const menusEmail = settingsRecords[0]?.fields["Menus Email"] as
-      | string
-      | undefined;
-
-    // Send confirmation email to user
-    await sendEmail({
-      to: userEmail,
-      subject: "Your Easyfeast Menu Has Been Received!",
-      react: OrderConfirmationEmail({
-        bookingDate: new Date(booking).toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        }),
-        menuSelections: items.map((item) => {
-          return {
-            name: item.menuItem.name,
-            portion: item.selections.portionSize,
-            singleChoice: item.selections.singleChoice || "",
-            multipleChoices: item.selections.multipleChoices,
-            sides: item.selections.sides,
-            notes: item.selections.additionalNotes || "",
-          };
-        }),
-        culinaryPreferences: culinaryPreferences.map((p) => p.name),
-        groceryPreferences: groceryPreferences.map((p) => p.name),
-      }),
-    });
-
-    // Send notification email to owner
-    if (menusEmail) {
-      await sendEmail({
-        to: menusEmail,
-        subject: "New Order Received - EasyFeast",
-        react: NewOrderNotificationEmail({
-          menuSelections,
-          clientEmail: userEmail,
-          culinaryPreferences: culinaryPreferences.map((p) => p.name),
-          groceryPreferences: groceryPreferences.map((p) => p.name),
-        }),
-      });
-    }
+    // TODO: push the information to Zapier to send 1) email to emily 2) email to client
 
     return NextResponse.json({ success: true, bookingId: bookingRecord.id });
   } catch (error) {

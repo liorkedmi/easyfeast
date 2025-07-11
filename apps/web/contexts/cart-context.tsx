@@ -7,10 +7,11 @@ export interface CartItem {
   // Menu item data
   menuItem: {
     id: string;
+    type: "Main" | "Add-on" | "Side";
     name: string;
     description?: string;
     menu: "Main Menu" | "Kosher";
-    proteinTypes: string[];
+    mealTypes: string[];
     dietaryRestrictions: string[];
     categories: string[];
     cuisine?: string[];
@@ -22,16 +23,19 @@ export interface CartItem {
     restriction_Peanut_Free?: string;
     restriction_Egg_Free?: string;
     restriction_Sesame_Free?: string;
+    restriction_Soy_Free?: string;
+    restriction_No_Pork?: string;
+    restriction_No_Shellfish?: string;
     choices_Select_1?: string[];
     choices_Select_Multiple?: string[];
-    sides?: string[];
+    sides?: { id: string; name: string; ingredients: string }[];
   };
   // Order selections
   selections: {
     portionSize: string;
     singleChoice?: string;
     multipleChoices: string[];
-    sides: string[];
+    sides: { id: string; name: string; ingredients: string }[];
     additionalNotes?: string;
     allergenSelections: {
       dairyFree: boolean;
@@ -40,6 +44,9 @@ export interface CartItem {
       peanutFree: boolean;
       eggFree: boolean;
       sesameFree: boolean;
+      soyFree: boolean;
+      noPork: boolean;
+      noShellfish: boolean;
     };
   };
 }

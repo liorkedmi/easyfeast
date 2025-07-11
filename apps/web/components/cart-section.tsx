@@ -9,14 +9,52 @@ import { Button } from "@workspace/ui/components/button";
 import { ChevronDown, ShoppingCart, X, Pencil } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/contexts/cart-context";
+import { useUserPreferences } from "@/contexts/user-preferences-context";
 import { OrderDialog } from "./order-dialog";
+
+// Calculate meal slot usage
+function calculateMealSlots(
+  mainMenuItems: any[],
+  addonsItems: any[],
+  preferences: any
+) {
+  const mainMealSlots = mainMenuItems.length;
+  const addonMealSlots = Math.ceil(addonsItems.length / 2); // 2 add-ons = 1 meal slot
+  const numberOfMeals = preferences?.numberOfMeals || 0;
+  const numberOfAddons = preferences?.numberOfAddons || 0;
+
+  // Calculate available add-on slots (can exceed base add-on limit if fewer main meals)
+  const remainingMainSlots = numberOfMeals - mainMealSlots;
+  const availableAddonSlots = numberOfAddons + remainingMainSlots;
+
+  return {
+    mainSlots: mainMealSlots,
+    addonSlots: addonMealSlots,
+    totalUsed: mainMealSlots + addonMealSlots,
+    addonsCount: addonsItems.length,
+    mainLimit: numberOfMeals,
+    addonLimit: availableAddonSlots,
+    isMainOverLimit: mainMealSlots > numberOfMeals,
+    isAddonOverLimit: addonMealSlots > availableAddonSlots,
+    isBelowMinimum: mainMealSlots + addonMealSlots < numberOfMeals,
+  };
+}
 
 export function UserCart() {
   const [isOpen, setIsOpen] = useState(true);
   const { items, removeItem } = useCart();
+  const { preferences } = useUserPreferences();
   const [editingItem, setEditingItem] = useState<(typeof items)[0] | null>(
     null
   );
+
+  const mainMenuItems = items.filter((item) => item.menuItem.type === "Main");
+  const addonsItems = items.filter((item) => item.menuItem.type === "Add-on");
+  const mealSlots = calculateMealSlots(mainMenuItems, addonsItems, preferences);
+
+  const numberOfMeals = preferences?.numberOfMeals || 0;
+  const numberOfAddons = preferences?.numberOfAddons || 0;
+  const totalAvailableSlots = numberOfMeals + numberOfAddons;
 
   return (
     <Collapsible
@@ -41,6 +79,63 @@ export function UserCart() {
         </CollapsibleTrigger>
       </div>
       <CollapsibleContent className="space-y-2">
+        {/* Meal Slot Summary */}
+        {totalAvailableSlots > 0 && (
+          <div className="rounded-md border p-3 bg-gray-50">
+            <div className="space-y-2">
+              {/* Main Meals */}
+              <div className="flex justify-between items-center text-sm">
+                <span className="font-medium">Main Meals:</span>
+                <span
+                  className={`font-semibold ${
+                    mealSlots.isMainOverLimit
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  {mealSlots.mainSlots} / {mealSlots.mainLimit}
+                </span>
+              </div>
+
+              {/* Add-ons */}
+              <div className="flex justify-between items-center text-sm">
+                <span className="font-medium">Add-ons:</span>
+                <span
+                  className={`font-semibold ${
+                    mealSlots.isAddonOverLimit
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  {mealSlots.addonsCount} items ({mealSlots.addonSlots} slots) /{" "}
+                  {mealSlots.addonLimit}
+                </span>
+              </div>
+
+              {/* Total Status */}
+              <div className="flex justify-between items-center text-sm border-t pt-2">
+                <span className="font-medium">Total:</span>
+                <span
+                  className={`font-semibold ${
+                    mealSlots.isBelowMinimum
+                      ? "text-orange-600"
+                      : mealSlots.isMainOverLimit || mealSlots.isAddonOverLimit
+                        ? "text-red-600"
+                        : "text-green-600"
+                  }`}
+                >
+                  {mealSlots.totalUsed} / {numberOfMeals} min
+                </span>
+              </div>
+            </div>
+
+            <div className="text-xs text-gray-600 mt-2">
+              2 add-ons = 1 meal slot • Can exceed add-on limit if fewer main
+              meals selected
+            </div>
+          </div>
+        )}
+
         <div className="rounded-md border p-4">
           {items.length === 0 ? (
             <div className="text-center text-gray-500">
@@ -103,10 +198,11 @@ export function UserCart() {
                   {item.selections.sides.length > 0 && (
                     <div className="flex flex-wrap gap-1">
                       <p className="text-sm font-bold text-gray-500">Sides:</p>
-                      {item.selections.sides.map((side) => (
-                        <div key={side} className="text-sm">
-                          {side}
-                        </div>
+                      {item.selections.sides.map((side, index) => (
+                        <span key={side.id} className="text-sm">
+                          {side.name}
+                          {index < item.selections.sides.length - 1 ? ", " : ""}
+                        </span>
                       ))}
                     </div>
                   )}

@@ -23,6 +23,10 @@ import { toast } from "sonner";
 // @ts-expect-error: No type definitions for lodash.debounce
 import debounce from "lodash.debounce";
 import { UserPreferences } from "@/contexts/user-preferences-context";
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from "@workspace/ui/components/radio-group";
 
 interface FilterOption {
   id: string;
@@ -31,7 +35,7 @@ interface FilterOption {
 
 interface PreferencesFormProps {
   filterOptions: {
-    proteinTypes: FilterOption[];
+    mealTypes: FilterOption[];
     dietaryRestrictions: FilterOption[];
     categories: FilterOption[];
     cuisines: FilterOption[];
@@ -89,11 +93,13 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
         <Card>
           <CardHeader>
             <CardTitle>
-              How many servings of each meal would you like?{" "}
-              <span className="font-normal text-gray-500">
-                This sets a default portion size for your household, but you'll
-                be able to adjust this each week.
-              </span>
+              How many servings should each meal include?{" "}
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                This sets your household's default portion size. You'll still
+                have the flexibility to adjust it each week based on your needs.
+                Your selection won't affect our service fee, but grocery costs
+                will vary accordingly.
+              </p>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -107,9 +113,9 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
                 <SelectValue placeholder="Select your preferred portion size" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Small">Small</SelectItem>
-                <SelectItem value="Medium">Medium</SelectItem>
-                <SelectItem value="Large">Large</SelectItem>
+                <SelectItem value="Small">Small: feeds 2 people</SelectItem>
+                <SelectItem value="Medium">Medium: feeds 4 people</SelectItem>
+                <SelectItem value="Large">Large: feeds 6 people</SelectItem>
               </SelectContent>
             </Select>
           </CardContent>
@@ -118,37 +124,73 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
         <Card>
           <CardHeader>
             <CardTitle>
-              What types of protein options are you interested in?{" "}
-              <span className="font-normal text-gray-500">
-                Check all that apply.
-              </span>
+              What types of meals would you like to see in your menu?{" "}
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                These broader categories reflect how you like to eat - whether
+                that's adventurous, extra-clean, or picky eater approved. Your
+                choices will help us highlight meals that fit your overall
+                lifestyle and preferences. If you'd like to see our full
+                collection of recipes, simply select "I'd like to see
+                everything!"
+              </p>
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                Select all that apply. You can update these filters at any time.
+              </p>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {filterOptions.proteinTypes.map((protein) => (
-                <div key={protein.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`protein-${protein.id}`}
-                    checked={preferences?.proteinPreferences?.some(
-                      (p) => p.id === protein.id
-                    )}
-                    onCheckedChange={(checked) => {
-                      const currentPreferences =
-                        preferences?.proteinPreferences || [];
-                      const newPreferences = checked
-                        ? [...currentPreferences, protein]
-                        : currentPreferences.filter((p) => p.id !== protein.id);
-                      handleUpdatePreferences({
-                        proteinPreferences: newPreferences,
-                      });
-                    }}
-                  />
-                  <Label htmlFor={`protein-${protein.id}`}>
-                    {protein.name}
-                  </Label>
-                </div>
-              ))}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="category-see-everything"
+                  checked={
+                    !(
+                      preferences?.categoryPreferences &&
+                      preferences.categoryPreferences.length > 0
+                    )
+                  }
+                  onCheckedChange={() => {
+                    // Clear all selections
+                    handleUpdatePreferences({ categoryPreferences: [] });
+                  }}
+                />
+                <Label
+                  htmlFor="category-see-everything"
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  I'd like to see everything!
+                </Label>
+              </div>
+              {filterOptions.categories
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((category) => (
+                  <div
+                    key={category.id}
+                    className="flex items-center space-x-2"
+                  >
+                    <Checkbox
+                      id={`category-${category.id}`}
+                      checked={preferences?.categoryPreferences?.some(
+                        (c) => c.id === category.id
+                      )}
+                      onCheckedChange={(checked) => {
+                        const currentPreferences =
+                          preferences?.categoryPreferences || [];
+                        const newPreferences = checked
+                          ? [...currentPreferences, category]
+                          : currentPreferences.filter(
+                              (c) => c.id !== category.id
+                            );
+                        handleUpdatePreferences({
+                          categoryPreferences: newPreferences,
+                        });
+                      }}
+                    />
+                    <Label htmlFor={`category-${category.id}`}>
+                      {category.name}
+                    </Label>
+                  </div>
+                ))}
             </div>
           </CardContent>
         </Card>
@@ -156,40 +198,70 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
         <Card>
           <CardHeader>
             <CardTitle>
-              Would you like us to highlight meals from any of these specific
-              categories?{" "}
-              <span className="font-normal text-gray-500">
-                Check all that apply.
-              </span>
+              What kinds of dishes and main ingredients do you want included?{" "}
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                Your selections will help shape your menu around the types of
+                dishes, proteins and main ingredients your household enjoys
+                most. If you'd like to see our full collection of recipes,
+                simply select "I'd like to see everything!"
+              </p>
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                Select all that apply. You can update these filters at any time.
+              </p>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {filterOptions.categories.map((category) => (
-                <div key={category.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`category-${category.id}`}
-                    checked={preferences?.categoryPreferences?.some(
-                      (c) => c.id === category.id
-                    )}
-                    onCheckedChange={(checked) => {
-                      const currentPreferences =
-                        preferences?.categoryPreferences || [];
-                      const newPreferences = checked
-                        ? [...currentPreferences, category]
-                        : currentPreferences.filter(
-                            (c) => c.id !== category.id
-                          );
-                      handleUpdatePreferences({
-                        categoryPreferences: newPreferences,
-                      });
-                    }}
-                  />
-                  <Label htmlFor={`category-${category.id}`}>
-                    {category.name}
-                  </Label>
-                </div>
-              ))}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="meal-type-see-everything"
+                  checked={
+                    !(
+                      preferences?.mealTypePreferences &&
+                      preferences.mealTypePreferences.length > 0
+                    )
+                  }
+                  onCheckedChange={() => {
+                    handleUpdatePreferences({ mealTypePreferences: [] });
+                  }}
+                />
+                <Label
+                  htmlFor="meal-type-see-everything"
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  I'd like to see everything!
+                </Label>
+              </div>
+              {filterOptions.mealTypes
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((mealType) => (
+                  <div
+                    key={mealType.id}
+                    className="flex items-center space-x-2"
+                  >
+                    <Checkbox
+                      id={`meal-type-${mealType.id}`}
+                      checked={preferences?.mealTypePreferences?.some(
+                        (p) => p.id === mealType.id
+                      )}
+                      onCheckedChange={(checked) => {
+                        const currentPreferences =
+                          preferences?.mealTypePreferences || [];
+                        const newPreferences = checked
+                          ? [...currentPreferences, mealType]
+                          : currentPreferences.filter(
+                              (p) => p.id !== mealType.id
+                            );
+                        handleUpdatePreferences({
+                          mealTypePreferences: newPreferences,
+                        });
+                      }}
+                    />
+                    <Label htmlFor={`meal-type-${mealType.id}`}>
+                      {mealType.name}
+                    </Label>
+                  </div>
+                ))}
             </div>
           </CardContent>
         </Card>
@@ -197,11 +269,77 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
         <Card>
           <CardHeader>
             <CardTitle>
-              Please select the allergies and dietary restrictions in your
-              household{" "}
-              <span className="font-normal text-gray-500">
-                If none, leave blank.
-              </span>
+              Which cuisines would you like included in your menu?{" "}
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                If you'd like to see our full collection of recipes, simply
+                select "I'd like to see everything!"
+              </p>
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                Select all that apply. You can update these filters at any time.
+              </p>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="cuisine-see-everything"
+                  checked={
+                    !(
+                      preferences?.cuisinePreferences &&
+                      preferences.cuisinePreferences.length > 0
+                    )
+                  }
+                  onCheckedChange={() => {
+                    handleUpdatePreferences({ cuisinePreferences: [] });
+                  }}
+                />
+                <Label
+                  htmlFor="cuisine-see-everything"
+                  className="cursor-pointer hover:text-primary transition-colors"
+                >
+                  I'd like to see everything!
+                </Label>
+              </div>
+              {filterOptions.cuisines
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((cuisine) => (
+                  <div key={cuisine.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`cuisine-${cuisine.id}`}
+                      checked={preferences?.cuisinePreferences?.some(
+                        (c) => c.id === cuisine.id
+                      )}
+                      onCheckedChange={(checked) => {
+                        const currentPreferences =
+                          preferences?.cuisinePreferences || [];
+                        const newPreferences = checked
+                          ? [...currentPreferences, cuisine]
+                          : currentPreferences.filter(
+                              (c) => c.id !== cuisine.id
+                            );
+                        handleUpdatePreferences({
+                          cuisinePreferences: newPreferences,
+                        });
+                      }}
+                    />
+                    <Label htmlFor={`cuisine-${cuisine.id}`}>
+                      {cuisine.name}
+                    </Label>
+                  </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              Please let us know if anyone in your household has an allergy or
+              dietary restriction.{" "}
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                If none, you can leave this blank. Choose all that apply:
+              </p>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -241,48 +379,10 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
         <Card>
           <CardHeader>
             <CardTitle>
-              Which cuisines are your favorites? Check all that apply.{" "}
-              <span className="font-normal text-gray-500">
-                Check all that apply.
-              </span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {filterOptions.cuisines.map((cuisine) => (
-                <div key={cuisine.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`cuisine-${cuisine.id}`}
-                    checked={preferences?.cuisinePreferences?.some(
-                      (c) => c.id === cuisine.id
-                    )}
-                    onCheckedChange={(checked) => {
-                      const currentPreferences =
-                        preferences?.cuisinePreferences || [];
-                      const newPreferences = checked
-                        ? [...currentPreferences, cuisine]
-                        : currentPreferences.filter((c) => c.id !== cuisine.id);
-                      handleUpdatePreferences({
-                        cuisinePreferences: newPreferences,
-                      });
-                    }}
-                  />
-                  <Label htmlFor={`cuisine-${cuisine.id}`}>
-                    {cuisine.name}
-                  </Label>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>
               What are your culinary preferences?{" "}
-              <span className="font-normal text-gray-500">
+              <p className="mt-2 text-sm font-normal text-gray-500">
                 Check all that apply.
-              </span>
+              </p>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -316,7 +416,9 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
           <CardHeader>
             <CardTitle>
               What are your grocery shopping preferences?{" "}
-              <span className="font-normal text-gray-500">(Optional)</span>
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                (Optional)
+              </p>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -351,33 +453,46 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
             <CardTitle>
               Are you comfortable with your chef bringing his or her own
               equipment?{" "}
-              <span className="font-normal text-gray-500">
+              <p className="mt-2 text-sm font-normal text-gray-500">
                 (For example, his or her own meat thermometer, knife set, etc.)
-              </span>
+              </p>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="chef-equipment"
-                checked={preferences?.canChefBringEquipment || false}
-                onCheckedChange={(checked) =>
-                  handleUpdatePreferences({
-                    canChefBringEquipment: checked === true,
-                  })
-                }
-              />
-              <Label htmlFor="chef-equipment">
-                Yes, I am comfortable with this
-              </Label>
-            </div>
+            <RadioGroup
+              value={
+                preferences?.canChefBringEquipment === false ? "No" : "Yes"
+              }
+              onValueChange={(value) =>
+                handleUpdatePreferences({
+                  canChefBringEquipment: value === "Yes",
+                })
+              }
+              className="flex flex-col gap-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Yes" id="chef-equipment-yes" />
+                <Label htmlFor="chef-equipment-yes">
+                  Yes, I am comfortable with this
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="No" id="chef-equipment-no" />
+                <Label htmlFor="chef-equipment-no">
+                  No, please only use my equipment
+                </Label>
+              </div>
+            </RadioGroup>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
             <CardTitle>
-              Please provide instructions for trash disposal
+              Trash disposal
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                Please provide instructions for trash disposal
+              </p>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -386,7 +501,6 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
               onChange={(e) =>
                 handleUpdatePreferences({ trashDisposal: e.target.value })
               }
-              placeholder="Please provide any specific instructions for trash disposal..."
               rows={4}
             />
           </CardContent>
@@ -394,7 +508,12 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
 
         <Card>
           <CardHeader>
-            <CardTitle>Additional Notes</CardTitle>
+            <CardTitle>
+              Additional notes
+              <p className="mt-2 text-sm font-normal text-gray-500">
+                Is there anything else we should know?
+              </p>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea
@@ -402,7 +521,6 @@ export function PreferencesForm({ filterOptions }: PreferencesFormProps) {
               onChange={(e) =>
                 handleUpdatePreferences({ notes: e.target.value })
               }
-              placeholder="Any additional preferences or notes..."
               rows={4}
             />
           </CardContent>

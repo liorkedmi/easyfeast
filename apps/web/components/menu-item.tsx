@@ -8,11 +8,12 @@ import { OrderDialog } from "./order-dialog";
 interface MenuItemProps {
   item: {
     id: string;
+    type: "Main" | "Add-on" | "Side";
     name: string;
     picture: string;
     description?: string;
     menu: "Main Menu" | "Kosher";
-    proteinTypes: string[];
+    mealTypes: string[];
     dietaryRestrictions: string[];
     categories: string[];
     cuisine?: string[];
@@ -24,9 +25,12 @@ interface MenuItemProps {
     restriction_Peanut_Free?: string;
     restriction_Egg_Free?: string;
     restriction_Sesame_Free?: string;
+    restriction_Soy_Free?: string;
+    restriction_No_Pork?: string;
+    restriction_No_Shellfish?: string;
     choices_Select_1?: string[];
     choices_Select_Multiple?: string[];
-    sides?: string[];
+    sides?: { id: string; name: string; ingredients: string }[];
   };
 }
 
@@ -78,10 +82,11 @@ export function MenuItem({ item }: MenuItemProps) {
           id: item.id,
           menuItem: {
             id: item.id,
+            type: item.type,
             name: item.name,
             description: item.description,
             menu: item.menu,
-            proteinTypes: item.proteinTypes,
+            mealTypes: item.mealTypes,
             dietaryRestrictions: item.dietaryRestrictions,
             categories: item.categories,
             cuisine: item.cuisine,
@@ -93,6 +98,9 @@ export function MenuItem({ item }: MenuItemProps) {
             restriction_Peanut_Free: item.restriction_Peanut_Free,
             restriction_Egg_Free: item.restriction_Egg_Free,
             restriction_Sesame_Free: item.restriction_Sesame_Free,
+            restriction_Soy_Free: item.restriction_Soy_Free,
+            restriction_No_Pork: item.restriction_No_Pork,
+            restriction_No_Shellfish: item.restriction_No_Shellfish,
             choices_Select_1: item.choices_Select_1,
             choices_Select_Multiple: item.choices_Select_Multiple,
             sides: item.sides,
