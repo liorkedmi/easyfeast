@@ -373,7 +373,9 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
               item.menuItem.restriction_No_Pork ||
               item.menuItem.restriction_No_Shellfish) && (
               <div>
-                <h3 className="font-semibold mb-2">Allergen Info</h3>
+                <h3 className="font-semibold mb-2">
+                  Dietary Restrictions & Allergens
+                </h3>
                 <div className="space-y-2">
                   {item.menuItem.restriction_Dairy_Free && (
                     <FormField

@@ -79,63 +79,6 @@ export function UserCart() {
         </CollapsibleTrigger>
       </div>
       <CollapsibleContent className="space-y-2">
-        {/* Meal Slot Summary */}
-        {totalAvailableSlots > 0 && (
-          <div className="rounded-md border p-3 bg-gray-50">
-            <div className="space-y-2">
-              {/* Main Meals */}
-              <div className="flex justify-between items-center text-sm">
-                <span className="font-medium">Main Meals:</span>
-                <span
-                  className={`font-semibold ${
-                    mealSlots.isMainOverLimit
-                      ? "text-red-600"
-                      : "text-green-600"
-                  }`}
-                >
-                  {mealSlots.mainSlots} / {mealSlots.mainLimit}
-                </span>
-              </div>
-
-              {/* Add-ons */}
-              <div className="flex justify-between items-center text-sm">
-                <span className="font-medium">Add-ons:</span>
-                <span
-                  className={`font-semibold ${
-                    mealSlots.isAddonOverLimit
-                      ? "text-red-600"
-                      : "text-green-600"
-                  }`}
-                >
-                  {mealSlots.addonsCount} items ({mealSlots.addonSlots} slots) /{" "}
-                  {mealSlots.addonLimit}
-                </span>
-              </div>
-
-              {/* Total Status */}
-              <div className="flex justify-between items-center text-sm border-t pt-2">
-                <span className="font-medium">Total:</span>
-                <span
-                  className={`font-semibold ${
-                    mealSlots.isBelowMinimum
-                      ? "text-orange-600"
-                      : mealSlots.isMainOverLimit || mealSlots.isAddonOverLimit
-                        ? "text-red-600"
-                        : "text-green-600"
-                  }`}
-                >
-                  {mealSlots.totalUsed} / {numberOfMeals} min
-                </span>
-              </div>
-            </div>
-
-            <div className="text-xs text-gray-600 mt-2">
-              2 add-ons = 1 meal slot • Can exceed add-on limit if fewer main
-              meals selected
-            </div>
-          </div>
-        )}
-
         <div className="rounded-md border p-4">
           {items.length === 0 ? (
             <div className="text-center text-gray-500">
