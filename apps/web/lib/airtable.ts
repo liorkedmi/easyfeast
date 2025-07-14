@@ -44,7 +44,8 @@ export const getMenuItems = cache(
         .select({
           filterByFormula: `AND(
             {Type} = '${type}',
-            {Menu} = '${isKosher ? "Kosher Menu" : "Main Menu"}'
+            {Menu} = '${isKosher ? "Kosher Menu" : "Main Menu"}',
+            {Live} = 1
           )`,
         })
         .all();
