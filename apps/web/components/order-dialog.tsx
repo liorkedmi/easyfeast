@@ -169,11 +169,18 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
       )
       .optional()
       .superRefine((val, ctx) => {
-        // If there are single choices available, a selection is required
+        // If there are sides available, a selection is required
         if (sides.length > 0 && (!val || val.length === 0)) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Please select at least one option",
+            message: "Please select one side",
+          });
+        }
+        // Ensure only one side is selected
+        if (val && val.length > 1) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Please select only one side",
           });
         }
       }),
@@ -626,7 +633,7 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
                 name="sides"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Sides</FormLabel>
+                    <FormLabel>Select One Side</FormLabel>
                     <div className="space-y-2">
                       {sides.map(
                         (side: {
@@ -646,12 +653,17 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
                                 }
                                 onCheckedChange={(checked) => {
                                   const currentValue = field.value || [];
-                                  const newValue = checked
-                                    ? [...currentValue, side]
-                                    : currentValue.filter(
+                                  if (checked) {
+                                    // If checking this side, uncheck all others (single selection)
+                                    field.onChange([side]);
+                                  } else {
+                                    // If unchecking, remove this side
+                                    field.onChange(
+                                      currentValue.filter(
                                         (s) => s.id !== side.id
-                                      );
-                                  field.onChange(newValue);
+                                      )
+                                    );
+                                  }
                                 }}
                               />
                             </FormControl>

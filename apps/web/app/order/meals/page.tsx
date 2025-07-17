@@ -88,29 +88,31 @@ async function MenuItems({
     });
 
   // Get filtered menu items using server-side filtering
-  const filteredMenuItems = await getFilteredMenuItems(type, isKosher, {
-    mealTypes:
-      typeof searchParams.mealTypes === "string"
-        ? searchParams.mealTypes
-        : undefined,
-    dietaryRestrictions:
-      typeof searchParams.dietaryRestrictions === "string"
-        ? searchParams.dietaryRestrictions
-        : undefined,
-    cuisines:
-      typeof searchParams.cuisines === "string"
-        ? searchParams.cuisines
-        : undefined,
-    categories:
-      typeof searchParams.categories === "string"
-        ? searchParams.categories
-        : undefined,
-    tags: typeof searchParams.tags === "string" ? searchParams.tags : undefined,
-    seasons:
-      typeof searchParams.seasons === "string"
-        ? searchParams.seasons
-        : undefined,
-  });
+  const filteredMenuItems = await getFilteredMenuItems(
+    type,
+    isKosher,
+    {
+      mealTypes:
+        typeof searchParams.mealTypes === "string"
+          ? searchParams.mealTypes
+          : undefined,
+      dietaryRestrictions:
+        typeof searchParams.dietaryRestrictions === "string"
+          ? searchParams.dietaryRestrictions
+          : undefined,
+      cuisines:
+        typeof searchParams.cuisines === "string"
+          ? searchParams.cuisines
+          : undefined,
+      categories:
+        typeof searchParams.categories === "string"
+          ? searchParams.categories
+          : undefined,
+      tags:
+        typeof searchParams.tags === "string" ? searchParams.tags : undefined,
+    },
+    filterOptions.currentSeason
+  );
 
   // Transform the items to include mapped names
   const transformedItems = filteredMenuItems.map((item) => ({
@@ -144,7 +146,6 @@ async function MenuItems({
         cuisines={filterOptions.cuisines}
         categories={filterOptions.categories}
         tags={filterOptions.tags}
-        seasons={filterOptions.seasons}
         currentSeason={filterOptions.currentSeason}
       />
       <FilterSummaryBar
@@ -154,7 +155,6 @@ async function MenuItems({
           cuisines: filterOptions.cuisines,
           categories: filterOptions.categories,
           tags: filterOptions.tags,
-          seasons: filterOptions.seasons,
         }}
         resultCount={transformedItems.length} // This will be updated by each tab
       />

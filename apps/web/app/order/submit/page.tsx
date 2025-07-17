@@ -83,34 +83,42 @@ export default function ReviewPage() {
         ) : (
           <div className="space-y-6">
             <div className="space-y-4">
-              {items.map((item) => (
-                <div key={item.id} className="p-4 border rounded-lg space-y-2">
-                  <h3 className="font-medium">{item.menuItem.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    Portion: {item.selections.portionSize}
-                  </p>
-                  {item.selections.singleChoice && (
-                    <p className="text-sm">
-                      Choice: {item.selections.singleChoice}
-                    </p>
-                  )}
-                  {item.selections.multipleChoices.length > 0 && (
-                    <p className="text-sm">
-                      Choices: {item.selections.multipleChoices.join(", ")}
-                    </p>
-                  )}
-                  {item.selections.sides.length > 0 && (
-                    <p className="text-sm">
-                      Sides: {item.selections.sides.join(", ")}
-                    </p>
-                  )}
-                  {item.selections.additionalNotes && (
+              {items.map((item) => {
+                const choices = [
+                  ...(item.selections.singleChoice
+                    ? [item.selections.singleChoice]
+                    : []),
+                  ...item.selections.multipleChoices,
+                ];
+
+                return (
+                  <div
+                    key={item.id}
+                    className="p-4 border rounded-lg space-y-2"
+                  >
+                    <h3 className="font-medium">{item.menuItem.name}</h3>
                     <p className="text-sm text-gray-500">
-                      Notes: {item.selections.additionalNotes}
+                      Portion: {item.selections.portionSize}
                     </p>
-                  )}
-                </div>
-              ))}
+                    {choices.length > 0 && (
+                      <p className="text-sm">Choices: {choices.join(", ")}</p>
+                    )}
+                    {item.selections.sides.length > 0 && (
+                      <p className="text-sm">
+                        Sides:{" "}
+                        {item.selections.sides
+                          .map((side) => side.name)
+                          .join(", ")}
+                      </p>
+                    )}
+                    {item.selections.additionalNotes && (
+                      <p className="text-sm text-gray-500">
+                        Notes: {item.selections.additionalNotes}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="flex justify-end">

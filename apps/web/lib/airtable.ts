@@ -193,10 +193,14 @@ export const getFilterOptions = cache(async () => {
       id: record.id,
       name: record.get("Name") as string,
     })),
-    tags: tags.map((record) => ({
-      id: record.id,
-      name: record.get("Name") as string,
-    })),
+    tags: [
+      ...tags.map((record) => ({
+        id: record.id,
+        name: record.get("Name") as string,
+      })),
+      // Add "Seasonal Specials" tag
+      { id: "seasonal-specials", name: "Seasonal Specials" },
+    ],
     sides: sides.map((record) => ({
       id: record.id,
       name: record.get("Name") as string,
@@ -210,12 +214,6 @@ export const getFilterOptions = cache(async () => {
       id: record.id,
       name: record.get("Name") as string,
     })),
-    seasons: [
-      { id: "Winter", name: "Winter" },
-      { id: "Spring", name: "Spring" },
-      { id: "Summer", name: "Summer" },
-      { id: "Fall", name: "Fall" },
-    ],
     currentSeason,
   };
 });
@@ -639,14 +637,14 @@ export interface FilterParams {
   cuisines?: string;
   categories?: string;
   tags?: string;
-  seasons?: string;
 }
 
 export const getFilteredMenuItems = cache(
   async (
     type: "Main" | "Add-on",
     isKosher: boolean,
-    filterParams: FilterParams
+    filterParams: FilterParams,
+    currentSeason?: string
   ): Promise<MenuItem[]> => {
     try {
       // Get all menu items first
@@ -660,8 +658,7 @@ export const getFilteredMenuItems = cache(
           !filterParams.dietaryRestrictions &&
           !filterParams.cuisines &&
           !filterParams.categories &&
-          !filterParams.tags &&
-          !filterParams.seasons
+          !filterParams.tags
         ) {
           return true;
         }
@@ -689,23 +686,43 @@ export const getFilteredMenuItems = cache(
             filterParams.categories!.split(",").includes(category)
           );
 
+        // Handle tags filtering with special case for "Seasonal Specials"
         const matchesTags =
           !filterParams.tags ||
-          item.tags.some((tag) => filterParams.tags!.split(",").includes(tag));
+          (() => {
+            const selectedTags = filterParams.tags!.split(",");
 
-        const matchesSeasons =
-          !filterParams.seasons ||
-          filterParams.seasons
-            .split(",")
-            .some((season) => item.seasons.includes(season));
+            // Check if "Seasonal Specials" is selected
+            const hasSeasonalSpecials = selectedTags.some((tag) =>
+              tag.toLowerCase().includes("seasonal-specials")
+            );
+
+            // If "Seasonal Specials" is selected, check if item is available in current season
+            if (hasSeasonalSpecials && currentSeason) {
+              const isSeasonal = item.seasons.includes(currentSeason);
+              if (!isSeasonal) return false;
+            }
+
+            // Check other tags
+            const otherTags = selectedTags.filter(
+              (tag) => !tag.toLowerCase().includes("seasonal-specials")
+            );
+
+            if (otherTags.length === 0) {
+              // Only "Seasonal Specials" was selected
+              return hasSeasonalSpecials;
+            }
+
+            // Check if item matches any of the other selected tags
+            return item.tags.some((tag) => otherTags.includes(tag));
+          })();
 
         return (
           matchesMealType &&
           matchesDietaryRestriction &&
           matchesCuisine &&
           matchesCategories &&
-          matchesTags &&
-          matchesSeasons
+          matchesTags
         );
       });
     } catch (error) {

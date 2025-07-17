@@ -2,6 +2,11 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Badge } from "@workspace/ui/components/badge";
 import { X } from "lucide-react";
+import { useTransition } from "react";
+import {
+  updateFilterWithStorage,
+  clearAllFiltersWithStorage,
+} from "./filter-section";
 
 interface FilterOption {
   id: string;
@@ -21,6 +26,7 @@ export function FilterSummaryBar({
 }: FilterSummaryBarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   // Collect all selected filters
   const selected: { key: string; id: string; name: string }[] = [];
@@ -43,22 +49,20 @@ export function FilterSummaryBar({
 
   // Remove a filter and update the URL
   const removeFilter = (key: string, id: string) => {
-    const params = new URLSearchParams(searchParams);
-    const ids = (params.get(key)?.split(",") || []).filter((v) => v !== id);
-    if (ids.length > 0) {
-      params.set(key, ids.join(","));
-    } else {
-      params.delete(key);
-    }
-    router.push(`?${params.toString()}`);
+    const ids = (searchParams.get(key)?.split(",") || []).filter(
+      (v) => v !== id
+    );
+    const value = ids.length > 0 ? ids.join(",") : null;
+    updateFilterWithStorage(searchParams, router, startTransition, key, value);
   };
 
   const clearAllFilters = () => {
-    const params = new URLSearchParams(searchParams);
-    Object.keys(filterOptions).forEach((key) => {
-      params.delete(key);
-    });
-    router.push(`?${params.toString()}`);
+    clearAllFiltersWithStorage(
+      searchParams,
+      router,
+      startTransition,
+      Object.keys(filterOptions)
+    );
   };
 
   return (

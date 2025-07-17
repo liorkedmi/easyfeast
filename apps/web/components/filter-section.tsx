@@ -31,7 +31,6 @@ interface FilterSectionProps {
   cuisines: FilterOption[];
   categories: FilterOption[];
   tags: FilterOption[];
-  seasons: FilterOption[];
   currentSeason: string;
 }
 
@@ -74,13 +73,74 @@ function ScrollablePopover({
   );
 }
 
+// Shared function to update filters (URL + sessionStorage)
+export const updateFilterWithStorage = (
+  searchParams: URLSearchParams,
+  router: any,
+  startTransition: any,
+  key: string,
+  value: string | null
+) => {
+  const params = new URLSearchParams(searchParams);
+  if (value) {
+    params.set(key, value);
+  } else {
+    params.delete(key);
+  }
+
+  // Save current filters to sessionStorage
+  const currentFilters: Record<string, string> = {};
+  params.forEach((value, key) => {
+    if (key !== "tab") {
+      // Don't save tab selection
+      currentFilters[key] = value;
+    }
+  });
+  sessionStorage.setItem("menuFilters", JSON.stringify(currentFilters));
+
+  startTransition(() => {
+    router.push(`?${params.toString()}`);
+  });
+};
+
+// Shared function to clear all filters (URL + sessionStorage)
+export const clearAllFiltersWithStorage = (
+  searchParams: URLSearchParams,
+  router: any,
+  startTransition: any,
+  filterKeys: string[]
+) => {
+  const params = new URLSearchParams(searchParams);
+
+  // Remove all filter parameters
+  filterKeys.forEach((key) => {
+    params.delete(key);
+  });
+
+  // Save current filters to sessionStorage
+  const currentFilters: Record<string, string> = {};
+  params.forEach((value, key) => {
+    if (key !== "tab") {
+      // Don't save tab selection
+      currentFilters[key] = value;
+    }
+  });
+  sessionStorage.setItem("menuFilters", JSON.stringify(currentFilters));
+
+  // Set a flag to indicate filters were explicitly cleared
+  sessionStorage.setItem("filtersCleared", "true");
+
+  startTransition(() => {
+    router.push(`?${params.toString()}`);
+  });
+};
+
 export function FilterSection({
   mealTypes,
   dietaryRestrictions,
   cuisines,
   categories,
   tags,
-  seasons,
   currentSeason,
 }: FilterSectionProps) {
   const router = useRouter();
@@ -91,7 +151,6 @@ export function FilterSection({
   const cuisineButtonRef = useRef<HTMLButtonElement>(null);
   const categoryButtonRef = useRef<HTMLButtonElement>(null);
   const tagButtonRef = useRef<HTMLButtonElement>(null);
-  const seasonButtonRef = useRef<HTMLButtonElement>(null);
 
   const { preferences } = useUserPreferences();
   const [mealTypeWidth, setMealTypeWidth] = useState<number>();
@@ -99,7 +158,6 @@ export function FilterSection({
   const [cuisineWidth, setCuisineWidth] = useState<number>();
   const [categoryWidth, setCategoryWidth] = useState<number>();
   const [tagWidth, setTagWidth] = useState<number>();
-  const [seasonWidth, setSeasonWidth] = useState<number>();
 
   useLayoutEffect(() => {
     if (mealTypeButtonRef.current) {
@@ -117,17 +175,22 @@ export function FilterSection({
     if (tagButtonRef.current) {
       setTagWidth(tagButtonRef.current.offsetWidth);
     }
-    if (seasonButtonRef.current) {
-      setSeasonWidth(seasonButtonRef.current.offsetWidth);
-    }
-  }, [mealTypes, dietaryRestrictions, cuisines, categories, tags, seasons]);
+  }, [mealTypes, dietaryRestrictions, cuisines, categories, tags]);
 
   // Initialize filters with user preferences if available
   useEffect(() => {
-    if (!preferences) return;
-
     const params = new URLSearchParams(searchParams);
     let hasChanges = false;
+
+    // Check if filters were explicitly cleared
+    const filtersCleared = sessionStorage.getItem("filtersCleared");
+
+    // If filters were explicitly cleared and there are no current params, don't re-apply defaults
+    if (filtersCleared === "true" && params.toString() === "") {
+      // Clear the flag since we've handled it
+      sessionStorage.removeItem("filtersCleared");
+      return;
+    }
 
     // Check if we have saved filters in sessionStorage
     const savedFilters = sessionStorage.getItem("menuFilters");
@@ -152,29 +215,41 @@ export function FilterSection({
       }
     };
 
-    // Apply saved filters or preferences if no saved filters exist
-    if (Object.keys(filtersToApply).length > 0) {
-      // Apply saved filters
-      Object.entries(filtersToApply).forEach(([key, value]) => {
-        if (!params.has(key)) {
-          params.set(key, value);
-          hasChanges = true;
-        }
-      });
+    if (preferences) {
+      // Apply saved filters or preferences if no saved filters exist
+      if (Object.keys(filtersToApply).length > 0) {
+        // Apply saved filters
+        Object.entries(filtersToApply).forEach(([key, value]) => {
+          if (!params.has(key)) {
+            params.set(key, value);
+            hasChanges = true;
+          }
+        });
+      } else {
+        // Apply preferences as fallback
+        updateParamIfNotSet("mealTypes", preferences.mealTypePreferences);
+        updateParamIfNotSet(
+          "dietaryRestrictions",
+          preferences.dietaryRestrictions
+        );
+        updateParamIfNotSet("cuisines", preferences.cuisinePreferences);
+        updateParamIfNotSet("categories", preferences.categoryPreferences);
+      }
     } else {
-      // Apply preferences as fallback
-      updateParamIfNotSet("mealTypes", preferences.mealTypePreferences);
-      updateParamIfNotSet(
-        "dietaryRestrictions",
-        preferences.dietaryRestrictions
-      );
-      updateParamIfNotSet("cuisines", preferences.cuisinePreferences);
-      updateParamIfNotSet("categories", preferences.categoryPreferences);
+      // No preferences available, apply saved filters if any
+      if (Object.keys(filtersToApply).length > 0) {
+        Object.entries(filtersToApply).forEach(([key, value]) => {
+          if (!params.has(key)) {
+            params.set(key, value);
+            hasChanges = true;
+          }
+        });
+      }
     }
 
-    // Set default season if not set
-    if (!params.has("seasons")) {
-      params.set("seasons", currentSeason);
+    // Set "Seasonal Specials" as default if no tags are selected
+    if (!params.has("tags")) {
+      params.set("tags", "seasonal-specials");
       hasChanges = true;
     }
 
@@ -184,32 +259,19 @@ export function FilterSection({
         router.push(`?${params.toString()}`);
       });
     }
-  }, [preferences, currentSeason]);
+  }, [preferences, searchParams, router]);
 
   const updateFilter = useCallback(
     (key: string, value: string | null) => {
-      const params = new URLSearchParams(searchParams);
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
-
-      // Save current filters to sessionStorage
-      const currentFilters: Record<string, string> = {};
-      params.forEach((value, key) => {
-        if (key !== "tab") {
-          // Don't save tab selection
-          currentFilters[key] = value;
-        }
-      });
-      sessionStorage.setItem("menuFilters", JSON.stringify(currentFilters));
-
-      startTransition(() => {
-        router.push(`?${params.toString()}`);
-      });
+      updateFilterWithStorage(
+        searchParams,
+        router,
+        startTransition,
+        key,
+        value
+      );
     },
-    [router, searchParams]
+    [router, searchParams, startTransition]
   );
 
   const getSelectedCount = (key: string) => {
@@ -241,104 +303,7 @@ export function FilterSection({
   return (
     <div className="mt-4 mb-8 p-6 bg-gray-100 rounded-lg border">
       <h2 className="text-xl font-semibold mb-6">Filter Menu</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
-            Season
-          </label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                ref={seasonButtonRef}
-                variant="outline"
-                role="combobox"
-                className="w-full justify-between"
-              >
-                <span className="truncate">
-                  {getSelectedNames("seasons", seasons) || "Season"}
-                </span>
-                <div className="flex items-center gap-2">
-                  {getSelectedCount("seasons") > 0 && (
-                    <Badge variant="secondary">
-                      {getSelectedCount("seasons")}
-                    </Badge>
-                  )}
-                  <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
-                </div>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              sideOffset={0}
-              style={seasonWidth ? { width: seasonWidth } : undefined}
-              className="p-0 mt-1 shadow-lg border border-gray-200 rounded-lg bg-white"
-            >
-              <ScrollablePopover>
-                <div className="p-2 space-y-2">
-                  <div className="flex gap-2 mb-2 pb-2 border-b">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        const selected =
-                          searchParams.get("seasons")?.split(",") || [];
-                        if (selected.length === seasons.length) {
-                          handleUnselectAll("seasons");
-                        } else {
-                          handleSelectAll("seasons", seasons);
-                        }
-                      }}
-                    >
-                      {(searchParams.get("seasons")?.split(",") || [])
-                        .length === seasons.length
-                        ? "Unselect All"
-                        : "Select All"}
-                    </Button>
-                  </div>
-                </div>
-                <div className="p-2 space-y-2">
-                  {seasons.map((season) => (
-                    <div
-                      key={season.id}
-                      className="flex items-center space-x-2"
-                    >
-                      <Checkbox
-                        id={`season-${season.id}`}
-                        checked={
-                          searchParams.get("seasons")?.includes(season.id) ||
-                          false
-                        }
-                        onCheckedChange={(checked) => {
-                          const currentValues =
-                            searchParams.get("seasons")?.split(",") || [];
-                          if (checked) {
-                            updateFilter(
-                              "seasons",
-                              [...currentValues, season.id].join(",")
-                            );
-                          } else {
-                            updateFilter(
-                              "seasons",
-                              currentValues
-                                .filter((v) => v !== season.id)
-                                .join(",") || null
-                            );
-                          }
-                        }}
-                      />
-                      <label
-                        htmlFor={`season-${season.id}`}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {season.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </ScrollablePopover>
-            </PopoverContent>
-          </Popover>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
         <div className="space-y-2">
           <label className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
             Meal Type

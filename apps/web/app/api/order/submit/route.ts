@@ -15,6 +15,17 @@ interface MenuItemSelection {
     name: string;
   };
   selections: {
+    allergenSelections: {
+      dairyFree: boolean;
+      eggFree: boolean;
+      glutenFree: boolean;
+      noPork: boolean;
+      noShellfish: boolean;
+      peanutFree: boolean;
+      sesameFree: boolean;
+      soyFree: boolean;
+      treeNutFree: boolean;
+    };
     portionSize: string;
     singleChoice?: string;
     multipleChoices: string[];
@@ -42,12 +53,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const {
-      items,
-      booking,
-      culinaryPreferences = [],
-      groceryPreferences = [],
-    } = (await request.json()) as OrderRequest;
+    const { items, booking } = (await request.json()) as OrderRequest;
 
     const userEmail = user.emailAddresses[0].emailAddress;
 
@@ -103,43 +109,55 @@ export async function POST(request: Request) {
       );
     }
 
+    const clientUsers = await airtable("Online_Users")
+      .select({
+        filterByFormula: `{Link to Online_Clients} = '${clientId}'`,
+      })
+      .all();
+
     // Create a text representation of the menu selections
     let menuSelections = items
       .map((item) => {
-        const selections = [
-          `Item: ${item.menuItem.name}`,
-          `Portion: ${item.selections.portionSize}`,
-        ];
+        const name = item.menuItem.name;
+        let dietaryRestrictions = [];
 
-        if (item.selections.singleChoice) {
-          selections.push(`Choice: ${item.selections.singleChoice}`);
+        if (item.selections.allergenSelections.dairyFree) {
+          dietaryRestrictions.push("Dairy-Free");
+        }
+        if (item.selections.allergenSelections.eggFree) {
+          dietaryRestrictions.push("Egg-Free");
+        }
+        if (item.selections.allergenSelections.glutenFree) {
+          dietaryRestrictions.push("Gluten-Free");
+        }
+        if (item.selections.allergenSelections.noPork) {
+          dietaryRestrictions.push("No Pork");
+        }
+        if (item.selections.allergenSelections.noShellfish) {
+          dietaryRestrictions.push("No Shellfish");
+        }
+        if (item.selections.allergenSelections.peanutFree) {
+          dietaryRestrictions.push("Peanut-Free");
+        }
+        if (item.selections.allergenSelections.sesameFree) {
+          dietaryRestrictions.push("Sesame-Free");
+        }
+        if (item.selections.allergenSelections.soyFree) {
+          dietaryRestrictions.push("Soy-Free");
+        }
+        if (item.selections.allergenSelections.treeNutFree) {
+          dietaryRestrictions.push("Tree Nut-Free");
         }
 
-        if (item.selections.multipleChoices.length > 0) {
-          selections.push(
-            `Choices: ${item.selections.multipleChoices.join(", ")}`
-          );
-        }
+        const sides = item.selections.sides.map((side) => side.name).join(", ");
+        const singleChoice = item.selections.singleChoice;
+        const multipleChoices = item.selections.multipleChoices.join(", ");
+        const notes = item.selections.additionalNotes;
+        const portionSize = item.selections.portionSize;
 
-        if (item.selections.sides.length > 0) {
-          selections.push(`Sides: ${item.selections.sides.join(", ")}`);
-        }
-
-        if (item.selections.additionalNotes) {
-          selections.push(`Notes: ${item.selections.additionalNotes}`);
-        }
-
-        return selections.join("\n");
+        return `- ${name} (${dietaryRestrictions.join(", ")}), ${sides}, ${singleChoice}, ${multipleChoices}, ${notes} (${portionSize})`;
       })
-      .join("\n\n");
-
-    // Add culinary and grocery preferences to the menuSelections string
-    if (culinaryPreferences.length > 0) {
-      menuSelections += `\n\nCulinary Preferences: ${culinaryPreferences.map((p) => p.name).join(", ")}`;
-    }
-    if (groceryPreferences.length > 0) {
-      menuSelections += `\nGrocery Preferences: ${groceryPreferences.map((p) => p.name).join(", ")}`;
-    }
+      .join("\n");
 
     // Create the booking record
     const bookingRecord = await airtable("Online_Bookings").create({
@@ -155,7 +173,50 @@ export async function POST(request: Request) {
       Status: "Submitted",
     });
 
-    // TODO: push the information to Zapier to send 1) email to emily 2) email to client
+    clientUsers.forEach(async (user) => {
+      const userFirstName = user.fields["First Name"];
+      const userLastName = user.fields["Last Name"];
+      const clientName = clientRecord.fields["Display Name"];
+      const bookingDate = new Date(
+        bookingRecord.fields["Booking Date & Time"] as string
+      ).toLocaleDateString("en-US", {
+        timeZone: "America/New_York",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+      const culinaryPreferences = (
+        clientRecord.fields["Culinary Preferences"] as string[]
+      ).join(", ");
+      const groceryPreferences = (
+        clientRecord.fields["Grocery Preferences"] as string[]
+      ).join(", ");
+      const notes = clientRecord.fields["Notes"] as string;
+
+      let fullNotes = "";
+      if (culinaryPreferences) {
+        fullNotes += `- ${culinaryPreferences}\n`;
+      }
+      if (groceryPreferences) {
+        fullNotes += `- ${groceryPreferences}\n`;
+      }
+      if (notes) {
+        fullNotes += `- ${notes}\n`;
+      }
+
+      await fetch(process.env.ZAPIER_WEBHOOK_URL!, {
+        method: "POST",
+        body: JSON.stringify({
+          userEmail: userEmail,
+          userFirstName: userFirstName,
+          userLastName: userLastName,
+          clientName: clientName,
+          bookingDate: bookingDate,
+          menuSelections: menuSelections,
+          notes: fullNotes,
+        }),
+      });
+    });
 
     return NextResponse.json({ success: true, bookingId: bookingRecord.id });
   } catch (error) {
