@@ -151,39 +151,12 @@ export function OrderDialog({ open, onOpenChange, item }: OrderDialogProps) {
           });
         }
       }),
-    multipleChoices: z
-      .array(z.string())
-      .optional()
-      .superRefine((val, ctx) => {
-        // If there are single choices available, a selection is required
-        if (multipleChoices.length > 0 && (!val || val.length === 0)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Please select at least one option",
-          });
-        }
-      }),
+    multipleChoices: z.array(z.string()).optional(),
     sides: z
       .array(
         z.object({ id: z.string(), name: z.string(), ingredients: z.string() })
       )
-      .optional()
-      .superRefine((val, ctx) => {
-        // If there are sides available, a selection is required
-        if (sides.length > 0 && (!val || val.length === 0)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Please select one side",
-          });
-        }
-        // Ensure only one side is selected
-        if (val && val.length > 1) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Please select only one side",
-          });
-        }
-      }),
+      .optional(),
     additionalNotes: z.string().optional(),
     allergenSelections: z.object({
       dairyFree: z.boolean(),

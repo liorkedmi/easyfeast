@@ -65,7 +65,16 @@ export default function ReviewPage() {
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
       <div className="z-10 max-w-5xl w-full">
-        <h1 className="text-4xl font-bold mb-8">Review Your Order</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-bold">Review Your Order</h1>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/order/meals")}
+            className="flex items-center gap-2"
+          >
+            ← Back to Menu
+          </Button>
+        </div>
         <p className="text-lg mb-8">
           Please review your selections before submitting your order.
         </p>
