@@ -111,7 +111,7 @@ export async function POST(request: Request) {
 
     const clientUsers = await airtable("Online_Users")
       .select({
-        filterByFormula: `{Link to Online_Clients} = '${clientId}'`,
+        filterByFormula: `{Client ID (from Link to Online_Clients)} = '${clientId}'`,
       })
       .all();
 
@@ -155,7 +155,31 @@ export async function POST(request: Request) {
         const notes = item.selections.additionalNotes;
         const portionSize = item.selections.portionSize;
 
-        return `- ${name} (${dietaryRestrictions.join(", ")}), ${sides}, ${singleChoice}, ${multipleChoices}, ${notes} (${portionSize})`;
+        let result = `- ${name}`;
+
+        if (dietaryRestrictions.length > 0) {
+          result += ` (${dietaryRestrictions.join(", ")})`;
+        }
+
+        if (sides) {
+          result += `, ${sides}`;
+        }
+
+        if (singleChoice) {
+          result += `, ${singleChoice}`;
+        }
+
+        if (multipleChoices) {
+          result += `, ${multipleChoices}`;
+        }
+
+        if (notes) {
+          result += `, ${notes}`;
+        }
+
+        result += ` (${portionSize})`;
+
+        return result;
       })
       .join("\n");
 
@@ -176,32 +200,58 @@ export async function POST(request: Request) {
     clientUsers.forEach(async (user) => {
       const userFirstName = user.fields["First Name"];
       const userLastName = user.fields["Last Name"];
-      const clientName = clientRecord.fields["Display Name"];
+      let clientName = clientRecord.fields["Display Name"];
       const bookingDate = new Date(
         bookingRecord.fields["Booking Date & Time"] as string
-      ).toLocaleDateString("en-US", {
+      ).toLocaleString("en-US", {
         timeZone: "America/New_York",
         year: "numeric",
         month: "long",
         day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
       });
-      const culinaryPreferences = (
-        clientRecord.fields["Culinary Preferences"] as string[]
-      ).join(", ");
-      const groceryPreferences = (
-        clientRecord.fields["Grocery Preferences"] as string[]
-      ).join(", ");
+      const culinaryPreferenceIds = clientRecord.fields[
+        "Culinary Preferences"
+      ] as string[];
+      const groceryPreferenceIds = clientRecord.fields[
+        "Grocery Preferences"
+      ] as string[];
       const notes = clientRecord.fields["Notes"] as string;
 
       let fullNotes = "";
-      if (culinaryPreferences) {
-        fullNotes += `- ${culinaryPreferences}\n`;
+      if (culinaryPreferenceIds && culinaryPreferenceIds.length > 0) {
+        const culinaryPreferenceRecords = await airtable(
+          "Online_Filter_Culinary_Preferences"
+        )
+          .select({
+            filterByFormula: `OR(${culinaryPreferenceIds.map((id) => `RECORD_ID() = '${id}'`).join(", ")})`,
+          })
+          .all();
+        const culinaryPreferenceNames = culinaryPreferenceRecords
+          .map((record) => record.fields.Name)
+          .join(", ");
+        fullNotes += `- ${culinaryPreferenceNames}\n`;
       }
-      if (groceryPreferences) {
-        fullNotes += `- ${groceryPreferences}\n`;
+      if (groceryPreferenceIds && groceryPreferenceIds.length > 0) {
+        const groceryPreferenceRecords = await airtable(
+          "Online_Filter_Grocery_Preferences"
+        )
+          .select({
+            filterByFormula: `OR(${groceryPreferenceIds.map((id) => `RECORD_ID() = '${id}'`).join(", ")})`,
+          })
+          .all();
+        const groceryPreferenceNames = groceryPreferenceRecords
+          .map((record) => record.fields.Name)
+          .join(", ");
+        fullNotes += `- ${groceryPreferenceNames}\n`;
       }
       if (notes) {
         fullNotes += `- ${notes}\n`;
+      }
+
+      if (Array.isArray(clientName) && clientName.length > 0) {
+        clientName = clientName[0];
       }
 
       await fetch(process.env.ZAPIER_WEBHOOK_URL!, {

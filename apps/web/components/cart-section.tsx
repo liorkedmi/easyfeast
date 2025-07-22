@@ -36,7 +36,6 @@ function calculateMealSlots(
     addonLimit: availableAddonSlots,
     isMainOverLimit: mainMealSlots > numberOfMeals,
     isAddonOverLimit: addonMealSlots > availableAddonSlots,
-    isBelowMinimum: mainMealSlots + addonMealSlots < numberOfMeals,
   };
 }
 

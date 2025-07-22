@@ -54,15 +54,7 @@ function calculateMealRequirements(
     };
   }
 
-  // Check if we have enough items to meet minimum requirements
-  const totalUsedSlots = mainMenuItems.length + addonMealSlots;
-  if (totalUsedSlots < numberOfMeals) {
-    return {
-      isValid: false,
-      message: `You need at least ${numberOfMeals} meal slots filled. You currently have ${totalUsedSlots} (${mainMenuItems.length} main + ${addonMealSlots} add-on slots).`,
-    };
-  }
-
+  // No minimum requirement - users can submit with fewer items than their preferences
   return { isValid: true };
 }
 
