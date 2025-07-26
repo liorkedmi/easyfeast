@@ -35,7 +35,7 @@ export interface MenuItem {
 
 export const getMenuItems = cache(
   async (
-    type: "Main" | "Add-on" = "Main",
+    type: "Main" | "Add-on" | "Side" = "Main",
     isKosher: boolean = false
   ): Promise<MenuItem[]> => {
     try {
@@ -647,10 +647,16 @@ export const getFilteredMenuItems = cache(
     currentSeason?: string
   ): Promise<MenuItem[]> => {
     try {
-      // Get all menu items first
-      const menuItems = await getMenuItems(type, isKosher);
+      // Get all menu items and sides
+      const [menuItems, allSides] = await Promise.all([
+        getMenuItems(type, isKosher),
+        getMenuItems("Side", isKosher),
+      ]);
 
-      // Apply filters
+      // Create a map of side IDs to side objects for efficient lookup
+      const sidesMap = new Map(allSides.map((side) => [side.id, side]));
+
+      // Apply filters to menu items and filter their sides
       return menuItems.filter((item) => {
         // If no filters are selected, show all items
         if (
@@ -660,6 +666,23 @@ export const getFilteredMenuItems = cache(
           !filterParams.categories &&
           !filterParams.tags
         ) {
+          // Still filter sides based on dietary restrictions even if no other filters
+          if (filterParams.dietaryRestrictions && item.sides) {
+            item.sides = item.sides.filter((sideId) => {
+              const side = sidesMap.get(sideId);
+              if (!side) return false;
+              return !side.dietaryRestrictions.includes(
+                filterParams.dietaryRestrictions!
+              );
+            });
+          }
+
+          // Filter out menu items that have no sides after filtering
+          // Only apply this if the item originally had sides
+          if (item.sides && item.sides.length === 0) {
+            return false;
+          }
+
           return true;
         }
 
@@ -717,13 +740,29 @@ export const getFilteredMenuItems = cache(
             return item.tags.some((tag) => otherTags.includes(tag));
           })();
 
-        return (
+        const itemMatches =
           matchesMealType &&
           matchesDietaryRestriction &&
           matchesCuisine &&
           matchesCategories &&
-          matchesTags
-        );
+          matchesTags;
+
+        if (!itemMatches) {
+          return false;
+        }
+
+        // Filter sides based on dietary restrictions
+        if (filterParams.dietaryRestrictions && item.sides) {
+          item.sides = item.sides.filter((sideId) => {
+            const side = sidesMap.get(sideId);
+            if (!side) return false;
+            return !side.dietaryRestrictions.includes(
+              filterParams.dietaryRestrictions!
+            );
+          });
+        }
+
+        return true;
       });
     } catch (error) {
       console.error("Error filtering menu items:", error);
